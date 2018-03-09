@@ -4,7 +4,10 @@ import ply.yacc as yacc
 keywords = {
     'if': 'IF',
     'else': 'ELSE',
+    'int': 'INT',
+    'float': 'FLOAT',
     'bool': 'BOOL',
+    'string': 'STRING',
     'fun': 'FUN',
     'when': 'WHEN',
     'for': 'FOR',
@@ -19,12 +22,14 @@ keywords = {
     'class': 'CLASS',
     'list': 'LIST',
     'range': 'RANGE',
-    'main': 'MAIN'
+    'main': 'MAIN',
+    'private': 'PRIVATE'
 }
 
 tokens = [
-             'INT',
-             'FLOAT',
+             'INTNUM',
+             'FLOATNUM',
+             'BOOLVAL',
              'PARIZQ',
              'PARDER',
              'LLAVEIZQ',
@@ -52,7 +57,8 @@ tokens = [
              'STRING',
              'ID',
              'CID',
-             'EOL'
+             'EOL',
+             'WS',
          ] + list(keywords.values())
 
 t_PARIZQ = r'\('
@@ -78,22 +84,24 @@ t_COMILLAS = r'\"'
 t_PUNTO = r'\.'
 t_IGUAL = r'='
 t_PUNTOSRANGO = r'\.\.'
-t_FLECHITA = r'->'
+t_FLECHITA = r'\-\>'
 t_STRING = r'[\"].*[\"]'
 t_EOL = r'\n'
+t_WS = r'\s'
 
 
-def t_FLOAT(token):
+
+def t_FLOATNUM(token):
     r'[0-9]+\.[0-9]+'
     return token
 
 
-def t_INT(token):
+def t_INTNUM(token):
     r'[0-9]+'
     return token
 
 
-def r_BOOL(token):
+def r_BOOLVAL(token):
     r'[true]|[false]'
     return token
 
@@ -132,13 +140,13 @@ def p_resultado(p):
 
 def p_class(p):
     '''
-    class : CLASS CID classparams class2 body
+    class : CLASS WS ID classparams class2 body
     '''
 
 
 def p_class2(p):
     '''
-    class2 : DOSPUNTOS CID PARIZQ vars2 PARDER
+    class2 : DOSPUNTOS ID PARIZQ vars2 PARDER
     | empty
     '''
 
@@ -164,7 +172,7 @@ def p_bloque(p):
 
 def p_bloque2(p):
     '''
-    bloque2 : RETURN bloque3
+    bloque2 : RETURN WS bloque3
     | empty
     '''
 
@@ -175,20 +183,24 @@ def p_bloque3(p):
     | empty
     '''
 
+def p_varcte(p):
+    '''
+    varcte : ID
+    | INTNUM
+    | FLOATNUM
+    | BOOLVAL
+    | STRING
+    | ID CORCHIZQ varcte CORCHDER
+    | ID PUNTO ID
+    | ID PARIZQ expresion2 PARDER
+    '''
+
 
 def p_expresion(p):
     '''
-    expresion : exp oplog EOL
-   | CID PARIZQ expresion2 PARDER EOL
+    expresion : exp oplog
+    | ID PARIZQ expresion2 PARDER
    '''
-
-
-def p_expresion2(p):
-    '''
-    expresion2 : expresion expresionr
-    | empty
-    '''
-
 
 def p_expresionr(p):
     '''
@@ -196,6 +208,11 @@ def p_expresionr(p):
     | empty
     '''
 
+def p_expresion2(p):
+    '''
+    expresion2 : expresion expresionr
+    | empty
+    '''
 
 def p_oplog(p):
     '''
@@ -208,25 +225,10 @@ def p_oplog(p):
     | empty
     '''
 
-
-def p_exp(p):
-    '''
-    exp : termino expr EOL
-    '''
-
-
-def p_expr(p):
-    '''
-    expr : MAS termino expr
-    | MENOS termino expr
-    | empty
-    '''
-
-
 def p_vars(p):
     '''
-    vars : tipo vars2
-    | tipo LIST vars2
+    vars : vars3 WS tipo WS vars2
+    | vars3 WS tipo WS LIST WS vars2
     '''
 
 
@@ -243,6 +245,12 @@ def p_vars2(p):
     | empty
     '''
 
+def p_vars3(p):
+    '''
+    vars3 : PRIVATE
+    | empty
+    '''
+
 
 def p_estatuto(p):
     '''
@@ -252,13 +260,14 @@ def p_estatuto(p):
     | for estatuto
     | while estatuto
     | when estatuto
+    | llamada estatuto
     | empty
     '''
 
 
 def p_asignacion(p):
     '''
-    asignacion : ID asignacion3 IGUAL asignacion2 EOL
+    asignacion : ID asignacion3 IGUAL asignacion2
     '''
 
 
@@ -266,20 +275,20 @@ def p_asignacion2(p):
     '''
     asignacion2 : expresion
     | CORCHDER expresion asignacion2r CORCHIZQ
-    | READ PARIZQ expresion PARDER
+    | READ PARIZQ STRING PARDER
     '''
 
 
 def p_asignacion2r(p):
     '''
-    asignacion2r : COMA expresion
+    asignacion2r : COMA expresion asignacion2r
     | empty
     '''
 
 
 def p_asignacion3(p):
     '''
-    asignacion3 : CORCHIZQ varcte CORCHDER
+    asignacion3 : CORCHIZQ expresion CORCHDER
     | PUNTO ID
     | empty
     '''
@@ -299,7 +308,7 @@ def p_condicion2(p):
 
 def p_condicionr(p):
     '''
-    condicionr : ELSE IF condicion
+    condicionr : ELSE WS IF condicion2
     | empty
     '''
 
@@ -330,21 +339,6 @@ def p_esc2(p):
     | empty
     '''
 
-
-def p_termino(p):
-    '''
-    termino : factor terminor
-    '''
-
-
-def p_terminor(p):
-    '''
-    terminor : POR factor terminor
-    | SOBRE factor terminor
-    | empty
-    '''
-
-
 def p_tipo(p):
     '''
     tipo : INT
@@ -354,11 +348,35 @@ def p_tipo(p):
     | CID
     '''
 
-
 def p_factor(p):
     '''
     factor : PARIZQ expresion PARDER
-    | factor2 varcte
+    | factor2 varcte varcter
+    '''
+
+def p_terminor(p):
+    '''
+    terminor : POR factor terminor
+    | SOBRE factor terminor
+    | empty
+    '''
+
+def p_termino(p):
+    '''
+    termino : factor terminor
+    '''
+
+def p_exp(p):
+    '''
+    exp : termino expr
+    '''
+
+
+def p_expr(p):
+    '''
+    expr : MAS termino expr
+    | MENOS termino expr
+    | empty
     '''
 
 
@@ -376,23 +394,9 @@ def p_factor2(p):
     | empty
     '''
 
-
-def p_varcte(p):
-    '''
-    varcte : ID
-    | INT
-    | FLOAT
-    | BOOL
-    | STRING
-    | ID CORCHIZQ varcte CORCHDER
-    | ID PUNTO ID
-    | ID PARIZQ expresion2 PARDER
-    '''
-
-
 def p_for(p):
     '''
-    for : FOR PARIZQ ID IN for2 PARDER bloque
+    for : FOR PARIZQ ID WS IN WS for2 PARDER bloque
     '''
 
 
@@ -405,7 +409,7 @@ def p_for2(p):
 
 def p_range(p):
     '''
-    range : INT PUNTOSRANGO INT
+    range : INTNUM PUNTOSRANGO INTNUM
     '''
 
 
@@ -424,7 +428,7 @@ def p_when(p):
 def p_when2(p):
     '''
     when2 : varcte varcter FLECHITA bloque when2
-    | IN range FLECHITA bloque when2
+    | IN WS range FLECHITA bloque when2
     | ELSE FLECHITA bloque when2
     | empty
     '''
@@ -432,13 +436,14 @@ def p_when2(p):
 
 def p_fun(p):
     '''
-    fun : FUN ID PARIZQ fun2 PARDER fun3 bloque
+    fun : vars3 WS FUN WS ID PARIZQ fun2 PARDER fun3 funbody
     '''
 
 
 def p_fun2(p):
     '''
-    fun2 : tipo ID varsr2
+    fun2 : tipo WS ID WS fun2
+    | empty
     '''
 
 
@@ -449,16 +454,26 @@ def p_fun3(p):
     '''
 
 
-def p_varsr2(p):
+def p_funbody(p):
     '''
-    varsr2 : COMA tipo ID varsr2
+    funbody : LLAVEIZQ opc1 WS opc2 WS bloque2 LLAVEDER
+    '''
+
+def p_opc1(p):
+    '''
+    opc1 : vars
     | empty
     '''
 
+def p_opc2(p):
+    '''
+    opc2 : estatuto
+    | empty
+    '''
 
 def p_body(p):
     '''
-    body : LLAVEIZQ body2 funr MAIN PARIZQ PARDER bloque LLAVEDER
+    body : LLAVEIZQ body2 WS funr WS MAIN PARIZQ PARDER bloque LLAVEDER
     '''
 
 
@@ -471,7 +486,13 @@ def p_body2(p):
 
 def p_funr(p):
     '''
-    funr : fun funr
+    funr : fun WS funr
+    | empty
+    '''
+
+def p_llamada(p):
+    '''
+    llamada : ID PARIZQ expresion expresionr PARDER
     | empty
     '''
 
@@ -485,7 +506,7 @@ def p_empty(p):
 
 
 lex.lex()
-parser = yacc.yacc(start='varcte')
+parser = yacc.yacc(start='body')
 
 
 while True:
