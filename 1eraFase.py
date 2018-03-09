@@ -1,5 +1,11 @@
 import ply.lex as lex
 import ply.yacc as yacc
+from FunDirectory import FunDirectory
+from FunEntry import FunEntry
+
+fun_directory = FunDirectory()
+fun_directory.add_entry(FunEntry("fun1", "int"))
+current_type = None
 
 keywords = {
     'if': 'IF',
@@ -228,6 +234,7 @@ def p_vars(p):
     vars : tipo vars2
     | tipo LIST vars2
     '''
+    current_type = p[1]
 
 
 def p_varsr(p):
@@ -235,6 +242,7 @@ def p_varsr(p):
     varsr : COMA ID varsr
     | empty
     '''
+    fun_directory.add_var_to_active_fun(p[2], current_type)
 
 
 def p_vars2(p):
@@ -494,3 +502,4 @@ while True:
     except EOFError:
         break
     parser.parse(s)
+    fun_directory.print()
