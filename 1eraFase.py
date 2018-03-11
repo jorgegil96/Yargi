@@ -1,14 +1,6 @@
 import ply.lex as lex
 import ply.yacc as yacc
-from FunDirectory import FunDirectory
-from FunEntry import FunEntry
-
-fun_directory = FunDirectory()
-# fun_directory.add_entry(FunEntry("fun1", "int"))
-# fun_directory.set_active("fun1")
-current_vars = []
-current_type = None
-current_fun_type = None
+from model import *
 
 keywords = {
     'if': 'IF',
@@ -49,6 +41,7 @@ tokens = [
              'SOBRE',
              'DOSPUNTOS',
              'COMA',
+             'COLON',
              'MAYORQUE',
              'MENORQUE',
              'DIFERENTE',
@@ -66,8 +59,7 @@ tokens = [
              'STRING',
              'ID',
              'CID',
-             'EOL',
-             'WS',
+             'EOL'
          ] + list(keywords.values())
 
 t_PARIZQ = r'\('
@@ -80,6 +72,7 @@ t_POR = r'\*'
 t_SOBRE = r'\/'
 t_DOSPUNTOS = r'\:'
 t_COMA = r'\,'
+t_COLON = r'\;'
 t_MAYORQUE = r'\>'
 t_MENORQUE = r'\<'
 t_DIFERENTE = r'\!='
@@ -95,8 +88,6 @@ t_IGUAL = r'='
 t_PUNTOSRANGO = r'\.\.'
 t_FLECHITA = r'\-\>'
 t_STRING = r'[\"].*[\"]'
-t_EOL = r'\\n'
-t_WS = r'\s'
 
 
 def t_FLOATNUM(token):
@@ -114,21 +105,24 @@ def r_BOOLVAL(token):
     return token
 
 
+def t_CID(token):
+    r'[A-Z][a-zA-z0-9]*'
+    token.type = keywords.get(token.value, 'CID')
+    #fun_directory.add_entry(FunEntry("global", "empty"))
+    #fun_directory.set_active("global")
+    return token
+
+
 def t_ID(token):
     r'[a-zA-Z][a-zA-z0-9]*'
     token.type = keywords.get(token.value, 'ID')
     return token
 
 
-def t_CID(token):
-    r'[A-Z][a-zA-z0-9]*'
-    token.type = keywords.get(token.value, 'CID')
+t_ignore = " \t"
 
 
-t_ignore = "\t"
-
-
-def t_newline(token):
+def t_EOL(token):
     r'\n+'
     token.lexer.lineno += token.value.count("\n")
 
@@ -148,8 +142,10 @@ def p_resultado(p):
 
 def p_class(p):
     '''
-    class : CLASS WS ID classparams class2 body
+    class : CLASS CID classparams class2 body
     '''
+    p[0] = Class(name=p[2], body=p[5])
+    print(p[0])
 
 
 def p_class2(p):
@@ -180,7 +176,7 @@ def p_bloque(p):
 
 def p_bloque2(p):
     '''
-    bloque2 : RETURN WS bloque3
+    bloque2 : RETURN bloque3
     | empty
     '''
 
@@ -240,13 +236,15 @@ def p_oplog(p):
 
 def p_vars(p):
     '''
-    vars : vars3 WS tipo WS vars2
-    | vars3 WS tipo WS LIST WS vars2
+    vars : vars3 tipo vars2 COLON
+    | vars3 tipo LIST vars2 COLON
     '''
-    global current_vars
-    for var in current_vars:
-        fun_directory.add_var_to_active_fun(var, current_type)
-    current_vars.clear()
+    variables = []
+    visibility = p[1]
+    type = p[2]
+    for var in p[3]:
+        variables.append(VarDeclaration(var, type, visibility))
+    p[0] = variables
 
 
 def p_varsr(p):
@@ -254,17 +252,17 @@ def p_varsr(p):
     varsr : COMA ID varsr
     | empty
     '''
-    if len(p) == 4:
-        current_vars.append(p[2])
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [p[2]] + p[3]
 
 
 def p_vars2(p):
     '''
     vars2 : ID varsr
-    | empty
     '''
-    global current_vars
-    current_vars.append(p[1])
+    p[0] = [p[1]] + p[2]
 
 
 def p_vars3(p):
@@ -272,6 +270,7 @@ def p_vars3(p):
     vars3 : PRIVATE
     | empty
     '''
+    p[0] = p[1]
 
 
 def p_estatuto(p):
@@ -330,7 +329,7 @@ def p_condicion2(p):
 
 def p_condicionr(p):
     '''
-    condicionr : ELSE WS IF condicion2
+    condicionr : ELSE IF condicion2
     | empty
     '''
 
@@ -370,9 +369,10 @@ def p_tipo(p):
     | STRING
     | CID
     '''
-    global current_type, current_fun_type
-    current_type = p[1]
-    current_fun_type = p[1]
+    p[0] = p[1]
+    #global current_type, current_fun_type
+    #current_type = p[1]
+    #current_fun_type = p[1]
 
 
 def p_factor(p):
@@ -427,7 +427,7 @@ def p_factor2(p):
 
 def p_for(p):
     '''
-    for : FOR PARIZQ ID WS IN WS for2 PARDER bloque
+    for : FOR PARIZQ ID IN for2 PARDER bloque
     '''
 
 
@@ -459,7 +459,7 @@ def p_when(p):
 def p_when2(p):
     '''
     when2 : varcte varcter FLECHITA bloque when2
-    | IN WS range FLECHITA bloque when2
+    | IN range FLECHITA bloque when2
     | ELSE FLECHITA bloque when2
     | empty
     '''
@@ -467,18 +467,33 @@ def p_when2(p):
 
 def p_fun(p):
     '''
-    fun : vars3 WS FUN WS ID PARIZQ fun2 PARDER fun3 funbody
+    fun : vars3 FUN ID PARIZQ fun2 PARDER fun3 funbody
     '''
-    global current_fun_type
-    fun_directory.add_entry(FunEntry(p[5], current_fun_type))
-    fun_directory.set_active(p[5])
+    body = p[8]
+    body.vars += p[5]
+    p[0] = Fun(name=p[3], type=p[7], visibility=p[1], body=body)
 
 
 def p_fun2(p):
     '''
-    fun2 : tipo WS ID WS fun2
+    fun2 : tipo ID funparamr
     | empty
-    ''' 
+    '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [VarDeclaration(name=p[2], type=p[1], visibility=None)] + p[3]
+
+
+def p_funparamr(p):
+    '''
+    funparamr : COMA tipo ID funparamr
+    | empty
+    '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [VarDeclaration(name=p[3], type=p[2], visibility=None)] + p[4]
 
 
 def p_fun3(p):
@@ -486,15 +501,17 @@ def p_fun3(p):
     fun3 : DOSPUNTOS tipo
     | empty
     '''
-    global current_fun_type
     if len(p) == 2:
-        current_fun_type = None
+        p[0] = "void"
+    else:
+        p[0] = p[2]
 
 
 def p_funbody(p):
     '''
-    funbody : LLAVEIZQ opc1 WS opc2 WS bloque2 LLAVEDER
+    funbody : LLAVEIZQ opc1 opc2 bloque2 LLAVEDER
     '''
+    p[0] = FunBody(p[2])
 
 
 def p_opc1(p):
@@ -502,6 +519,10 @@ def p_opc1(p):
     opc1 : vars
     | empty
     '''
+    if p[1] is None:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 
 def p_opc2(p):
@@ -513,8 +534,9 @@ def p_opc2(p):
 
 def p_body(p):
     '''
-    body : LLAVEIZQ body2 WS funr WS MAIN PARIZQ PARDER bloque LLAVEDER
+    body : LLAVEIZQ body2 funr MAIN PARIZQ PARDER bloque LLAVEDER
     '''
+    p[0] = ClassBody(vars=p[2], funs=p[3])
 
 
 def p_body2(p):
@@ -522,13 +544,21 @@ def p_body2(p):
     body2 : vars
     | empty
     '''
+    if p[1] is None:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 
 def p_funr(p):
     '''
-    funr : fun WS funr
+    funr : fun funr
     | empty
     '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [p[1]] + p[2]
 
 
 def p_llamada(p):
@@ -547,8 +577,10 @@ def p_empty(p):
 
 
 lex.lex()
-parser = yacc.yacc(start='fun')
+parser = yacc.yacc(start='resultado')
 
+
+'''
 while True:
     try:
         s = input('calc > ')
@@ -556,3 +588,8 @@ while True:
         break
     parser.parse(s)
     fun_directory.print()
+'''
+
+with open("test.txt", 'r') as f:
+    input = f.read()
+    parser.parse(input)

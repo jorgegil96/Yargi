@@ -1,16 +1,21 @@
 class Carro() {
 
-    string str
-    int p
+    int str;
 
     private fun foo() {
-        int x, y
-        double z
+        bool x, y;
     }
 
-    private fun bar(): int {
-        int a
-        bool b
+    fun bar(): int {
+        int a;
+    }
+
+    private fun withparams(int h, bool i) {
+
+    }
+
+    fun withparams2(float f): float {
+        float f2;
     }
 
 	main() {
