@@ -4,8 +4,11 @@ from FunDirectory import FunDirectory
 from FunEntry import FunEntry
 
 fun_directory = FunDirectory()
-fun_directory.add_entry(FunEntry("fun1", "int"))
+# fun_directory.add_entry(FunEntry("fun1", "int"))
+# fun_directory.set_active("fun1")
+current_vars = []
 current_type = None
+current_fun_type = None
 
 keywords = {
     'if': 'IF',
@@ -92,9 +95,8 @@ t_IGUAL = r'='
 t_PUNTOSRANGO = r'\.\.'
 t_FLECHITA = r'\-\>'
 t_STRING = r'[\"].*[\"]'
-t_EOL = r'\n'
+t_EOL = r'\\n'
 t_WS = r'\s'
-
 
 
 def t_FLOATNUM(token):
@@ -189,6 +191,7 @@ def p_bloque3(p):
     | empty
     '''
 
+
 def p_varcte(p):
     '''
     varcte : ID
@@ -208,17 +211,20 @@ def p_expresion(p):
     | ID PARIZQ expresion2 PARDER
    '''
 
+
 def p_expresionr(p):
     '''
     expresionr : COMA expresion expresionr
     | empty
     '''
 
+
 def p_expresion2(p):
     '''
     expresion2 : expresion expresionr
     | empty
     '''
+
 
 def p_oplog(p):
     '''
@@ -231,12 +237,16 @@ def p_oplog(p):
     | empty
     '''
 
+
 def p_vars(p):
     '''
     vars : vars3 WS tipo WS vars2
     | vars3 WS tipo WS LIST WS vars2
     '''
-    current_type = p[1]
+    global current_vars
+    for var in current_vars:
+        fun_directory.add_var_to_active_fun(var, current_type)
+    current_vars.clear()
 
 
 def p_varsr(p):
@@ -244,7 +254,8 @@ def p_varsr(p):
     varsr : COMA ID varsr
     | empty
     '''
-    fun_directory.add_var_to_active_fun(p[2], current_type)
+    if len(p) == 4:
+        current_vars.append(p[2])
 
 
 def p_vars2(p):
@@ -252,6 +263,9 @@ def p_vars2(p):
     vars2 : ID varsr
     | empty
     '''
+    global current_vars
+    current_vars.append(p[1])
+
 
 def p_vars3(p):
     '''
@@ -347,6 +361,7 @@ def p_esc2(p):
     | empty
     '''
 
+
 def p_tipo(p):
     '''
     tipo : INT
@@ -355,12 +370,17 @@ def p_tipo(p):
     | STRING
     | CID
     '''
+    global current_type, current_fun_type
+    current_type = p[1]
+    current_fun_type = p[1]
+
 
 def p_factor(p):
     '''
     factor : PARIZQ expresion PARDER
     | factor2 varcte varcter
     '''
+
 
 def p_terminor(p):
     '''
@@ -369,10 +389,12 @@ def p_terminor(p):
     | empty
     '''
 
+
 def p_termino(p):
     '''
     termino : factor terminor
     '''
+
 
 def p_exp(p):
     '''
@@ -401,6 +423,7 @@ def p_factor2(p):
     | MENOS
     | empty
     '''
+
 
 def p_for(p):
     '''
@@ -446,13 +469,16 @@ def p_fun(p):
     '''
     fun : vars3 WS FUN WS ID PARIZQ fun2 PARDER fun3 funbody
     '''
+    global current_fun_type
+    fun_directory.add_entry(FunEntry(p[5], current_fun_type))
+    fun_directory.set_active(p[5])
 
 
 def p_fun2(p):
     '''
     fun2 : tipo WS ID WS fun2
     | empty
-    '''
+    ''' 
 
 
 def p_fun3(p):
@@ -460,6 +486,9 @@ def p_fun3(p):
     fun3 : DOSPUNTOS tipo
     | empty
     '''
+    global current_fun_type
+    if len(p) == 2:
+        current_fun_type = None
 
 
 def p_funbody(p):
@@ -467,17 +496,20 @@ def p_funbody(p):
     funbody : LLAVEIZQ opc1 WS opc2 WS bloque2 LLAVEDER
     '''
 
+
 def p_opc1(p):
     '''
     opc1 : vars
     | empty
     '''
 
+
 def p_opc2(p):
     '''
     opc2 : estatuto
     | empty
     '''
+
 
 def p_body(p):
     '''
@@ -498,6 +530,7 @@ def p_funr(p):
     | empty
     '''
 
+
 def p_llamada(p):
     '''
     llamada : ID PARIZQ expresion expresionr PARDER
@@ -514,8 +547,7 @@ def p_empty(p):
 
 
 lex.lex()
-parser = yacc.yacc(start='body')
-
+parser = yacc.yacc(start='fun')
 
 while True:
     try:

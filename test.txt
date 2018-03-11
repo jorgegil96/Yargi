@@ -1,4 +1,18 @@
-class Carro( {
+class Carro() {
+
+    string str
+    int p
+
+    private fun foo() {
+        int x, y
+        double z
+    }
+
+    private fun bar(): int {
+        int a
+        bool b
+    }
+
 	main() {
 
 	}

@@ -16,7 +16,7 @@ class FunDirectory:
         self.active_fun = name
 
     def print(self):
-        for fun_name, entry in self.fun_entries:
+        for fun_name, entry in self.fun_entries.items():
             print(fun_name + " returns type " + entry.var_type + " has vars:")
-            for var_name, var_type in entry.var_table.vars:
-                print(var_name + "is of type " + var_type)
+            for var_name, var_type in entry.var_table.vars.items():
+                print(var_name + " is of type " + var_type)
