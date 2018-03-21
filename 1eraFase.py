@@ -108,8 +108,6 @@ def r_BOOLVAL(token):
 def t_CID(token):
     r'[A-Z][a-zA-z0-9]*'
     token.type = keywords.get(token.value, 'CID')
-    #fun_directory.add_entry(FunEntry("global", "empty"))
-    #fun_directory.set_active("global")
     return token
 
 
@@ -370,9 +368,6 @@ def p_tipo(p):
     | CID
     '''
     p[0] = p[1]
-    #global current_type, current_fun_type
-    #current_type = p[1]
-    #current_fun_type = p[1]
 
 
 def p_factor(p):

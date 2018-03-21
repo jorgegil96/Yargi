@@ -1,9 +1,9 @@
 class Carro() {
 
-    int str;
+    Perro perro;
 
     private fun foo() {
-        bool x, y;
+        bool str, y;
     }
 
     fun bar(): int {
