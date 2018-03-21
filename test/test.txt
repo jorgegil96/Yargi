@@ -1,13 +1,16 @@
 class Carro() {
 
     Perro perro;
+    int oooo;
 
     private fun foo() {
         bool str, y;
+        int opo;
     }
 
     fun bar(): int {
         int a;
+        Gato foo;
     }
 
     private fun withparams(int h, bool i) {

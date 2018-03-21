@@ -531,13 +531,13 @@ def p_funbody(p):
 
 def p_opc1(p):
     '''
-    opc1 : vars
+    opc1 : vars multvarsdecl
     | empty
     '''
     if p[1] is None:
         p[0] = []
     else:
-        p[0] = p[1]
+        p[0] = p[1] + p[2]
 
 
 def p_opc2(p):
@@ -556,7 +556,18 @@ def p_body(p):
 
 def p_body2(p):
     '''
-    body2 : vars
+    body2 : vars multvarsdecl
+    | empty
+    '''
+    if p[1] is None:
+        p[0] = []
+    else:
+        p[0] = p[1] + p[2]
+
+
+def p_multvarsdecl(p):
+    '''
+    multvarsdecl : vars
     | empty
     '''
     if p[1] is None:
@@ -592,7 +603,7 @@ def p_empty(p):
 
 
 lex.lex()
-parser = yacc.yacc(start='expresion')
+parser = yacc.yacc(start='class')
 
 '''
 while True:
@@ -604,6 +615,6 @@ while True:
     fun_directory.print()
 '''
 
-with open("test/test2.txt", 'r') as f:
+with open("test/test.txt", 'r') as f:
     input = f.read()
     parser.parse(input)
