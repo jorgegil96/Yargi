@@ -232,6 +232,26 @@ def p_oplog(p):
     '''
 
 
+def p_superexp(p):
+    '''
+    superexp : exp oplog
+    '''
+
+
+def p_megaexp(p):
+    '''
+    megaexp : superexp megaexpr
+    '''
+
+
+def p_megaexpr(p):
+    '''
+    megaexpr : AND superexp megaexpr
+    | OR superexp megaexpr
+    | empty
+    '''
+
+
 def p_vars(p):
     '''
     vars : vars3 tipo vars2 COLON
@@ -573,7 +593,6 @@ def p_empty(p):
 
 lex.lex()
 parser = yacc.yacc(start='resultado')
-
 
 '''
 while True:
