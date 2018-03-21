@@ -117,3 +117,5 @@ venv.bak/
 .mypy_cache/
 .gitignore
 __pycache__/model.cpython-36.pyc
+
+.idea/workspace.xml
