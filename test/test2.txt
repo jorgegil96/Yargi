@@ -1,1 +1,2 @@
-3 + 4 > 1 and 4 == 5 or true
+int a;
+a = 3

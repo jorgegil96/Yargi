@@ -10,7 +10,7 @@ class Carro() {
 
     fun bar(): int {
         int a;
-        Gato foo;
+        a = 5;
     }
 
     private fun withparams(int h, bool i) {

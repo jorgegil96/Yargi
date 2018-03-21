@@ -31,8 +31,9 @@ class Fun:
 
 
 class FunBody:
-    def __init__(self, vars):
+    def __init__(self, vars, statements):
         self.vars = vars
+        self.statements = statements
 
 
 class Class:
@@ -62,3 +63,9 @@ class ClassBody:
     def __init__(self, vars, funs):
         self.vars = vars
         self.funs = funs
+
+
+class Assignment:
+    def __init__(self, id, value):
+        self.id = id
+        self.value = value

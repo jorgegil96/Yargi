@@ -97,6 +97,7 @@ def t_FLOATNUM(token):
 
 def t_INTNUM(token):
     r'[0-9]+'
+    token.type = keywords.get(token.value, 'INTNUM')
     return token
 
 
@@ -197,6 +198,7 @@ def p_varcte(p):
     | ID PUNTO ID
     | ID PARIZQ expresion2 PARDER
     '''
+    p[0] = p[1]
 
 
 def p_expresion(p):
@@ -204,6 +206,7 @@ def p_expresion(p):
     expresion : megaexp
     | ID PARIZQ expresion2 PARDER
    '''
+    p[0] = p[1]
 
 
 def p_expresionr(p):
@@ -236,12 +239,14 @@ def p_superexp(p):
     '''
     superexp : exp oplog
     '''
+    p[0] = p[1]
 
 
 def p_megaexp(p):
     '''
     megaexp : superexp megaexpr
     '''
+    p[0] = p[1]
 
 
 def p_megaexpr(p):
@@ -302,12 +307,14 @@ def p_estatuto(p):
     | llamada estatuto
     | empty
     '''
+    p[0] = [p[1]]
 
 
 def p_asignacion(p):
     '''
-    asignacion : ID asignacion3 IGUAL asignacion2
+    asignacion : ID asignacion3 IGUAL asignacion2 COLON
     '''
+    p[0] = Assignment(p[1], p[4])
 
 
 def p_asignacion2(p):
@@ -316,6 +323,8 @@ def p_asignacion2(p):
     | CORCHDER expresion asignacion2r CORCHIZQ
     | READ PARIZQ STRING PARDER
     '''
+    if len(p) == 2:
+        p[0] = p[1]
 
 
 def p_asignacion2r(p):
@@ -395,6 +404,7 @@ def p_factor(p):
     factor : PARIZQ expresion PARDER
     | factor2 varcte varcter
     '''
+    p[0] = p[2]
 
 
 def p_terminor(p):
@@ -409,12 +419,14 @@ def p_termino(p):
     '''
     termino : factor terminor
     '''
+    p[0] = p[1]
 
 
 def p_exp(p):
     '''
     exp : termino expr
     '''
+    p[0] = p[1]
 
 
 def p_expr(p):
@@ -526,7 +538,7 @@ def p_funbody(p):
     '''
     funbody : LLAVEIZQ opc1 opc2 bloque2 LLAVEDER
     '''
-    p[0] = FunBody(p[2])
+    p[0] = FunBody(p[2], p[3])
 
 
 def p_opc1(p):
@@ -545,6 +557,7 @@ def p_opc2(p):
     opc2 : estatuto
     | empty
     '''
+    p[0] = p[1]
 
 
 def p_body(p):
