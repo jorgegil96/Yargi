@@ -201,7 +201,7 @@ def p_varcte(p):
 
 def p_expresion(p):
     '''
-    expresion : exp oplog
+    expresion : megaexp
     | ID PARIZQ expresion2 PARDER
    '''
 
@@ -592,7 +592,7 @@ def p_empty(p):
 
 
 lex.lex()
-parser = yacc.yacc(start='resultado')
+parser = yacc.yacc(start='expresion')
 
 '''
 while True:
@@ -604,6 +604,6 @@ while True:
     fun_directory.print()
 '''
 
-with open("test.txt", 'r') as f:
+with open("test/test2.txt", 'r') as f:
     input = f.read()
     parser.parse(input)
