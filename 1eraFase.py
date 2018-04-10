@@ -236,7 +236,7 @@ def p_oplog(p):
     | IGUALIGUAL exp
     | empty
     '''
-    if len(p) == 0:
+    if len(p) == 2:
         p[0] = None
     else:
         p[0] = RelationalOperand(p[1], p[2])
