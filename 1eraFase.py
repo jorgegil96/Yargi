@@ -5,6 +5,8 @@ from model import *
 keywords = {
     'if': 'IF',
     'else': 'ELSE',
+    'and': 'AND',
+    'or': 'OR',
     'int': 'INT',
     'float': 'FLOAT',
     'bool': 'BOOL',
@@ -17,8 +19,6 @@ keywords = {
     'return': 'RETURN',
     'write': 'WRITE',
     'read': 'READ',
-    'and': 'AND',
-    'or': 'OR',
     'global': 'GLOBAL',
     'class': 'CLASS',
     'list': 'LIST',
@@ -206,7 +206,10 @@ def p_expresion(p):
     expresion : megaexp
     | ID PARIZQ expresion2 PARDER
    '''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        print("TODO")
 
 
 def p_expresionr(p):
@@ -233,20 +236,24 @@ def p_oplog(p):
     | IGUALIGUAL exp
     | empty
     '''
+    if len(p) == 0:
+        p[0] = None
+    else:
+        p[0] = RelationalOperand(p[1], p[2])
 
 
 def p_superexp(p):
     '''
     superexp : exp oplog
     '''
-    p[0] = p[1]
+    p[0] = RelationalOperation(p[1], p[2])
 
 
 def p_megaexp(p):
     '''
     megaexp : superexp megaexpr
     '''
-    p[0] = p[1]
+    p[0] = LogicalOperation(p[1], p[2])
 
 
 def p_megaexpr(p):
@@ -255,6 +262,10 @@ def p_megaexpr(p):
     | OR superexp megaexpr
     | empty
     '''
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = LogicalOperand(p[1], p[2], p[3])
 
 
 def p_vars(p):
@@ -404,7 +415,10 @@ def p_factor(p):
     factor : PARIZQ expresion PARDER
     | factor2 varcte varcter
     '''
-    p[0] = p[2]
+    if p[0] is None:
+        p[0] = ConstantVar(p[2])
+    else:
+        p[0] = ArithmeticOperand(p[1], p[2])
 
 
 def p_terminor(p):
@@ -413,20 +427,24 @@ def p_terminor(p):
     | SOBRE factor terminor
     | empty
     '''
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = TerminoR(p[1], p[2], p[3])
 
 
 def p_termino(p):
     '''
     termino : factor terminor
     '''
-    p[0] = p[1]
+    p[0] = Termino(p[1], p[2])
 
 
 def p_exp(p):
     '''
     exp : termino expr
     '''
-    p[0] = p[1]
+    p[0] = Exp(p[1], p[2])
 
 
 def p_expr(p):
@@ -435,6 +453,10 @@ def p_expr(p):
     | MENOS termino expr
     | empty
     '''
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = ExpR(p[1], p[2], p[3])
 
 
 def p_varcter(p):
@@ -450,6 +472,10 @@ def p_factor2(p):
     | MENOS
     | empty
     '''
+    if p[1] is None:
+        p[0] = p[1]
+    else:
+        p[0] = p[1]
 
 
 def p_for(p):
@@ -628,6 +654,6 @@ while True:
     fun_directory.print()
 '''
 
-with open("test/test.txt", 'r') as f:
+with open("test/test2.txt", 'r') as f:
     input = f.read()
     parser.parse(input)

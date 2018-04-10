@@ -1,2 +1,11 @@
-int a;
-a = 3
+class Carro() {
+
+    fun bar(): int {
+        bool b;
+        b = x or y;
+    }
+
+	main() {
+
+	}
+}
