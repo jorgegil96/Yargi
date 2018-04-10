@@ -7,6 +7,7 @@ Unused terminals:
     EOL
     GLOBAL
     RANGE
+    STRINGVAL
 
 Grammar
 
@@ -189,6 +190,7 @@ READ                 : 57
 RETURN               : 9
 SOBRE                : 82
 STRING               : 17 57 71 77
+STRINGVAL            : 
 WHEN                 : 99
 WHILE                : 98
 WRITE                : 69

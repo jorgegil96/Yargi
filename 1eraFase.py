@@ -56,7 +56,7 @@ tokens = [
              'IGUAL',
              'PUNTOSRANGO',
              'FLECHITA',
-             'STRING',
+             'STRINGVAL',
              'ID',
              'CID',
              'EOL'
@@ -87,7 +87,7 @@ t_PUNTO = r'\.'
 t_IGUAL = r'='
 t_PUNTOSRANGO = r'\.\.'
 t_FLECHITA = r'\-\>'
-t_STRING = r'[\"].*[\"]'
+t_STRINGVAL = r'[\"].*[\"]'
 
 
 def t_FLOATNUM(token):
