@@ -1,6 +1,7 @@
 import ply.lex as lex
 import ply.yacc as yacc
 from model import *
+from semantics.semantic_analyser import SemanticAnalyser
 
 keywords = {
     'if': 'IF',
@@ -143,8 +144,11 @@ def p_class(p):
     '''
     class : CLASS CID classparams class2 body
     '''
-    p[0] = Class(name=p[2], body=p[5])
-    print(p[0])
+    result = Class(name=p[2], body=p[5])
+    p[0] = result
+    #print(result)
+    analyser = SemanticAnalyser(result.body)
+    analyser.verify()
 
 
 def p_class2(p):
@@ -198,13 +202,13 @@ def p_varcte(p):
     | ID PUNTO ID
     | ID PARIZQ expresion2 PARDER
     '''
-    p[0] = p[1]
+    type = p.slice[1].type
+    p[0] = ConstantVar(p[1], type)
 
 
 def p_expresion(p):
     '''
     expresion : megaexp
-    | ID PARIZQ expresion2 PARDER
    '''
     if len(p) == 2:
         p[0] = p[1]
@@ -416,7 +420,7 @@ def p_factor(p):
     | factor2 varcte varcter
     '''
     if p[0] is None:
-        p[0] = ConstantVar(p[2])
+        p[0] = p[2]
     else:
         p[0] = ArithmeticOperand(p[1], p[2])
 

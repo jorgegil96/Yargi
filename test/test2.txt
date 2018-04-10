@@ -1,8 +1,17 @@
 class Carro() {
 
+    int x, p;
+    bool z;
+
     fun bar(): int {
+        int b;
+        int c;
+        c = c * r;
+    }
+
+    fun foo(): int {
+        int x;
         bool b;
-        b = x or y;
     }
 
 	main() {

@@ -1,3 +1,6 @@
+from typing import List
+
+
 class VarDeclaration:
     def __init__(self, name, type, visibility):
         self.name = name
@@ -11,8 +14,14 @@ class VarDeclaration:
         return "var %s of type %s with %s visibility\n" % (self.name, self.type, self.visibility)
 
 
+class FunBody:
+    def __init__(self, vars: List[VarDeclaration], statements):
+        self.vars = vars
+        self.statements = statements
+
+
 class Fun:
-    def __init__(self, name, type, visibility, body):
+    def __init__(self, name, type, visibility, body: FunBody):
         self.name = name
         self.type = type
         self.visibility = visibility
@@ -28,12 +37,6 @@ class Fun:
             for var in self.body.vars:
                 s += "              " + str(var)
         return s
-
-
-class FunBody:
-    def __init__(self, vars, statements):
-        self.vars = vars
-        self.statements = statements
 
 
 class Class:
@@ -60,7 +63,7 @@ class Class:
 
 
 class ClassBody:
-    def __init__(self, vars, funs):
+    def __init__(self, vars, funs: List[Fun]):
         self.vars = vars
         self.funs = funs
 
@@ -72,8 +75,9 @@ class Assignment:
 
 
 class ConstantVar:
-    def __init__(self, varcte):
+    def __init__(self, varcte, type):
         self.varcte = varcte
+        self.type = type
 
 
 class ArithmeticOperand:
