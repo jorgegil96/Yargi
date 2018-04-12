@@ -1,20 +1,15 @@
 class Carro() {
 
-    int x, p;
-    bool z;
+    int g;
 
     fun bar(): int {
-        int b;
-        int c;
-        c = c * r;
-    }
-
-    fun foo(): int {
-        int x;
-        bool b;
+        int b, c;
+        g = 1;
+        b = 5;
+        g = g + false;
+        return c;
     }
 
 	main() {
-
 	}
 }

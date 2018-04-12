@@ -1,7 +1,9 @@
 import ply.lex as lex
 import ply.yacc as yacc
 from model import *
-from semantics.semantic_analyser import SemanticAnalyser
+import operator
+import pprint
+import model
 
 keywords = {
     'if': 'IF',
@@ -31,7 +33,8 @@ keywords = {
 tokens = [
              'INTNUM',
              'FLOATNUM',
-             'BOOLVAL',
+             'TRUE',
+             'FALSE',
              'PARIZQ',
              'PARDER',
              'LLAVEIZQ',
@@ -93,17 +96,29 @@ t_STRINGVAL = r'[\"].*[\"]'
 
 def t_FLOATNUM(token):
     r'[0-9]+\.[0-9]+'
+    token.type = keywords.get(token.value, 'FLOATNUM')
+    token.value = float(token.value)
     return token
 
 
 def t_INTNUM(token):
     r'[0-9]+'
     token.type = keywords.get(token.value, 'INTNUM')
+    token.value = int(token.value)
     return token
 
 
-def r_BOOLVAL(token):
-    r'[true]|[false]'
+def t_TRUE(token):
+    'true'
+    token.type = keywords.get(token.value, 'TRUE')
+    token.value = True
+    return token
+
+
+def t_FALSE(token):
+    'false'
+    token.type = keywords.get(token.value, 'FALSE')
+    token.value = False
     return token
 
 
@@ -116,6 +131,7 @@ def t_CID(token):
 def t_ID(token):
     r'[a-zA-Z][a-zA-z0-9]*'
     token.type = keywords.get(token.value, 'ID')
+
     return token
 
 
@@ -125,13 +141,6 @@ t_ignore = " \t"
 def t_EOL(token):
     r'\n+'
     token.lexer.lineno += token.value.count("\n")
-
-
-'''
-def t_error (token):
-    print("Error")
-    token.lexer.skip(1)
-'''
 
 
 def p_resultado(p):
@@ -146,9 +155,6 @@ def p_class(p):
     '''
     result = Class(name=p[2], body=p[5])
     p[0] = result
-    #print(result)
-    analyser = SemanticAnalyser(result.body)
-    analyser.verify()
 
 
 def p_class2(p):
@@ -186,7 +192,7 @@ def p_bloque2(p):
 
 def p_bloque3(p):
     '''
-    bloque3 : expresion
+    bloque3 : expresion COLON
     | empty
     '''
 
@@ -196,7 +202,8 @@ def p_varcte(p):
     varcte : ID
     | INTNUM
     | FLOATNUM
-    | BOOLVAL
+    | TRUE
+    | FALSE
     | STRING
     | ID CORCHIZQ varcte CORCHDER
     | ID PUNTO ID
@@ -322,7 +329,10 @@ def p_estatuto(p):
     | llamada estatuto
     | empty
     '''
-    p[0] = [p[1]]
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [p[1]] + p[2]
 
 
 def p_asignacion(p):
@@ -460,7 +470,13 @@ def p_expr(p):
     if len(p) == 2:
         p[0] = None
     else:
-        p[0] = ExpR(p[1], p[2], p[3])
+        type = p.slice[1].type
+        if type == 'MAS':
+            p[0] = ExpR(operator.add, p[2], p[3])
+        elif type == 'MENOS':
+            p[0] = ExpR(operator.sub, p[2], p[3])
+        else:
+            raise Exception("Invalid operator type %s in expr" % type)
 
 
 def p_varcter(p):
@@ -477,9 +493,15 @@ def p_factor2(p):
     | empty
     '''
     if p[1] is None:
-        p[0] = p[1]
+        p[0] = None
     else:
-        p[0] = p[1]
+        type = p.slice[1].type
+        if type == 'MAS':
+            p[0] = operator.add
+        elif type == 'MENOS':
+            p[0] = operator.sub
+        else:
+            raise Exception("Invalid operator type %s in factor2" % type)
 
 
 def p_for(p):
@@ -587,7 +609,10 @@ def p_opc2(p):
     opc2 : estatuto
     | empty
     '''
-    p[0] = p[1]
+    if p[1] is None:
+        return []
+    else:
+        p[0] = p[1]
 
 
 def p_body(p):
@@ -638,7 +663,10 @@ def p_llamada(p):
 
 
 def p_error(p):
-    print("Syntax error at '%s'" % p.value)
+    if p is not None:
+        print("Syntax error at line %d, illegal token '%s' found" % (p.lineno, p.value))
+
+    print("Unexpected end of input")
 
 
 def p_empty(p):
@@ -660,4 +688,11 @@ while True:
 
 with open("test/test2.txt", 'r') as f:
     input = f.read()
-    parser.parse(input)
+    res: Class = parser.parse(input)
+
+    res.eval()
+
+    pp = pprint.PrettyPrinter()
+    pp.pprint(res)
+    pp.pprint(model.symbol_table)
+
