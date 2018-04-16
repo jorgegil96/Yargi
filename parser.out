@@ -38,14 +38,14 @@ Rule 23    expresionr -> COMA expresion expresionr
 Rule 24    expresionr -> empty
 Rule 25    expresion2 -> expresion expresionr
 Rule 26    expresion2 -> empty
-Rule 27    oplog -> MAYORQUE exp
-Rule 28    oplog -> MENORQUE exp
-Rule 29    oplog -> DIFERENTE exp
-Rule 30    oplog -> MAYOROIGUAL exp
-Rule 31    oplog -> MENOROIGUAL exp
-Rule 32    oplog -> IGUALIGUAL exp
-Rule 33    oplog -> empty
-Rule 34    superexp -> exp oplog
+Rule 27    superexp -> exp oplog
+Rule 28    oplog -> MAYORQUE exp
+Rule 29    oplog -> MENORQUE exp
+Rule 30    oplog -> DIFERENTE exp
+Rule 31    oplog -> MAYOROIGUAL exp
+Rule 32    oplog -> MENOROIGUAL exp
+Rule 33    oplog -> IGUALIGUAL exp
+Rule 34    oplog -> empty
 Rule 35    megaexp -> superexp megaexpr
 Rule 36    megaexpr -> AND superexp megaexpr
 Rule 37    megaexpr -> OR superexp megaexpr
@@ -150,7 +150,7 @@ COMENTARIOS          :
 COMILLAS             : 
 CORCHDER             : 19 56 60
 CORCHIZQ             : 19 56 60
-DIFERENTE            : 29
+DIFERENTE            : 30
 DOSPUNTOS            : 3 109
 ELSE                 : 65 67 102
 EOL                  : 
@@ -164,7 +164,7 @@ GLOBAL               :
 ID                   : 3 13 19 20 20 21 41 43 54 61 94 95 104 105 107 123
 IF                   : 63 65
 IGUAL                : 54
-IGUALIGUAL           : 32
+IGUALIGUAL           : 33
 IN                   : 94 101
 INT                  : 74
 INTNUM               : 14 97 97
@@ -173,10 +173,10 @@ LLAVEDER             : 8 99 111 116
 LLAVEIZQ             : 8 99 111 116
 MAIN                 : 116
 MAS                  : 86 91
-MAYOROIGUAL          : 30
-MAYORQUE             : 27
-MENOROIGUAL          : 31
-MENORQUE             : 28
+MAYOROIGUAL          : 31
+MAYORQUE             : 28
+MENOROIGUAL          : 32
+MENORQUE             : 29
 MENOS                : 87 92
 OR                   : 37
 PARDER               : 3 5 21 57 64 69 79 94 98 99 104 116 123
@@ -215,13 +215,13 @@ classparams2         : 5
 condicion            : 47
 condicion2           : 63 65
 condicionr           : 63
-empty                : 4 7 10 12 24 26 33 38 42 45 53 59 62 66 68 73 83 88 90 93 103 106 108 110 113 115 118 120 122 124
+empty                : 4 7 10 12 24 26 34 38 42 45 53 59 62 66 68 73 83 88 90 93 103 106 108 110 113 115 118 120 122 124
 esc1                 : 69 72
 esc2                 : 69 72
 escritura            : 48
 estatuto             : 8 46 47 48 49 50 51 52 114
 estatutor            : 63
-exp                  : 27 28 29 30 31 32 34
+exp                  : 27 28 29 30 31 32 33
 expr                 : 85 86 87
 expresion            : 11 23 25 55 56 58 60 64 70 79 98 99 123
 expresion2           : 21
@@ -242,7 +242,7 @@ megaexpr             : 35 36 37
 multvarsdecl         : 112 117
 opc1                 : 111
 opc2                 : 111
-oplog                : 34
+oplog                : 27
 range                : 96 101
 resultado            : 
 superexp             : 35 36 37
@@ -1473,7 +1473,7 @@ state 79
     (22) expresion -> . megaexp
     (125) empty -> .
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -1578,7 +1578,7 @@ state 89
     (123) llamada -> ID PARIZQ . expresion expresionr PARDER
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -1612,7 +1612,7 @@ state 90
     (60) asignacion3 -> CORCHIZQ . expresion CORCHDER
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -1683,7 +1683,7 @@ state 94
     (64) condicion2 -> PARIZQ . expresion PARDER bloque
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -1719,7 +1719,7 @@ state 95
     (71) esc1 -> . STRING
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -1764,7 +1764,7 @@ state 97
     (98) while -> WHILE PARIZQ . expresion PARDER bloque
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -1798,7 +1798,7 @@ state 98
     (99) when -> WHEN PARIZQ . expresion PARDER LLAVEIZQ when2 LLAVEDER
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -1972,14 +1972,14 @@ state 110
 
 state 111
 
-    (34) superexp -> exp . oplog
-    (27) oplog -> . MAYORQUE exp
-    (28) oplog -> . MENORQUE exp
-    (29) oplog -> . DIFERENTE exp
-    (30) oplog -> . MAYOROIGUAL exp
-    (31) oplog -> . MENOROIGUAL exp
-    (32) oplog -> . IGUALIGUAL exp
-    (33) oplog -> . empty
+    (27) superexp -> exp . oplog
+    (28) oplog -> . MAYORQUE exp
+    (29) oplog -> . MENORQUE exp
+    (30) oplog -> . DIFERENTE exp
+    (31) oplog -> . MAYOROIGUAL exp
+    (32) oplog -> . MENOROIGUAL exp
+    (33) oplog -> . IGUALIGUAL exp
+    (34) oplog -> . empty
     (125) empty -> .
 
     MAYORQUE        shift and go to state 143
@@ -2060,7 +2060,7 @@ state 114
     (79) factor -> PARIZQ . expresion PARDER
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2143,7 +2143,7 @@ state 118
     (57) asignacion2 -> . READ PARIZQ STRING PARDER
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2388,7 +2388,7 @@ state 138
 state 139
 
     (36) megaexpr -> AND . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2418,7 +2418,7 @@ state 139
 state 140
 
     (37) megaexpr -> OR . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2458,20 +2458,20 @@ state 141
 
 state 142
 
-    (34) superexp -> exp oplog .
+    (27) superexp -> exp oplog .
 
-    AND             reduce using rule 34 (superexp -> exp oplog .)
-    OR              reduce using rule 34 (superexp -> exp oplog .)
-    COLON           reduce using rule 34 (superexp -> exp oplog .)
-    COMA            reduce using rule 34 (superexp -> exp oplog .)
-    PARDER          reduce using rule 34 (superexp -> exp oplog .)
-    CORCHDER        reduce using rule 34 (superexp -> exp oplog .)
-    CORCHIZQ        reduce using rule 34 (superexp -> exp oplog .)
+    AND             reduce using rule 27 (superexp -> exp oplog .)
+    OR              reduce using rule 27 (superexp -> exp oplog .)
+    COLON           reduce using rule 27 (superexp -> exp oplog .)
+    COMA            reduce using rule 27 (superexp -> exp oplog .)
+    PARDER          reduce using rule 27 (superexp -> exp oplog .)
+    CORCHDER        reduce using rule 27 (superexp -> exp oplog .)
+    CORCHIZQ        reduce using rule 27 (superexp -> exp oplog .)
 
 
 state 143
 
-    (27) oplog -> MAYORQUE . exp
+    (28) oplog -> MAYORQUE . exp
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2499,7 +2499,7 @@ state 143
 
 state 144
 
-    (28) oplog -> MENORQUE . exp
+    (29) oplog -> MENORQUE . exp
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2527,7 +2527,7 @@ state 144
 
 state 145
 
-    (29) oplog -> DIFERENTE . exp
+    (30) oplog -> DIFERENTE . exp
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2555,7 +2555,7 @@ state 145
 
 state 146
 
-    (30) oplog -> MAYOROIGUAL . exp
+    (31) oplog -> MAYOROIGUAL . exp
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2583,7 +2583,7 @@ state 146
 
 state 147
 
-    (31) oplog -> MENOROIGUAL . exp
+    (32) oplog -> MENOROIGUAL . exp
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2611,7 +2611,7 @@ state 147
 
 state 148
 
-    (32) oplog -> IGUALIGUAL . exp
+    (33) oplog -> IGUALIGUAL . exp
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -2639,15 +2639,15 @@ state 148
 
 state 149
 
-    (33) oplog -> empty .
+    (34) oplog -> empty .
 
-    AND             reduce using rule 33 (oplog -> empty .)
-    OR              reduce using rule 33 (oplog -> empty .)
-    COLON           reduce using rule 33 (oplog -> empty .)
-    COMA            reduce using rule 33 (oplog -> empty .)
-    PARDER          reduce using rule 33 (oplog -> empty .)
-    CORCHDER        reduce using rule 33 (oplog -> empty .)
-    CORCHIZQ        reduce using rule 33 (oplog -> empty .)
+    AND             reduce using rule 34 (oplog -> empty .)
+    OR              reduce using rule 34 (oplog -> empty .)
+    COLON           reduce using rule 34 (oplog -> empty .)
+    COMA            reduce using rule 34 (oplog -> empty .)
+    PARDER          reduce using rule 34 (oplog -> empty .)
+    CORCHDER        reduce using rule 34 (oplog -> empty .)
+    CORCHIZQ        reduce using rule 34 (oplog -> empty .)
 
 
 state 150
@@ -3039,7 +3039,7 @@ state 168
     (56) asignacion2 -> CORCHDER . expresion asignacion2r CORCHIZQ
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -3087,7 +3087,7 @@ state 171
     (23) expresionr -> COMA . expresion expresionr
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -3199,7 +3199,7 @@ state 180
     (71) esc1 -> . STRING
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -3428,80 +3428,80 @@ state 190
 
 state 191
 
-    (27) oplog -> MAYORQUE exp .
+    (28) oplog -> MAYORQUE exp .
 
-    AND             reduce using rule 27 (oplog -> MAYORQUE exp .)
-    OR              reduce using rule 27 (oplog -> MAYORQUE exp .)
-    COLON           reduce using rule 27 (oplog -> MAYORQUE exp .)
-    COMA            reduce using rule 27 (oplog -> MAYORQUE exp .)
-    PARDER          reduce using rule 27 (oplog -> MAYORQUE exp .)
-    CORCHDER        reduce using rule 27 (oplog -> MAYORQUE exp .)
-    CORCHIZQ        reduce using rule 27 (oplog -> MAYORQUE exp .)
+    AND             reduce using rule 28 (oplog -> MAYORQUE exp .)
+    OR              reduce using rule 28 (oplog -> MAYORQUE exp .)
+    COLON           reduce using rule 28 (oplog -> MAYORQUE exp .)
+    COMA            reduce using rule 28 (oplog -> MAYORQUE exp .)
+    PARDER          reduce using rule 28 (oplog -> MAYORQUE exp .)
+    CORCHDER        reduce using rule 28 (oplog -> MAYORQUE exp .)
+    CORCHIZQ        reduce using rule 28 (oplog -> MAYORQUE exp .)
 
 
 state 192
 
-    (28) oplog -> MENORQUE exp .
+    (29) oplog -> MENORQUE exp .
 
-    AND             reduce using rule 28 (oplog -> MENORQUE exp .)
-    OR              reduce using rule 28 (oplog -> MENORQUE exp .)
-    COLON           reduce using rule 28 (oplog -> MENORQUE exp .)
-    COMA            reduce using rule 28 (oplog -> MENORQUE exp .)
-    PARDER          reduce using rule 28 (oplog -> MENORQUE exp .)
-    CORCHDER        reduce using rule 28 (oplog -> MENORQUE exp .)
-    CORCHIZQ        reduce using rule 28 (oplog -> MENORQUE exp .)
+    AND             reduce using rule 29 (oplog -> MENORQUE exp .)
+    OR              reduce using rule 29 (oplog -> MENORQUE exp .)
+    COLON           reduce using rule 29 (oplog -> MENORQUE exp .)
+    COMA            reduce using rule 29 (oplog -> MENORQUE exp .)
+    PARDER          reduce using rule 29 (oplog -> MENORQUE exp .)
+    CORCHDER        reduce using rule 29 (oplog -> MENORQUE exp .)
+    CORCHIZQ        reduce using rule 29 (oplog -> MENORQUE exp .)
 
 
 state 193
 
-    (29) oplog -> DIFERENTE exp .
+    (30) oplog -> DIFERENTE exp .
 
-    AND             reduce using rule 29 (oplog -> DIFERENTE exp .)
-    OR              reduce using rule 29 (oplog -> DIFERENTE exp .)
-    COLON           reduce using rule 29 (oplog -> DIFERENTE exp .)
-    COMA            reduce using rule 29 (oplog -> DIFERENTE exp .)
-    PARDER          reduce using rule 29 (oplog -> DIFERENTE exp .)
-    CORCHDER        reduce using rule 29 (oplog -> DIFERENTE exp .)
-    CORCHIZQ        reduce using rule 29 (oplog -> DIFERENTE exp .)
+    AND             reduce using rule 30 (oplog -> DIFERENTE exp .)
+    OR              reduce using rule 30 (oplog -> DIFERENTE exp .)
+    COLON           reduce using rule 30 (oplog -> DIFERENTE exp .)
+    COMA            reduce using rule 30 (oplog -> DIFERENTE exp .)
+    PARDER          reduce using rule 30 (oplog -> DIFERENTE exp .)
+    CORCHDER        reduce using rule 30 (oplog -> DIFERENTE exp .)
+    CORCHIZQ        reduce using rule 30 (oplog -> DIFERENTE exp .)
 
 
 state 194
 
-    (30) oplog -> MAYOROIGUAL exp .
+    (31) oplog -> MAYOROIGUAL exp .
 
-    AND             reduce using rule 30 (oplog -> MAYOROIGUAL exp .)
-    OR              reduce using rule 30 (oplog -> MAYOROIGUAL exp .)
-    COLON           reduce using rule 30 (oplog -> MAYOROIGUAL exp .)
-    COMA            reduce using rule 30 (oplog -> MAYOROIGUAL exp .)
-    PARDER          reduce using rule 30 (oplog -> MAYOROIGUAL exp .)
-    CORCHDER        reduce using rule 30 (oplog -> MAYOROIGUAL exp .)
-    CORCHIZQ        reduce using rule 30 (oplog -> MAYOROIGUAL exp .)
+    AND             reduce using rule 31 (oplog -> MAYOROIGUAL exp .)
+    OR              reduce using rule 31 (oplog -> MAYOROIGUAL exp .)
+    COLON           reduce using rule 31 (oplog -> MAYOROIGUAL exp .)
+    COMA            reduce using rule 31 (oplog -> MAYOROIGUAL exp .)
+    PARDER          reduce using rule 31 (oplog -> MAYOROIGUAL exp .)
+    CORCHDER        reduce using rule 31 (oplog -> MAYOROIGUAL exp .)
+    CORCHIZQ        reduce using rule 31 (oplog -> MAYOROIGUAL exp .)
 
 
 state 195
 
-    (31) oplog -> MENOROIGUAL exp .
+    (32) oplog -> MENOROIGUAL exp .
 
-    AND             reduce using rule 31 (oplog -> MENOROIGUAL exp .)
-    OR              reduce using rule 31 (oplog -> MENOROIGUAL exp .)
-    COLON           reduce using rule 31 (oplog -> MENOROIGUAL exp .)
-    COMA            reduce using rule 31 (oplog -> MENOROIGUAL exp .)
-    PARDER          reduce using rule 31 (oplog -> MENOROIGUAL exp .)
-    CORCHDER        reduce using rule 31 (oplog -> MENOROIGUAL exp .)
-    CORCHIZQ        reduce using rule 31 (oplog -> MENOROIGUAL exp .)
+    AND             reduce using rule 32 (oplog -> MENOROIGUAL exp .)
+    OR              reduce using rule 32 (oplog -> MENOROIGUAL exp .)
+    COLON           reduce using rule 32 (oplog -> MENOROIGUAL exp .)
+    COMA            reduce using rule 32 (oplog -> MENOROIGUAL exp .)
+    PARDER          reduce using rule 32 (oplog -> MENOROIGUAL exp .)
+    CORCHDER        reduce using rule 32 (oplog -> MENOROIGUAL exp .)
+    CORCHIZQ        reduce using rule 32 (oplog -> MENOROIGUAL exp .)
 
 
 state 196
 
-    (32) oplog -> IGUALIGUAL exp .
+    (33) oplog -> IGUALIGUAL exp .
 
-    AND             reduce using rule 32 (oplog -> IGUALIGUAL exp .)
-    OR              reduce using rule 32 (oplog -> IGUALIGUAL exp .)
-    COLON           reduce using rule 32 (oplog -> IGUALIGUAL exp .)
-    COMA            reduce using rule 32 (oplog -> IGUALIGUAL exp .)
-    PARDER          reduce using rule 32 (oplog -> IGUALIGUAL exp .)
-    CORCHDER        reduce using rule 32 (oplog -> IGUALIGUAL exp .)
-    CORCHIZQ        reduce using rule 32 (oplog -> IGUALIGUAL exp .)
+    AND             reduce using rule 33 (oplog -> IGUALIGUAL exp .)
+    OR              reduce using rule 33 (oplog -> IGUALIGUAL exp .)
+    COLON           reduce using rule 33 (oplog -> IGUALIGUAL exp .)
+    COMA            reduce using rule 33 (oplog -> IGUALIGUAL exp .)
+    PARDER          reduce using rule 33 (oplog -> IGUALIGUAL exp .)
+    CORCHDER        reduce using rule 33 (oplog -> IGUALIGUAL exp .)
+    CORCHIZQ        reduce using rule 33 (oplog -> IGUALIGUAL exp .)
 
 
 state 197
@@ -3745,7 +3745,7 @@ state 207
     (22) expresion -> . megaexp
     (125) empty -> .
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER
@@ -4259,7 +4259,7 @@ state 242
     (58) asignacion2r -> COMA . expresion asignacion2r
     (22) expresion -> . megaexp
     (35) megaexp -> . superexp megaexpr
-    (34) superexp -> . exp oplog
+    (27) superexp -> . exp oplog
     (85) exp -> . termino expr
     (84) termino -> . factor terminor
     (79) factor -> . PARIZQ expresion PARDER

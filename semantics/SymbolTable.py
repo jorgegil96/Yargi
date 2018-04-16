@@ -58,18 +58,21 @@ class SymbolTable:
 
         self.__fun_dir[fun.name] = fun
 
-    def add_sym(self, name, type):
+    def add_sym(self, name, type, is_constant=False):
         '''
         Adds a symbol to the current local active table, or the global table if
         there aren't any locals.
         '''
-        if name == "temp":
-            table = self.__temp_sym_table
+        if is_constant:
+            table = self.__global_sym_table
         else:
-            if self.get_current_scope() == SCOPE_LOCAL:
-                table = self.get_local_table()
+            if name == "temp":
+                table = self.__temp_sym_table
             else:
-                table = self.__global_sym_table
+                if self.get_current_scope() == SCOPE_LOCAL:
+                    table = self.get_local_table()
+                else:
+                    table = self.__global_sym_table
 
         if name in table:
             raise Exception("Var %s is already declared" % name)
@@ -112,7 +115,7 @@ class SymbolTable:
 
     def verify_sym_declared_with_correct_type(self, id, type):
         '''
-        Verifies that the given symbol is declared in the appropriate score and that its type matches the given type.
+        Verifies that the given symbol is declared in the appropriate scope and that its type matches the given type.
         Throws if verification fails.
         '''
         if self.get_current_scope() == SCOPE_GLOBAL:
@@ -141,9 +144,9 @@ class SymbolTable:
 
         found = False
         local_table = self.get_local_table()
-        if id in local_table[type]:
+        if type in local_table and id in local_table[type]:
             found = True
-        if id in self.__global_sym_table[type]:
+        if type in self.__global_sym_table and id in self.__global_sym_table[type]:
             found = True
 
         if not found:

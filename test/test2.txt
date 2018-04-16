@@ -1,13 +1,13 @@
 class Carro() {
 
     int g;
-    float z;
+    bool z;
 
     fun bar(): int {
         int b, c;
         g = 1;
         b = 5;
-        g = g + 3;
+        g = g * 3;
         return c;
     }
 
@@ -15,8 +15,8 @@ class Carro() {
         float x;
         int y;
         x = 2.5;
-        y = 10 - 10 - g;
-        z = x + y;
+        y = 10 / 10 - g;
+        z = x > y or 5 < 1;
     }
 
 	main() {

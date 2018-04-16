@@ -237,6 +237,13 @@ def p_expresion2(p):
     '''
 
 
+def p_superexp(p):
+    '''
+    superexp : exp oplog
+    '''
+    p[0] = RelationalOperation(p[1], p[2])
+
+
 def p_oplog(p):
     '''
     oplog : MAYORQUE exp
@@ -251,13 +258,6 @@ def p_oplog(p):
         p[0] = None
     else:
         p[0] = RelationalOperand(p[1], p[2])
-
-
-def p_superexp(p):
-    '''
-    superexp : exp oplog
-    '''
-    p[0] = RelationalOperation(p[1], p[2])
 
 
 def p_megaexp(p):
@@ -444,7 +444,13 @@ def p_terminor(p):
     if len(p) == 2:
         p[0] = None
     else:
-        p[0] = TerminoR(p[1], p[2], p[3])
+        type = p.slice[1].type
+        if type == 'POR':
+            p[0] = TerminoR(operator.mul, p[2], p[3])
+        elif type == 'SOBRE':
+            p[0] = TerminoR(operator.floordiv, p[2], p[3])
+        else:
+            raise Exception("Invalid operator type %s in terminor" % type)
 
 
 def p_termino(p):
