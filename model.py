@@ -370,3 +370,89 @@ class LogicalOperation(BaseExpression):
             address = symbol_table.add_temp(res_type)
             quadruples.append([op_type, left_address, right_address, address])
             return address, res_type
+
+
+class If(BaseExpression):
+    def __init__(self, base_exp: BaseExpression, true_stmts: List[BaseExpression], false_stmts: List[BaseExpression]):
+        self.base_exp = base_exp
+        self.true_stmts = true_stmts
+        self.false_stmts = false_stmts
+
+    def __repr__(self):
+        return '<If base_exp={0} true_stms={1}>'\
+            .format(self.base_exp, self.true_stmts)
+
+    def eval(self):
+        exp_address, exp_type = self.base_exp.eval()
+        if exp_type != 'bool':
+            raise Exception("Conditional statement must evaluate to bool")
+
+        gotof = ['GOTOF', exp_address, '', '']
+        quadruples.append(gotof)
+
+        # Generate quadruples for the true statements.
+        for stmt in self.true_stmts:
+            stmt.eval()
+
+        goto = ['GOTO', '', '', '']
+        quadruples.append(goto)
+
+        # Set the jump address of the gotof to after the goto quadruple.
+        gotof[3] = len(quadruples)
+
+        # Generate quadruples for the false statements.
+        for stmt in self.false_stmts:
+            stmt.eval()
+
+        # Set the jump address of the goto to after the last false stmt quadruple.
+        goto[3] = len(quadruples)
+
+
+class Range:
+    def __init__(self, start: ConstantVar, end: ConstantVar):
+        self.start = start
+        self.end = end
+
+
+class ForIn(BaseExpression):
+    def __init__(self, id, range: Range, stmts: List[BaseExpression]):
+        self.id = id
+        self.range = range
+        self.stmts = stmts
+
+    def __repr__(self):
+        return '<ForIn id={0} range={1} stmts={2}>'.format(self.id, self.range, self.stmts)
+
+    def eval(self):
+        ConstantVar(1, 'INTNUM').eval()
+        one_const_address, one_const_type = symbol_table.get_sym_address_and_type('1')
+
+        self.range.start.eval()
+        self.range.end.eval()
+        Assignment(self.id, self.range.start).eval()
+
+        id_address, id_type = symbol_table.get_sym_address_and_type(self.id)
+        start_address, start_type = symbol_table.get_sym_address_and_type(str(self.range.start.varcte))
+        end_address, end_type = symbol_table.get_sym_address_and_type(str(self.range.end.varcte))
+        op_type = '<'
+
+        res_type = cube[id_type][start_type][op_type]
+
+        # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
+        address = symbol_table.add_temp(res_type)
+        quadruples.append(['<', id_address, end_address, address])
+        cond_index = len(quadruples) - 1
+
+        gotof = ["GOTOF", address, '', '']
+        quadruples.append(gotof)
+
+        for stmt in self.stmts:
+            stmt.eval()
+
+        res_type_2 = cube[id_type][one_const_type]['+']
+        address = symbol_table.add_temp(res_type_2)
+        quadruples.append(['+', id_address, one_const_address, address])
+        quadruples.append(['=', address, '', id_address])
+        quadruples.append(["GOTO", '', '', cond_index])
+
+        gotof[3] = len(quadruples)

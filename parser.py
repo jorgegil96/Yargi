@@ -177,26 +177,6 @@ def p_classparams2(p):
     '''
 
 
-def p_bloque(p):
-    '''
-    bloque : LLAVEIZQ estatuto bloque2 LLAVEDER
-    '''
-
-
-def p_bloque2(p):
-    '''
-    bloque2 : RETURN bloque3
-    | empty
-    '''
-
-
-def p_bloque3(p):
-    '''
-    bloque3 : expresion COLON
-    | empty
-    '''
-
-
 def p_varcte(p):
     '''
     varcte : ID
@@ -369,14 +349,17 @@ def p_asignacion3(p):
 
 def p_condicion(p):
     '''
-    condicion : IF condicion2 condicionr estatutor
+    condicion : IF condicion2 estatutor
     '''
+    base_exp, stmts = p[2]
+    p[0] = If(base_exp, stmts, p[3])
 
 
 def p_condicion2(p):
     '''
     condicion2 : PARIZQ expresion PARDER bloque
     '''
+    p[0] = p[2], p[4]
 
 
 def p_condicionr(p):
@@ -386,11 +369,36 @@ def p_condicionr(p):
     '''
 
 
+def p_bloque(p):
+    '''
+    bloque : LLAVEIZQ estatuto bloque2 LLAVEDER
+    '''
+    p[0] = p[2]
+
+
+def p_bloque2(p):
+    '''
+    bloque2 : RETURN bloque3
+    | empty
+    '''
+
+
+def p_bloque3(p):
+    '''
+    bloque3 : expresion COLON
+    | empty
+    '''
+
+
 def p_estatutor(p):
     '''
     estatutor : ELSE bloque
     | empty
     '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = p[2]
 
 
 def p_escritura(p):
@@ -514,6 +522,7 @@ def p_for(p):
     '''
     for : FOR PARIZQ ID IN for2 PARDER bloque
     '''
+    p[0] = ForIn(p[3], p[5], p[7])
 
 
 def p_for2(p):
@@ -521,12 +530,16 @@ def p_for2(p):
     for2 : ID
     | range
     '''
+    p[0] = p[1]
 
 
 def p_range(p):
     '''
     range : INTNUM PUNTOSRANGO INTNUM
     '''
+    type = p.slice[1].type
+    type2 = p.slice[3].type
+    p[0] = Range(ConstantVar(p[1], type), ConstantVar(p[3], type2))
 
 
 def p_while(p):
@@ -701,5 +714,5 @@ with open("test/test2.txt", 'r') as f:
     pp = pprint.PrettyPrinter()
     pp.pprint(res)
     pp.pprint(model.symbol_table)
-    pp.pprint(model.quadruples)
-
+    for i in range(0, len(quadruples)):
+        print(str(i) + ": " + str(quadruples[i]))
