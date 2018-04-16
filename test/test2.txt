@@ -5,10 +5,11 @@ class Carro() {
 
     fun bar(): int {
         int b, c;
+        float p;
         g = 1;
         b = 5;
         z = true;
-        for(g in 0..10) {
+        for(g in b..c) {
             z = false;
         }
         return c;

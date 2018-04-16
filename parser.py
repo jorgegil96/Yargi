@@ -536,6 +536,7 @@ def p_for2(p):
 def p_range(p):
     '''
     range : INTNUM PUNTOSRANGO INTNUM
+        | ID PUNTOSRANGO ID
     '''
     type = p.slice[1].type
     type2 = p.slice[3].type
