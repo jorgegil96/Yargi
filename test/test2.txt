@@ -15,7 +15,7 @@ class Carro() {
         float x;
         int y;
         x = 2.5;
-        y = 10 - 10;
+        y = 10 - 10 - g;
         z = x + y;
     }
 

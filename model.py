@@ -169,21 +169,6 @@ class Termino(BaseExpression):
         return self.factor.eval()
 
 
-class ExpR(BaseExpression):
-    def __init__(self, op: operator, termino: Termino, exp_r: BaseExpression):
-        self.op = op
-        self.termino = termino
-        self.exp_r = exp_r
-
-    def __repr__(self):
-        return '<ExpR op={0} termino={1} exp_r={2}>' \
-            .format(self.op, self.termino, self.exp_r)
-
-    def eval(self):
-        self.termino.eval()
-        self.exp_r.eval()
-
-
 def get_type_from_instance(value):
     if isinstance(value, bool):
         return 'bool'
@@ -200,6 +185,34 @@ def get_op_type_from_operator(op: operator):
         return '-'
 
 
+class ExpR(BaseExpression):
+    def __init__(self, op: operator, termino: Termino, exp_r: BaseExpression):
+        self.op = op
+        self.termino = termino
+        self.exp_r = exp_r
+
+    def __repr__(self):
+        return '<ExpR op={0} termino={1} exp_r={2}>' \
+            .format(self.op, self.termino, self.exp_r)
+
+    def eval(self):
+        if self.exp_r is None:
+            return self.termino.eval()
+        else:
+            left_address, left_type = self.termino.eval()
+            right_address, right_type = self.exp_r.eval()
+            opType = get_op_type_from_operator(self.exp_r.op)
+
+            res_type = cube[left_type][right_type][opType]
+            if res_type is "Error":
+                raise Exception("Invalid operation {0} for {1} and {2}".format(opType, left_type, right_type))
+
+            # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
+            address = symbol_table.add_temp(res_type)
+            quadruples.append([opType, left_address, right_address, address])
+            return address, res_type
+
+
 class Exp(BaseExpression):
     def __init__(self, termino: Termino, exp_r: ExpR):
         self.termino = termino
@@ -213,7 +226,7 @@ class Exp(BaseExpression):
             return self.termino.eval()
         else:
             left_address, left_type = self.termino.eval()
-            right_address, right_type = self.exp_r.termino.eval()
+            right_address, right_type = self.exp_r.eval()
             opType = get_op_type_from_operator(self.exp_r.op)
 
             res_type = cube[left_type][right_type][opType]
