@@ -510,3 +510,35 @@ class While(BaseExpression):
         quadruples.append(goto)
 
         gotof[3] = len(quadruples)
+
+
+class WhenBranch(BaseExpression):
+    def __init__(self, base_exp: BaseExpression, stmts: List[BaseExpression], next_branch: BaseExpression):
+        self.base_exp = base_exp
+        self.stmts = stmts
+        self.next_branch = next_branch
+
+    def __repr__(self):
+        return '<WhenBranch base_exp={0} stmts={1} next_branch={2}>'\
+            .format(self.base_exp, self.stmts, self.next_branch)
+
+    def eval(self):
+        exp_address, exp_type = self.base_exp.eval()
+        if exp_type != 'bool':
+            raise Exception("When branch must evaluate to bool")
+
+        gotof = ["GOTOF", exp_address, '', '']
+        quadruples.append(gotof)
+
+        for stmt in self.stmts:
+            stmt.eval()
+
+        goto = ["GOTO", '', '', '']
+        quadruples.append(goto)
+
+        gotof[3] = len(quadruples)
+
+        if self.next_branch is not None:
+            self.next_branch.eval()
+
+        goto[3] = len(quadruples)

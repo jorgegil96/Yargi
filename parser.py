@@ -552,17 +552,23 @@ def p_while(p):
 
 def p_when(p):
     '''
-    when : WHEN PARIZQ expresion PARDER LLAVEIZQ when2 LLAVEDER
+    when : WHEN LLAVEIZQ when2 LLAVEDER
     '''
+    p[0] = p[3]
 
 
 def p_when2(p):
     '''
-    when2 : varcte varcter FLECHITA bloque when2
-    | IN range FLECHITA bloque when2
-    | ELSE FLECHITA bloque when2
+    when2 : expresion FLECHITA bloque when2
+    | ELSE FLECHITA bloque
     | empty
     '''
+    if len(p) == 2:
+        p[0] = None
+    elif len(p) == 4:
+        p[0] = WhenBranch(ConstantVar('True', 'TRUE'), p[3], None)
+    else:
+        p[0] = WhenBranch(p[1], p[3], p[4])
 
 
 def p_fun(p):

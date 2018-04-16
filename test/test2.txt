@@ -9,8 +9,16 @@ class Carro() {
         g = 1;
         b = 5;
         z = true;
-        while (b > g + 1) {
-            g = g + 1;
+        when {
+            g == 1 -> {
+                b = 4 + 4;
+            }
+            b > 0 -> {
+                z = false;
+            }
+            else -> {
+                z = true;
+            }
         }
         return c;
     }
