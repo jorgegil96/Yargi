@@ -547,6 +547,7 @@ def p_while(p):
     '''
     while : WHILE PARIZQ expresion PARDER bloque
     '''
+    p[0] = While(p[3], p[5])
 
 
 def p_when(p):

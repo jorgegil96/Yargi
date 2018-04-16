@@ -485,3 +485,28 @@ class ForIn(BaseExpression):
         # We reached the end of the for quadruples, point the gotof to the next one.
         gotof[3] = len(quadruples)
 
+
+class While(BaseExpression):
+    def __init__(self, base_exp: BaseExpression, stmts: List[BaseExpression]):
+        self.base_exp = base_exp
+        self.stmts = stmts
+
+    def __repr__(self):
+        return '<While base_exp={0} stmts={1}>'.format(self.base_exp, self.stmts)
+
+    def eval(self):
+        cond_index = len(quadruples)
+        exp_address, exp_type = self.base_exp.eval()
+        if exp_type != 'bool':
+            raise Exception("While statement must evaluate to bool")
+
+        gotof = ["GOTOF", exp_address, '', '']
+        quadruples.append(gotof)
+
+        for stmt in self.stmts:
+            stmt.eval()
+
+        goto = ["GOTO", '', '', cond_index]
+        quadruples.append(goto)
+
+        gotof[3] = len(quadruples)

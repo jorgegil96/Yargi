@@ -9,8 +9,8 @@ class Carro() {
         g = 1;
         b = 5;
         z = true;
-        for(g in b..c) {
-            z = false;
+        while (b > g + 1) {
+            g = g + 1;
         }
         return c;
     }
