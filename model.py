@@ -2,8 +2,10 @@ from typing import List
 from semantics.semantic_analyser import SymbolTable
 import operator
 from semantic_cube import cube
+from util import utils
 
 symbol_table = SymbolTable()
+quadruples = []
 
 
 class BaseExpression:
@@ -26,7 +28,7 @@ class VarDeclaration(BaseExpression):
             .format(self.name, self.type, self.visibility, self.value)
 
     def eval(self):
-        symbol_table.add_sym(self)
+        symbol_table.add_sym(self.name, self.type)
 
 
 class FunBody(BaseExpression):
@@ -100,11 +102,14 @@ class Assignment(BaseExpression):
         return '<Assignment id={0} value={1}>'.format(self.id, self.value)
 
     def eval(self):
-        # Verify that the variable to assign to exists.
-        if not symbol_table.is_sym_declared(self.id):
-            raise Exception("Use of undefined variable %s" % self.id)
+        address, type = self.value.eval() # address and type of the result.
 
-        symbol_table.set_sym_value(self.id, self.value.eval())
+        # Verify that the variable to assign to exists and is of correct type. Throws if invalid.
+        symbol_table.verify_sym_declared_with_correct_type(self.id, utils.parser_type_to_cube_type(type))
+
+        assignee_address, assignee_type = symbol_table.get_sym_address_and_type(self.id)
+
+        quadruples.append(['=', address, '', assignee_address])
 
 
 class ConstantVar(BaseExpression):
@@ -117,8 +122,16 @@ class ConstantVar(BaseExpression):
 
     def eval(self):
         if self.type == "ID":
-            return symbol_table.get_sym_value(self.varcte)
-        return self.varcte
+            return symbol_table.get_sym_address_and_type(self.varcte)
+
+        # Varcte if a primitive
+        cube_type = utils.parser_type_to_cube_type(self.type)
+
+        # Add constant primititive to symbol table with its a value as its name.
+        # e.g. for varcte = 5 of type INTNUM, call add_sym('5', 'int').
+        # This creates a record(memory address) in the symbol table for the constant 5 indexed as '5'.
+        address = symbol_table.add_sym(str(self.varcte), cube_type)
+        return address, cube_type
 
 
 class ArithmeticOperand(BaseExpression):
@@ -126,7 +139,7 @@ class ArithmeticOperand(BaseExpression):
     E.g. + 5, - x
     """
 
-    def __init__(self, op: operator, varcte):
+    def __init__(self, op: operator, varcte: BaseExpression):
         self.op = op
         self.varcte = varcte
 
@@ -134,7 +147,7 @@ class ArithmeticOperand(BaseExpression):
         return '<ArithmeticOperand operator={0} varcte={1}>'.format(self.op, self.varcte)
 
     def eval(self):
-        return self
+        return self.varcte.eval()
 
 
 class TerminoR:
@@ -154,11 +167,6 @@ class Termino(BaseExpression):
 
     def eval(self):
         return self.factor.eval()
-        '''
-        if isinstance(self.factor, ConstantVar):
-            self.factor.eval()
-        elif isinstance(self.factor, ArithmeticOperand):
-        '''
 
 
 class ExpR(BaseExpression):
@@ -204,19 +212,18 @@ class Exp(BaseExpression):
         if self.exp_r is None:
             return self.termino.eval()
         else:
-            left = self.termino.eval()
-            right = self.exp_r.termino.eval()
-
-            leftType = get_type_from_instance(left)
-            rightType = get_type_from_instance(right)
+            left_address, left_type = self.termino.eval()
+            right_address, right_type = self.exp_r.termino.eval()
             opType = get_op_type_from_operator(self.exp_r.op)
 
-            res = cube[leftType][rightType][opType]
-            if res is "Error":
-                raise Exception("Invalid operation {0} for {1} and {2}".format(opType, leftType, rightType))
+            res_type = cube[left_type][right_type][opType]
+            if res_type is "Error":
+                raise Exception("Invalid operation {0} for {1} and {2}".format(opType, left_type, right_type))
 
-            result = self.exp_r.op(left, right)
-            return result
+            # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
+            address = symbol_table.add_temp(res_type)
+            quadruples.append([opType, left_address, right_address, address])
+            return address, res_type
 
 
 class RelationalOperand:

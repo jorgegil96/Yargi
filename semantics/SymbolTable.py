@@ -1,5 +1,3 @@
-from model import *
-
 SCOPE_GLOBAL = "GLOBAL"
 SCOPE_LOCAL = "LOCAL"
 
@@ -11,6 +9,16 @@ class SymbolTable:
     __global_sym_table = {}
     # Stores a list a variable tables of local scope
     __local_sym_tables = []
+    # Stores the variable table for temporary vars
+    __temp_sym_table = {}
+
+    __temp_counter = 0
+
+    __int_pointer = 0
+    __float_pointer = 5000
+    __bool_pointer = 10000
+    __string_pointer = 15000
+    __last_pointer = 0
 
     def __repr__(self):
         return '<SymbolTable\n fun_dir={0}\n global_sym_table={1}\n local_sym_tables={2}>' \
@@ -35,6 +43,9 @@ class SymbolTable:
         if scope == SCOPE_LOCAL:
             self.__local_sym_tables.append({})
         else:
+            print("LOCAL TABLE START")
+            print(self.get_local_table())
+            print("LOCAL TABLE END")
             self.__local_sym_tables.pop()
 
     def add_fun(self, fun):
@@ -47,45 +58,111 @@ class SymbolTable:
 
         self.__fun_dir[fun.name] = fun
 
-    def add_sym(self, var):
+    def add_sym(self, name, type):
         '''
         Adds a symbol to the current local active table, or the global table if
         there aren't any locals.
         '''
-        if self.get_current_scope() == SCOPE_LOCAL:
-            self.get_local_table()[var.name] = var
+        if name == "temp":
+            table = self.__temp_sym_table
         else:
-            self.__global_sym_table[var.name] = var
+            if self.get_current_scope() == SCOPE_LOCAL:
+                table = self.get_local_table()
+            else:
+                table = self.__global_sym_table
 
-    def set_sym_value(self, id, value):
+        if name in table:
+            raise Exception("Var %s is already declared" % name)
+
+        # Create inner table for types in current table
+        if type not in table:
+            table[type] = {}
+
+        if name == "temp":
+            name = "t" + str(self.__temp_counter)
+            self.__temp_counter += 1
+
+        if name in table[type]:
+            return table[type][name]
+        if type == "int":
+            table[type][name] = self.__int_pointer
+            self.__last_pointer = self.__int_pointer
+            self.__int_pointer += 1
+        elif type == "float":
+            table[type][name] = self.__float_pointer
+            self.__last_pointer = self.__float_pointer
+            self.__float_pointer += 1
+        elif type == "bool":
+            table[type][name] = self.__bool_pointer
+            self.__last_pointer = self.__bool_pointer
+            self.__bool_pointer += 1
+        elif type == "string":
+            table[type][name] = self.__string_pointer
+            self.__last_pointer = self.__string_pointer
+            self.__string_pointer += 1
+        else:
+            raise Exception("Invalid type %s" % type)
+        return self.__last_pointer
+
+    def add_temp(self, type):
         '''
-        Sets the given value to the specified id.
-        The id must already be declared.
+        Adds a temporary symbol to the current active table.
         '''
-        if self.get_current_scope() == SCOPE_LOCAL:
-            if id in self.get_local_table():
-                self.get_local_table()[id] = value
-                return
+        return self.add_sym("temp", type)
 
-        if id in self.__global_sym_table:
-            self.__global_sym_table[id] = value
-            return
-
-        raise Exception("Assignment of undeclared variable %s of value %s" % id, value)
-
-    def get_sym_value(self, id):
-        if self.get_current_scope() == SCOPE_LOCAL:
-            if id in self.get_local_table():
-                return self.get_local_table()[id]
-
-        return self.__global_sym_table[id]
-
-    def is_sym_declared(self, id):
+    def verify_sym_declared_with_correct_type(self, id, type):
         '''
-        Returns true if the given id is declared in a valid scope, i.e. the current
-        local function or the global scope.
+        Verifies that the given symbol is declared in the appropriate score and that its type matches the given type.
+        Throws if verification fails.
         '''
         if self.get_current_scope() == SCOPE_GLOBAL:
-            return id in self.__global_sym_table
+            declared = False
+            for type_table in self.__global_sym_table.keys():
+                if id in self.__global_sym_table[type_table]:
+                    declared = True
+
+            if not declared:
+                raise Exception("Use of undefined variable %s" % id)
+
+            if id not in self.__global_sym_table[type]:
+                raise Exception("Assignment of type %s to var of different type" % type)
         else:
-            return id in self.__global_sym_table or id in self.get_local_table()
+            declared = False
+            for type_table in self.__global_sym_table.keys():
+                if id in self.__global_sym_table[type_table]:
+                    declared = True
+
+            for type_table in self.get_local_table().keys():
+                if id in self.get_local_table()[type_table]:
+                    declared = True
+
+            if not declared:
+                raise Exception("Use of undefined variable %s" % id)
+
+        found = False
+        local_table = self.get_local_table()
+        if id in local_table[type]:
+            found = True
+        if id in self.__global_sym_table[type]:
+            found = True
+
+        if not found:
+            raise Exception("Assignment of type %s to var of different type" % type)
+
+    def get_sym_address_and_type(self, name):
+        '''
+        Given the name of the symbol, returns the address where it is stored and its type.
+        Throws if it doesn't exist.
+        '''
+        if self.get_current_scope() == SCOPE_LOCAL:
+            for key in self.get_local_table().keys():
+                for id in self.get_local_table()[key]:
+                    if id == name:
+                        return self.get_local_table()[key][id], key
+
+        for key in self.__global_sym_table.keys():
+            for id in self.__global_sym_table[key]:
+                if id == name:
+                    return self.__global_sym_table[key][id], key
+
+        raise Exception("Variable %s does not exist" % name)

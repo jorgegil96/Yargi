@@ -695,4 +695,5 @@ with open("test/test2.txt", 'r') as f:
     pp = pprint.PrettyPrinter()
     pp.pprint(res)
     pp.pprint(model.symbol_table)
+    pp.pprint(model.quadruples)
 
