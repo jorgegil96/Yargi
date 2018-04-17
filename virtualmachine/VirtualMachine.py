@@ -1,5 +1,4 @@
 from typing import List
-import operator
 from util.utils import operator_from_symbol
 
 
