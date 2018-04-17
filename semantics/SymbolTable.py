@@ -24,6 +24,9 @@ class SymbolTable:
         return '<SymbolTable\n fun_dir={0}\n global_sym_table={1}\n local_sym_tables={2}>' \
             .format(self.__fun_dir, self.__global_sym_table, self.__local_sym_tables)
 
+    def get_global_table(self):
+        return self.__global_sym_table
+
     def get_current_scope(self):
         '''
         Returns SCOPE_GLOBAL if there are no local sym tables, true otherwise.

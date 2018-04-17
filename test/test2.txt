@@ -1,27 +1,22 @@
 class Carro() {
 
     int g;
-    bool z;
-
-    fun bar(float x, int y): int {
-        int b, c;
-        g = 1;
-        b = 5 + g;
-        c = b;
-        return c;
-    }
-
-    fun foo() {
-        g = 5;
-        bar(3.3, g);
-        z = false;
-    }
 
 	main() {
-	    int x;
+	    int x, y;
 	    x = 100;
-	    for (x in 0..100) {
-	        g = 1;
+	    y = 100 - 110;
+
+	    when {
+	        y == 0 -> {
+	            g = 1;
+	        }
+	        y < 10 -> {
+	            g = 2;
+	        }
+	        else -> {
+	            g = 3;
+	        }
 	    }
 	}
 }

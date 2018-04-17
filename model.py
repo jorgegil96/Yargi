@@ -41,6 +41,7 @@ class Main(BaseExpression):
         return '<Main vars={0} stmts={1}>'.format(self.vars, self.stmts)
 
     def eval(self):
+        quadruples[0][3] = len(quadruples)
         quadruples.append(['STARTPROC', self.name, '', ''])
         symbol_table.add_fun(self)
         symbol_table.set_scope("LOCAL")
@@ -177,6 +178,7 @@ class Class(BaseExpression):
         return '<Class name={0} body={1}>'.format(self.name, self.body)
 
     def eval(self):
+        quadruples.append(['GOTO', '', '', ''])
         self.body.eval()
 
 

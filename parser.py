@@ -4,6 +4,7 @@ from model import *
 import operator
 import pprint
 import model
+from virtualmachine.VirtualMachine import VirtualMachine
 
 keywords = {
     'if': 'IF',
@@ -549,6 +550,8 @@ def p_range(p):
     '''
     range : INTNUM PUNTOSRANGO INTNUM
         | ID PUNTOSRANGO ID
+        | ID PUNTOSRANGO INTNUM
+        | INTNUM PUNTOSRANGO ID
     '''
     type = p.slice[1].type
     type2 = p.slice[3].type
@@ -755,3 +758,6 @@ with open("test/test2.txt", 'r') as f:
     pp.pprint(model.symbol_table)
     for i in range(0, len(quadruples)):
         print(str(i) + ": " + str(quadruples[i]))
+
+    vm = VirtualMachine(model.quadruples, model.symbol_table.get_global_table())
+    vm.execute()
