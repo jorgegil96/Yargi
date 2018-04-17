@@ -5,7 +5,7 @@ class Carro() {
 	main() {
 	    int x, y;
 	    x = 100;
-	    y = 100 - 110;
+	    y = 100 * 110;
 
 	    when {
 	        y == 0 -> {

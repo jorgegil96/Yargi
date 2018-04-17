@@ -44,68 +44,29 @@ class VirtualMachine:
                 else:
                     i = self.quadruples[i][3]
             elif quad[0] == 'STARTPROC':
-                print("Start of fun " + quad[1])
                 i += 1
             elif quad[0] == 'ENDPROC':
-                print("End of fun " + quad[1])
                 if len(self.stack) > 0:
                     i = self.stack.pop()
                 else:
                     i += 1
             elif quad[0] == 'ERA':
-                print("ERA for fun " + quad[1])
                 i += 1
             elif quad[0] == 'param':
-                print("Sending param " + quad[3] + " with address " + str(quad[1]))
                 i += 1
             elif quad[0] == 'GOSUB':
-                print("GOSUB for fun " + quad[1])
                 self.stack.append(i + 1)
                 i = quad[3]
             elif quad[0] == 'RETURN':
-                print("RETURN")
                 i += 1
             elif quad[0] == '=':
-                print("ASSIGNMENT")
                 value = quad[1]
                 assignee = quad[3]
                 self.memory[assignee] = self.memory[value]
                 i += 1
-            elif quad[0] == '+':
-                print("SUM")
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '-':
-                print("SUB")
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '*':
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '/':
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '>':
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '<':
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '>=':
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '>=':
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '==':
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
-                i += 1
-            elif quad[0] == '!=':
-                self.binary_op(quad[1], quad[2], quad[3], operator_from_symbol(quad[0]))
+            elif quad[0] in ['+', '-', '*', '/', '>', '<', '>=', '<=', '==', '!=']:
+                self.memory[quad[3]] = operator_from_symbol(quad[0])(self.memory[quad[1]], self.memory[quad[2]])
                 i += 1
         print("Execution finished")
         for key in self.memory:
             print(str(key) + " => " + str(self.memory[key]))
-
-    def binary_op(self, left, right, assignee, op: operator):
-        self.memory[assignee] = op(self.memory[left], self.memory[right])
