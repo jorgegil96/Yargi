@@ -656,9 +656,9 @@ def p_opc2(p):
 
 def p_body(p):
     '''
-    body : LLAVEIZQ body2 funr MAIN PARIZQ PARDER bloque LLAVEDER
+    body : LLAVEIZQ body2 funr MAIN PARIZQ PARDER mainbloque LLAVEDER
     '''
-    p[0] = ClassBody(vars=p[2], funs=p[3])
+    p[0] = ClassBody(vars=p[2], funs=p[3], main=p[7])
 
 
 def p_body2(p):
@@ -670,6 +670,13 @@ def p_body2(p):
         p[0] = []
     else:
         p[0] = p[1] + p[2]
+
+
+def p_mainbloque(p):
+    '''
+    mainbloque : LLAVEIZQ body2 estatuto LLAVEDER
+    '''
+    p[0] = Main(p[2], p[3])
 
 
 def p_multvarsdecl(p):

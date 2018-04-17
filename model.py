@@ -31,6 +31,30 @@ class VarDeclaration(BaseExpression):
         symbol_table.add_sym(self.name, self.type)
 
 
+class Main(BaseExpression):
+    def __init__(self, vars: List[VarDeclaration], stmts: List[BaseExpression]):
+        self.name = 'main'
+        self.vars = vars
+        self.stmts = stmts
+
+    def __repr__(self):
+        return '<Main vars={0} stmts={1}>'.format(self.vars, self.stmts)
+
+    def eval(self):
+        quadruples.append(['STARTPROC', self.name, '', ''])
+        symbol_table.add_fun(self)
+        symbol_table.set_scope("LOCAL")
+
+        for var in self.vars:
+            var.eval()
+        for stmt in self.stmts:
+            stmt.eval()
+
+        symbol_table.set_scope("GLOBAL")
+
+        quadruples.append(['ENDPROC', self.name, '', ''])
+
+
 class FunBody(BaseExpression):
     def __init__(self, params: List[VarDeclaration], vars: List[VarDeclaration],
                  statements: List[BaseExpression], return_exp: BaseExpression):
@@ -127,9 +151,10 @@ class FunCall(BaseExpression):
 
 
 class ClassBody(BaseExpression):
-    def __init__(self, vars: List[VarDeclaration], funs: List[Fun]):
+    def __init__(self, vars: List[VarDeclaration], funs: List[Fun], main: Main):
         self.vars = vars
         self.funs = funs
+        self.main = main
 
     def __repr__(self):
         return '<ClassBody vars_len={0} funs_len={1} vars={2} funs={3}>' \
@@ -140,6 +165,7 @@ class ClassBody(BaseExpression):
             var.eval()
         for fun in self.funs:
             fun.eval()
+        self.main.eval()
 
 
 class Class(BaseExpression):

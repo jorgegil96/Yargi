@@ -18,5 +18,10 @@ class Carro() {
     }
 
 	main() {
+	    int x;
+	    x = 100;
+	    for (x in 0..100) {
+	        g = 1;
+	    }
 	}
 }
