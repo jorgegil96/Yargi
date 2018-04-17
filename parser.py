@@ -208,6 +208,10 @@ def p_expresionr(p):
     expresionr : COMA expresion expresionr
     | empty
     '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [p[2]] + p[3]
 
 
 def p_expresion2(p):
@@ -381,6 +385,10 @@ def p_bloque2(p):
     bloque2 : RETURN bloque3
     | empty
     '''
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = p[2]
 
 
 def p_bloque3(p):
@@ -388,6 +396,10 @@ def p_bloque3(p):
     bloque3 : expresion COLON
     | empty
     '''
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = p[1]
 
 
 def p_estatutor(p):
@@ -435,7 +447,7 @@ def p_tipo(p):
 def p_factor(p):
     '''
     factor : PARIZQ expresion PARDER
-    | factor2 varcte varcter
+    | factor2 varcte
     '''
     if p[0] is None:
         p[0] = p[2]
@@ -575,8 +587,8 @@ def p_fun(p):
     '''
     fun : vars3 FUN ID PARIZQ fun2 PARDER fun3 funbody
     '''
-    body = p[8]
-    body.vars += p[5]
+    body: FunBody = p[8]
+    body.params = p[5]
     p[0] = Fun(name=p[3], type=p[7], visibility=p[1], body=body)
 
 
@@ -617,7 +629,7 @@ def p_funbody(p):
     '''
     funbody : LLAVEIZQ opc1 opc2 bloque2 LLAVEDER
     '''
-    p[0] = FunBody(p[2], p[3])
+    p[0] = FunBody([], p[2], p[3], p[4])
 
 
 def p_opc1(p):
@@ -684,9 +696,21 @@ def p_funr(p):
 
 def p_llamada(p):
     '''
-    llamada : ID PARIZQ expresion expresionr PARDER
+    llamada : ID PARIZQ llamada_param PARDER COLON
     | empty
     '''
+    p[0] = FunCall(p[1], p[3])
+
+
+def p_llamada_param(p):
+    '''
+    llamada_param : expresion expresionr
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [p[1]] + p[2]
 
 
 def p_error(p):

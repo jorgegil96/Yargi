@@ -3,24 +3,18 @@ class Carro() {
     int g;
     bool z;
 
-    fun bar(): int {
+    fun bar(float x, int y): int {
         int b, c;
-        float p;
         g = 1;
-        b = 5;
-        z = true;
-        when {
-            g == 1 -> {
-                b = 4 + 4;
-            }
-            b > 0 -> {
-                z = false;
-            }
-            else -> {
-                z = true;
-            }
-        }
+        b = 5 + g;
+        c = b;
         return c;
+    }
+
+    fun foo() {
+        g = 5;
+        bar(3.3, g);
+        z = false;
     }
 
 	main() {

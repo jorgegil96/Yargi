@@ -32,19 +32,28 @@ class VarDeclaration(BaseExpression):
 
 
 class FunBody(BaseExpression):
-    def __init__(self, vars: List[VarDeclaration], statements: List[BaseExpression]):
+    def __init__(self, params: List[VarDeclaration], vars: List[VarDeclaration],
+                 statements: List[BaseExpression], return_exp: BaseExpression):
+        self.params = params
         self.vars = vars
         self.statements = statements
+        self.return_exp = return_exp
 
     def __repr__(self):
-        return '<FunBody vars_len={0} stmts_len={1} vars={2} statements={3}>' \
-            .format(len(self.vars), len(self.statements), self.vars, self.statements)
+        return '<FunBody num_params={0} params={1} vars_len={2} stmts_len={3} vars={4} statements={5} return_exp={6}>' \
+            .format(len(self.params), self.params, len(self.vars), len(self.statements), self.vars, self.statements,
+                    self.return_exp)
 
     def eval(self):
+        for param in self.params:
+            param.eval()
         for var in self.vars:
             var.eval()
         for stmt in self.statements:
             stmt.eval()
+        if self.return_exp is not None:
+            ret_address, ret_type = self.return_exp.eval()
+            quadruples.append(['RETURN', ret_address, ret_type, ''])
 
 
 class Fun(BaseExpression):
@@ -59,10 +68,62 @@ class Fun(BaseExpression):
             .format(self.name, self.type, self.visibility, self.body)
 
     def eval(self):
+        quadruples.append(['STARTPROC', self.name, '', ''])
         symbol_table.add_fun(self)
         symbol_table.set_scope("LOCAL")
         self.body.eval()
         symbol_table.set_scope("GLOBAL")
+
+        last_quad = quadruples[len(quadruples) - 1]
+        if self.type != 'void':
+            if last_quad[0] != 'RETURN':
+                raise Exception("Missing return statement in fun %s" % self.name)
+            if last_quad[2] != self.type:
+                raise Exception("Return value must be of type {0} in fun {1} but was {2}"
+                                .format(self.type, self.name, last_quad[2]))
+
+        quadruples.append(['ENDPROC', self.name, '', ''])
+
+
+class FunCall(BaseExpression):
+    def __init__(self, fun_name, params: List[BaseExpression]):
+        self.fun_name = fun_name
+        self.params = params
+
+    def __repr__(self):
+        return '<FunCall fun_name={0} params={1}>'.format(self.fun_name, self.params)
+
+    def eval(self):
+        quadruples.append(["ERA", self.fun_name, '', ''])
+
+        fun: Fun = symbol_table.get_fun(self.fun_name)
+        if len(fun.body.params) != len(self.params):
+            raise Exception("Fun {0} expected {1} arguments but was {2}"
+                            .format(self.fun_name, len(fun.body.params), len(self.params)))
+
+        for param_index in range(0, len(self.params)):
+            fun_param = fun.body.params[param_index]
+            call_param = self.params[param_index]
+
+            address, type = call_param.eval()
+            if type != fun_param.type:
+                raise Exception("Expected {0} argument in function {1} call but was {2}"
+                                .format(fun_param.type, self.fun_name, type))
+
+            quadruples.append(['param', address, '', 'param' + str(param_index)])
+            param_index += 1
+
+        fun_start_quad_index = None
+        for i in range(0, len(quadruples)):
+            quad = quadruples[i]
+            if quad[0] == 'STARTPROC' and quad[1] == self.fun_name:
+                fun_start_quad_index = i
+                break
+
+        if fun_start_quad_index is None:
+            raise Exception("Use of undefined function %s" % self.fun_name)
+
+        quadruples.append(['GOSUB', self.fun_name, '', fun_start_quad_index])
 
 
 class ClassBody(BaseExpression):

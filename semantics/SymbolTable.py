@@ -58,6 +58,12 @@ class SymbolTable:
 
         self.__fun_dir[fun.name] = fun
 
+    def get_fun(self, fun_name):
+        if fun_name in self.__fun_dir:
+            return self.__fun_dir[fun_name]
+
+        raise Exception("Function %s not found" % fun_name)
+
     def add_sym(self, name, type, is_constant=False):
         '''
         Adds a symbol to the current local active table, or the global table if
