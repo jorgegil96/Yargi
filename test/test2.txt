@@ -1,22 +1,22 @@
 class Carro() {
 
-    int g;
+    int a, b;
+
+    fun factorial(int n, int m): int {
+        int x;
+        if (n <= 1) {
+            x = 1;
+        } else {
+            x = n * factorial(n - 1, m);
+        }
+        return x;
+    }
+
+    fun sum(int p, int q): int {
+        return p + q;
+    }
 
 	main() {
-	    int x, y;
-	    x = 100;
-	    y = 100 * 110;
-
-	    when {
-	        y == 0 -> {
-	            g = 1;
-	        }
-	        y < 10 -> {
-	            g = 2;
-	        }
-	        else -> {
-	            g = 3;
-	        }
-	    }
+	    a = factorial(4 + 1, 1 + 1);
 	}
 }

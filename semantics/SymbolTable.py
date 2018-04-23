@@ -7,17 +7,25 @@ class SymbolTable:
     __fun_dir = {}
     # Stores the variable table of the global scope
     __global_sym_table = {}
+    __global_int_pointer = 0
+    __global_float_pointer = 5000
+    __global_bool_pointer = 10000
+    __global_string_pointer = 15000
     # Stores a list a variable tables of local scope
     __local_sym_tables = []
+    __local_int_pointer = 20000
+    __local_float_pointer = 25000
+    __local_bool_pointer = 30000
+    __local_string_pointer = 35000
     # Stores the variable table for temporary vars
     __temp_sym_table = {}
+    __temp_int_pointer = 40000
+    __temp_float_pointer = 45000
+    __temp_bool_pointer = 50000
+    __temp_string_pointer = 55000
 
     __temp_counter = 0
 
-    __int_pointer = 0
-    __float_pointer = 5000
-    __bool_pointer = 10000
-    __string_pointer = 15000
     __last_pointer = 0
 
     def __repr__(self):
@@ -74,14 +82,18 @@ class SymbolTable:
         '''
         if is_constant:
             table = self.__global_sym_table
+            table_type = "GLOBAL"
         else:
             if name == "temp":
                 table = self.__temp_sym_table
+                table_type = "TEMP"
             else:
                 if self.get_current_scope() == SCOPE_LOCAL:
                     table = self.get_local_table()
+                    table_type = "LOCAL"
                 else:
                     table = self.__global_sym_table
+                    table_type = "GLOBAL"
 
         if name in table:
             raise Exception("Var %s is already declared" % name)
@@ -96,25 +108,61 @@ class SymbolTable:
 
         if name in table[type]:
             return table[type][name]
-        if type == "int":
-            table[type][name] = self.__int_pointer
-            self.__last_pointer = self.__int_pointer
-            self.__int_pointer += 1
-        elif type == "float":
-            table[type][name] = self.__float_pointer
-            self.__last_pointer = self.__float_pointer
-            self.__float_pointer += 1
-        elif type == "bool":
-            table[type][name] = self.__bool_pointer
-            self.__last_pointer = self.__bool_pointer
-            self.__bool_pointer += 1
-        elif type == "string":
-            table[type][name] = self.__string_pointer
-            self.__last_pointer = self.__string_pointer
-            self.__string_pointer += 1
-        else:
-            raise Exception("Invalid type %s" % type)
+
+        pointer = self.get_pointer(table_type, type)
+        table[type][name] = pointer
+        self.__last_pointer = pointer
+
         return self.__last_pointer
+
+    def get_pointer(self, table_type, var_type):
+        if table_type == "GLOBAL":
+            if var_type == "int":
+                self.__global_int_pointer += 1
+                return self.__global_int_pointer - 1
+            elif var_type == "float":
+                self.__global_float_pointer += 1
+                return self.__global_float_pointer - 1
+            elif var_type == "bool":
+                self.__global_bool_pointer += 1
+                return self.__global_bool_pointer - 1
+            elif var_type == "string":
+                self.__global_string_pointer += 1
+                return self.__global_string_pointer - 1
+            else:
+                raise Exception("Illegal state")
+        elif table_type == "LOCAL":
+            if var_type == "int":
+                self.__local_int_pointer += 1
+                return self.__local_int_pointer - 1
+            elif var_type == "float":
+                self.__local_float_pointer += 1
+                return self.__local_float_pointer - 1
+            elif var_type == "bool":
+                self.__local_bool_pointer += 1
+                return self.__local_bool_pointer - 1
+            elif var_type == "string":
+                self.__local_string_pointer += 1
+                return self.__local_string_pointer - 1
+            else:
+                raise Exception("Illegal state")
+        elif table_type == "TEMP":
+            if var_type == "int":
+                self.__temp_int_pointer += 1
+                return self.__temp_int_pointer - 1
+            elif var_type == "float":
+                self.__temp_float_pointer += 1
+                return self.__temp_float_pointer - 1
+            elif var_type == "bool":
+                self.__temp_bool_pointer += 1
+                return self.__temp_bool_pointer - 1
+            elif var_type == "string":
+                self.__temp_string_pointer += 1
+                return self.__temp_string_pointer - 1
+            else:
+                raise Exception("Illegal state")
+        else:
+            raise Exception("Illegal state")
 
     def add_temp(self, type):
         '''

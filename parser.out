@@ -27,7 +27,7 @@ Rule 12    varcte -> FALSE
 Rule 13    varcte -> STRING
 Rule 14    varcte -> ID CORCHIZQ varcte CORCHDER
 Rule 15    varcte -> ID PUNTO ID
-Rule 16    varcte -> ID PARIZQ expresion2 PARDER
+Rule 16    varcte -> ID PARIZQ llamada_param PARDER
 Rule 17    expresion -> megaexp
 Rule 18    expresionr -> COMA expresion expresionr
 Rule 19    expresionr -> empty
@@ -229,7 +229,7 @@ estatutor            : 58
 exp                  : 22 23 24 25 26 27 28
 expr                 : 85 86 87
 expresion            : 18 20 50 51 53 55 59 65 70 79 101 103 128
-expresion2           : 16
+expresion2           : 
 expresionr           : 18 20 128
 factor               : 81 82 84
 factor2              : 80
@@ -242,7 +242,7 @@ funbody              : 106
 funparamr            : 107 109
 funr                 : 118 124
 llamada              : 47
-llamada_param        : 126
+llamada_param        : 16 126
 mainbloque           : 118
 megaexp              : 17
 megaexpr             : 30 31 32
@@ -2197,7 +2197,7 @@ state 118
     (13) varcte -> . STRING
     (14) varcte -> . ID CORCHIZQ varcte CORCHDER
     (15) varcte -> . ID PUNTO ID
-    (16) varcte -> . ID PARIZQ expresion2 PARDER
+    (16) varcte -> . ID PARIZQ llamada_param PARDER
 
     ID              shift and go to state 171
     INTNUM          shift and go to state 172
@@ -3110,7 +3110,7 @@ state 171
     (8) varcte -> ID .
     (14) varcte -> ID . CORCHIZQ varcte CORCHDER
     (15) varcte -> ID . PUNTO ID
-    (16) varcte -> ID . PARIZQ expresion2 PARDER
+    (16) varcte -> ID . PARIZQ llamada_param PARDER
 
   ! shift/reduce conflict for CORCHIZQ resolved as shift
     POR             reduce using rule 8 (varcte -> ID .)
@@ -3854,7 +3854,7 @@ state 212
     (13) varcte -> . STRING
     (14) varcte -> . ID CORCHIZQ varcte CORCHDER
     (15) varcte -> . ID PUNTO ID
-    (16) varcte -> . ID PARIZQ expresion2 PARDER
+    (16) varcte -> . ID PARIZQ llamada_param PARDER
 
     ID              shift and go to state 171
     INTNUM          shift and go to state 172
@@ -3874,9 +3874,9 @@ state 213
 
 state 214
 
-    (16) varcte -> ID PARIZQ . expresion2 PARDER
-    (20) expresion2 -> . expresion expresionr
-    (21) expresion2 -> . empty
+    (16) varcte -> ID PARIZQ . llamada_param PARDER
+    (128) llamada_param -> . expresion expresionr
+    (129) llamada_param -> . empty
     (17) expresion -> . megaexp
     (130) empty -> .
     (30) megaexp -> . superexp megaexpr
@@ -3900,9 +3900,9 @@ state 214
     MAS             shift and go to state 119
     MENOS           shift and go to state 120
 
-    expresion2                     shift and go to state 242
-    expresion                      shift and go to state 243
-    empty                          shift and go to state 244
+    llamada_param                  shift and go to state 242
+    expresion                      shift and go to state 111
+    empty                          shift and go to state 112
     megaexp                        shift and go to state 113
     superexp                       shift and go to state 114
     exp                            shift and go to state 115
@@ -3920,7 +3920,7 @@ state 215
     RETURN          shift and go to state 227
     LLAVEDER        reduce using rule 130 (empty -> .)
 
-    bloque2                        shift and go to state 245
+    bloque2                        shift and go to state 243
     empty                          shift and go to state 228
 
 state 216
@@ -3962,7 +3962,7 @@ state 218
     COMA            shift and go to state 182
     PARDER          reduce using rule 130 (empty -> .)
 
-    esc2                           shift and go to state 246
+    esc2                           shift and go to state 244
     empty                          shift and go to state 183
 
 state 219
@@ -3972,14 +3972,14 @@ state 219
     (99) range -> ID . PUNTOSRANGO INTNUM
 
     PARDER          reduce using rule 95 (for2 -> ID .)
-    PUNTOSRANGO     shift and go to state 247
+    PUNTOSRANGO     shift and go to state 245
 
 
 state 220
 
     (94) for -> FOR PARIZQ ID IN for2 . PARDER bloque
 
-    PARDER          shift and go to state 248
+    PARDER          shift and go to state 246
 
 
 state 221
@@ -3994,7 +3994,7 @@ state 222
     (97) range -> INTNUM . PUNTOSRANGO INTNUM
     (100) range -> INTNUM . PUNTOSRANGO ID
 
-    PUNTOSRANGO     shift and go to state 249
+    PUNTOSRANGO     shift and go to state 247
 
 
 state 223
@@ -4042,7 +4042,7 @@ state 224
     MENOS           shift and go to state 120
 
     expresion                      shift and go to state 134
-    when2                          shift and go to state 250
+    when2                          shift and go to state 248
     empty                          shift and go to state 136
     megaexp                        shift and go to state 113
     superexp                       shift and go to state 114
@@ -4062,7 +4062,7 @@ state 226
 
     (113) funbody -> LLAVEIZQ opc1 opc2 bloque2 . LLAVEDER
 
-    LLAVEDER        shift and go to state 251
+    LLAVEDER        shift and go to state 249
 
 
 state 227
@@ -4093,9 +4093,9 @@ state 227
     MAS             shift and go to state 119
     MENOS           shift and go to state 120
 
-    bloque3                        shift and go to state 252
-    expresion                      shift and go to state 253
-    empty                          shift and go to state 254
+    bloque3                        shift and go to state 250
+    expresion                      shift and go to state 251
+    empty                          shift and go to state 252
     megaexp                        shift and go to state 113
     superexp                       shift and go to state 114
     exp                            shift and go to state 115
@@ -4114,7 +4114,7 @@ state 229
 
     (51) asignacion2 -> CORCHDER expresion asignacion2r . CORCHIZQ
 
-    CORCHIZQ        shift and go to state 255
+    CORCHIZQ        shift and go to state 253
 
 
 state 230
@@ -4142,7 +4142,7 @@ state 230
     FALSE           reduce using rule 130 (empty -> .)
     STRING          reduce using rule 130 (empty -> .)
 
-    expresion                      shift and go to state 256
+    expresion                      shift and go to state 254
     megaexp                        shift and go to state 113
     superexp                       shift and go to state 114
     exp                            shift and go to state 115
@@ -4162,7 +4162,7 @@ state 232
 
     (52) asignacion2 -> READ PARIZQ STRING . PARDER
 
-    PARDER          shift and go to state 257
+    PARDER          shift and go to state 255
 
 
 state 233
@@ -4284,7 +4284,7 @@ state 240
 
     (14) varcte -> ID CORCHIZQ varcte . CORCHDER
 
-    CORCHDER        shift and go to state 258
+    CORCHDER        shift and go to state 256
 
 
 state 241
@@ -4313,87 +4313,60 @@ state 241
 
 state 242
 
-    (16) varcte -> ID PARIZQ expresion2 . PARDER
+    (16) varcte -> ID PARIZQ llamada_param . PARDER
 
-    PARDER          shift and go to state 259
+    PARDER          shift and go to state 257
 
 
 state 243
 
-    (20) expresion2 -> expresion . expresionr
-    (18) expresionr -> . COMA expresion expresionr
-    (19) expresionr -> . empty
-    (130) empty -> .
-
-    COMA            shift and go to state 148
-    PARDER          reduce using rule 130 (empty -> .)
-
-    expresionr                     shift and go to state 260
-    empty                          shift and go to state 149
-
-state 244
-
-    (21) expresion2 -> empty .
-    (93) factor2 -> empty .
-
-    PARDER          reduce using rule 21 (expresion2 -> empty .)
-    ID              reduce using rule 93 (factor2 -> empty .)
-    INTNUM          reduce using rule 93 (factor2 -> empty .)
-    FLOATNUM        reduce using rule 93 (factor2 -> empty .)
-    TRUE            reduce using rule 93 (factor2 -> empty .)
-    FALSE           reduce using rule 93 (factor2 -> empty .)
-    STRING          reduce using rule 93 (factor2 -> empty .)
-
-
-state 245
-
     (62) bloque -> LLAVEIZQ estatuto bloque2 . LLAVEDER
 
-    LLAVEDER        shift and go to state 261
+    LLAVEDER        shift and go to state 258
 
 
-state 246
+state 244
 
     (72) esc2 -> COMA esc1 esc2 .
 
     PARDER          reduce using rule 72 (esc2 -> COMA esc1 esc2 .)
 
 
-state 247
+state 245
 
     (98) range -> ID PUNTOSRANGO . ID
     (99) range -> ID PUNTOSRANGO . INTNUM
 
-    ID              shift and go to state 262
-    INTNUM          shift and go to state 263
+    ID              shift and go to state 259
+    INTNUM          shift and go to state 260
 
 
-state 248
+state 246
 
     (94) for -> FOR PARIZQ ID IN for2 PARDER . bloque
     (62) bloque -> . LLAVEIZQ estatuto bloque2 LLAVEDER
 
     LLAVEIZQ        shift and go to state 179
 
-    bloque                         shift and go to state 264
+    bloque                         shift and go to state 261
 
-state 249
+state 247
 
     (97) range -> INTNUM PUNTOSRANGO . INTNUM
     (100) range -> INTNUM PUNTOSRANGO . ID
 
-    INTNUM          shift and go to state 265
-    ID              shift and go to state 266
+    INTNUM          shift and go to state 262
+    ID              shift and go to state 263
 
 
-state 250
+state 248
 
     (103) when2 -> expresion FLECHITA bloque when2 .
 
     LLAVEDER        reduce using rule 103 (when2 -> expresion FLECHITA bloque when2 .)
 
 
-state 251
+state 249
 
     (113) funbody -> LLAVEIZQ opc1 opc2 bloque2 LLAVEDER .
 
@@ -4402,21 +4375,21 @@ state 251
     MAIN            reduce using rule 113 (funbody -> LLAVEIZQ opc1 opc2 bloque2 LLAVEDER .)
 
 
-state 252
+state 250
 
     (63) bloque2 -> RETURN bloque3 .
 
     LLAVEDER        reduce using rule 63 (bloque2 -> RETURN bloque3 .)
 
 
-state 253
+state 251
 
     (65) bloque3 -> expresion . COLON
 
-    COLON           shift and go to state 267
+    COLON           shift and go to state 264
 
 
-state 254
+state 252
 
     (66) bloque3 -> empty .
     (93) factor2 -> empty .
@@ -4430,14 +4403,14 @@ state 254
     STRING          reduce using rule 93 (factor2 -> empty .)
 
 
-state 255
+state 253
 
     (51) asignacion2 -> CORCHDER expresion asignacion2r CORCHIZQ .
 
     COLON           reduce using rule 51 (asignacion2 -> CORCHDER expresion asignacion2r CORCHIZQ .)
 
 
-state 256
+state 254
 
     (53) asignacion2r -> COMA expresion . asignacion2r
     (53) asignacion2r -> . COMA expresion asignacion2r
@@ -4447,17 +4420,17 @@ state 256
     COMA            shift and go to state 230
     CORCHIZQ        reduce using rule 130 (empty -> .)
 
-    asignacion2r                   shift and go to state 268
+    asignacion2r                   shift and go to state 265
     empty                          shift and go to state 231
 
-state 257
+state 255
 
     (52) asignacion2 -> READ PARIZQ STRING PARDER .
 
     COLON           reduce using rule 52 (asignacion2 -> READ PARIZQ STRING PARDER .)
 
 
-state 258
+state 256
 
     (14) varcte -> ID CORCHIZQ varcte CORCHDER .
 
@@ -4481,38 +4454,31 @@ state 258
     CORCHIZQ        reduce using rule 14 (varcte -> ID CORCHIZQ varcte CORCHDER .)
 
 
-state 259
+state 257
 
-    (16) varcte -> ID PARIZQ expresion2 PARDER .
+    (16) varcte -> ID PARIZQ llamada_param PARDER .
 
-    POR             reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    SOBRE           reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    MAS             reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    MENOS           reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    MAYORQUE        reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    MENORQUE        reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    DIFERENTE       reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    MAYOROIGUAL     reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    MENOROIGUAL     reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    IGUALIGUAL      reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    AND             reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    OR              reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    COMA            reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    PARDER          reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    CORCHDER        reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    FLECHITA        reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    COLON           reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-    CORCHIZQ        reduce using rule 16 (varcte -> ID PARIZQ expresion2 PARDER .)
-
-
-state 260
-
-    (20) expresion2 -> expresion expresionr .
-
-    PARDER          reduce using rule 20 (expresion2 -> expresion expresionr .)
+    POR             reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    SOBRE           reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    MAS             reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    MENOS           reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    MAYORQUE        reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    MENORQUE        reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    DIFERENTE       reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    MAYOROIGUAL     reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    MENOROIGUAL     reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    IGUALIGUAL      reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    AND             reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    OR              reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    COMA            reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    PARDER          reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    CORCHDER        reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    FLECHITA        reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    COLON           reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
+    CORCHIZQ        reduce using rule 16 (varcte -> ID PARIZQ llamada_param PARDER .)
 
 
-state 261
+state 258
 
     (62) bloque -> LLAVEIZQ estatuto bloque2 LLAVEDER .
 
@@ -4535,21 +4501,21 @@ state 261
     STRING          reduce using rule 62 (bloque -> LLAVEIZQ estatuto bloque2 LLAVEDER .)
 
 
-state 262
+state 259
 
     (98) range -> ID PUNTOSRANGO ID .
 
     PARDER          reduce using rule 98 (range -> ID PUNTOSRANGO ID .)
 
 
-state 263
+state 260
 
     (99) range -> ID PUNTOSRANGO INTNUM .
 
     PARDER          reduce using rule 99 (range -> ID PUNTOSRANGO INTNUM .)
 
 
-state 264
+state 261
 
     (94) for -> FOR PARIZQ ID IN for2 PARDER bloque .
 
@@ -4563,28 +4529,28 @@ state 264
     RETURN          reduce using rule 94 (for -> FOR PARIZQ ID IN for2 PARDER bloque .)
 
 
-state 265
+state 262
 
     (97) range -> INTNUM PUNTOSRANGO INTNUM .
 
     PARDER          reduce using rule 97 (range -> INTNUM PUNTOSRANGO INTNUM .)
 
 
-state 266
+state 263
 
     (100) range -> INTNUM PUNTOSRANGO ID .
 
     PARDER          reduce using rule 100 (range -> INTNUM PUNTOSRANGO ID .)
 
 
-state 267
+state 264
 
     (65) bloque3 -> expresion COLON .
 
     LLAVEDER        reduce using rule 65 (bloque3 -> expresion COLON .)
 
 
-state 268
+state 265
 
     (53) asignacion2r -> COMA expresion asignacion2r .
 

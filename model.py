@@ -28,7 +28,7 @@ class VarDeclaration(BaseExpression):
             .format(self.name, self.type, self.visibility, self.value)
 
     def eval(self):
-        symbol_table.add_sym(self.name, self.type)
+        return symbol_table.add_sym(self.name, self.type)
 
 
 class Main(BaseExpression):
@@ -71,7 +71,8 @@ class FunBody(BaseExpression):
 
     def eval(self):
         for param in self.params:
-            param.eval()
+            address = param.eval()
+            quadruples.append(['ASG_PARAM', '', '', address])
         for var in self.vars:
             var.eval()
         for stmt in self.statements:
@@ -148,7 +149,13 @@ class FunCall(BaseExpression):
         if fun_start_quad_index is None:
             raise Exception("Use of undefined function %s" % self.fun_name)
 
-        quadruples.append(['GOSUB', self.fun_name, '', fun_start_quad_index])
+        if fun.type != 'void':
+            address = symbol_table.add_temp(fun.type)
+        else:
+            address = ''
+
+        quadruples.append(['GOSUB', self.fun_name, address, fun_start_quad_index])
+        return address, fun.type
 
 
 class ClassBody(BaseExpression):

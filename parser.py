@@ -188,10 +188,13 @@ def p_varcte(p):
     | STRING
     | ID CORCHIZQ varcte CORCHDER
     | ID PUNTO ID
-    | ID PARIZQ expresion2 PARDER
+    | ID PARIZQ llamada_param PARDER
     '''
-    type = p.slice[1].type
-    p[0] = ConstantVar(p[1], type)
+    if len(p) == 2:
+        type = p.slice[1].type
+        p[0] = ConstantVar(p[1], type)
+    elif len(p) == 5:
+        p[0] = FunCall(p[1], p[3])
 
 
 def p_expresion(p):
