@@ -339,12 +339,20 @@ def p_asignacion2(p):
     '''
     asignacion2 : expresion
     | CORCHDER expresion asignacion2r CORCHIZQ
-    | READ PARIZQ STRINGVAL PARDER
+    | READ PARIZQ assign_read PARDER
     '''
     if len(p) == 2:
         p[0] = p[1]
     elif len(p) == 5:
         p[0] = Read(p[3])
+
+
+def p_assign_read(p):
+    '''
+    assign_read : STRINGVAL
+        | empty
+    '''
+    p[0] = p[1]
 
 
 def p_asignacion2r(p):

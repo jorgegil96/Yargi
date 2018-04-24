@@ -694,4 +694,6 @@ class Read(BaseExpression):
         return '<Read message={0}>'.format(self.message)
 
     def eval(self):
+        if self.message is None:
+            return input()
         return input(self.message)
