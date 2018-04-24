@@ -339,10 +339,12 @@ def p_asignacion2(p):
     '''
     asignacion2 : expresion
     | CORCHDER expresion asignacion2r CORCHIZQ
-    | READ PARIZQ STRING PARDER
+    | READ PARIZQ STRINGVAL PARDER
     '''
     if len(p) == 2:
         p[0] = p[1]
+    elif len(p) == 5:
+        p[0] = Read(p[3])
 
 
 def p_asignacion2r(p):
@@ -761,7 +763,7 @@ while True:
     fun_directory.print()
 '''
 
-with open("test/fibonacci.txt", 'r') as f:
+with open("test/factorial.txt", 'r') as f:
     input = f.read()
     res: Class = parser.parse(input)
 

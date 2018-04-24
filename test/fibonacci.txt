@@ -31,13 +31,14 @@ class Fibonacci() {
     }
 
 	main() {
-	    int i;
+	    int i, n;
+	    n = read("Cuantos numeros de la serie? => ");
 
 	    write("Non-recursive Fibonacci:");
-        nonRecursiveFibonacci(10);
+        nonRecursiveFibonacci(n);
 
         write("Recursive Fibonacci:");
-        for (i in 0..10) {
+        for (i in 0..n) {
             write(recursiveFibonacci(i));
         }
 	}

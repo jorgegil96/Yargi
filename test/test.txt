@@ -1,0 +1,11 @@
+class Test() {
+
+    main() {
+        bool x;
+
+        x = read("dame un numero => ");
+
+        write(x);
+    }
+
+}

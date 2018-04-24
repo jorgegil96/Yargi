@@ -12,7 +12,7 @@ class Factorial() {
 
 	main() {
 	    int n;
-	    n = 5;
+	    n = read("Factorial para el numero => ");
 	    write("Factorial de ", n, " es => ", factorial(5));
 	}
 }

@@ -62,7 +62,7 @@ Rule 48    estatuto -> empty
 Rule 49    asignacion -> ID asignacion3 IGUAL asignacion2 COLON
 Rule 50    asignacion2 -> expresion
 Rule 51    asignacion2 -> CORCHDER expresion asignacion2r CORCHIZQ
-Rule 52    asignacion2 -> READ PARIZQ STRING PARDER
+Rule 52    asignacion2 -> READ PARIZQ STRINGVAL PARDER
 Rule 53    asignacion2r -> COMA expresion asignacion2r
 Rule 54    asignacion2r -> empty
 Rule 55    asignacion3 -> CORCHIZQ expresion CORCHDER
@@ -193,8 +193,8 @@ RANGE                :
 READ                 : 52
 RETURN               : 63
 SOBRE                : 82
-STRING               : 52 71 77
-STRINGVAL            : 13
+STRING               : 71 77
+STRINGVAL            : 13 52
 TRUE                 : 11
 WHEN                 : 102
 WHILE                : 101
@@ -1960,7 +1960,7 @@ state 108
     (49) asignacion -> ID asignacion3 IGUAL . asignacion2 COLON
     (50) asignacion2 -> . expresion
     (51) asignacion2 -> . CORCHDER expresion asignacion2r CORCHIZQ
-    (52) asignacion2 -> . READ PARIZQ STRING PARDER
+    (52) asignacion2 -> . READ PARIZQ STRINGVAL PARDER
     (17) expresion -> . megaexp
     (30) megaexp -> . superexp megaexpr
     (22) superexp -> . exp oplog
@@ -2547,7 +2547,7 @@ state 143
 
 state 144
 
-    (52) asignacion2 -> READ . PARIZQ STRING PARDER
+    (52) asignacion2 -> READ . PARIZQ STRINGVAL PARDER
 
     PARIZQ          shift and go to state 196
 
@@ -3542,9 +3542,9 @@ state 195
 
 state 196
 
-    (52) asignacion2 -> READ PARIZQ . STRING PARDER
+    (52) asignacion2 -> READ PARIZQ . STRINGVAL PARDER
 
-    STRING          shift and go to state 232
+    STRINGVAL       shift and go to state 232
 
 
 state 197
@@ -4148,7 +4148,7 @@ state 231
 
 state 232
 
-    (52) asignacion2 -> READ PARIZQ STRING . PARDER
+    (52) asignacion2 -> READ PARIZQ STRINGVAL . PARDER
 
     PARDER          shift and go to state 256
 
@@ -4427,9 +4427,9 @@ state 255
 
 state 256
 
-    (52) asignacion2 -> READ PARIZQ STRING PARDER .
+    (52) asignacion2 -> READ PARIZQ STRINGVAL PARDER .
 
-    COLON           reduce using rule 52 (asignacion2 -> READ PARIZQ STRING PARDER .)
+    COLON           reduce using rule 52 (asignacion2 -> READ PARIZQ STRINGVAL PARDER .)
 
 
 state 257

@@ -198,14 +198,38 @@ class Assignment(BaseExpression):
         return '<Assignment id={0} value={1}>'.format(self.id, self.value)
 
     def eval(self):
-        address, type = self.value.eval()  # address and type of the result.
+        if isinstance(self.value, Read):
+            input = self.value.eval()
+            assignee_address, assignee_type = symbol_table.get_sym_address_and_type(self.id)
 
-        # Verify that the variable to assign to exists and is of correct type. Throws if invalid.
-        symbol_table.verify_sym_declared_with_correct_type(self.id, utils.parser_type_to_cube_type(type))
+            if assignee_type == 'bool':
+                if input == "true":
+                    val = True
+                elif input == "false":
+                    val = False
+                else:
+                    raise Exception("Invalid boolean value " + input)
+            elif assignee_type == 'int':
+                val = int(input)
+            elif assignee_type == 'float':
+                val = float(input)
+            elif assignee_type == 'string':
+                val = str(input)
+            else:
+                raise Exception("Invalid input type at assignment " + input)
 
-        assignee_address, assignee_type = symbol_table.get_sym_address_and_type(self.id)
+            address = symbol_table.add_sym(str(val), assignee_type, is_constant=True)
+            quadruples.append(['=', address, '', assignee_address])
+            print()
+        else:
+            address, type = self.value.eval()  # address and type of the result.
 
-        quadruples.append(['=', address, '', assignee_address])
+            # Verify that the variable to assign to exists and is of correct type. Throws if invalid.
+            symbol_table.verify_sym_declared_with_correct_type(self.id, utils.parser_type_to_cube_type(type))
+
+            assignee_address, assignee_type = symbol_table.get_sym_address_and_type(self.id)
+
+            quadruples.append(['=', address, '', assignee_address])
 
 
 class ConstantVar(BaseExpression):
@@ -253,7 +277,7 @@ class TerminoR(BaseExpression):
         self.termino_r = termino_r
 
     def __repr__(self):
-        return '<TerminoR optype={0} factor={1} termino_r={2}>'\
+        return '<TerminoR optype={0} factor={1} termino_r={2}>' \
             .format(self.optype, self.factor, self.termino_r)
 
     def eval(self):
@@ -420,7 +444,7 @@ class LogicalOperand(BaseExpression):
         self.logical_operand = logical_operand
 
     def __repr__(self):
-        return '<LogicalOperand type={0} super_exp={1} logical_operand={2}>'\
+        return '<LogicalOperand type={0} super_exp={1} logical_operand={2}>' \
             .format(self.type, self.super_exp, self.logical_operand)
 
     def eval(self):
@@ -475,7 +499,7 @@ class If(BaseExpression):
         self.false_stmts = false_stmts
 
     def __repr__(self):
-        return '<If base_exp={0} true_stms={1}>'\
+        return '<If base_exp={0} true_stms={1}>' \
             .format(self.base_exp, self.true_stmts)
 
     def eval(self):
@@ -615,7 +639,7 @@ class WhenBranch(BaseExpression):
         self.next_branch = next_branch
 
     def __repr__(self):
-        return '<WhenBranch base_exp={0} stmts={1} next_branch={2}>'\
+        return '<WhenBranch base_exp={0} stmts={1} next_branch={2}>' \
             .format(self.base_exp, self.stmts, self.next_branch)
 
     def eval(self):
@@ -660,3 +684,14 @@ class Write(BaseExpression):
             address, _ = arg.eval()
             quadruples.append(['WRITE', address, '', ''])
         quadruples.append(['WRITE', '', '', ''])
+
+
+class Read(BaseExpression):
+    def __init__(self, message):
+        self.message = message
+
+    def __repr__(self):
+        return '<Read message={0}>'.format(self.message)
+
+    def eval(self):
+        return input(self.message)
