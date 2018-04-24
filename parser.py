@@ -92,7 +92,6 @@ t_PUNTO = r'\.'
 t_IGUAL = r'='
 t_PUNTOSRANGO = r'\.\.'
 t_FLECHITA = r'\-\>'
-t_STRINGVAL = r'[\"].*[\"]'
 
 
 def t_FLOATNUM(token):
@@ -132,7 +131,13 @@ def t_CID(token):
 def t_ID(token):
     r'[a-zA-Z][a-zA-z0-9]*'
     token.type = keywords.get(token.value, 'ID')
+    return token
 
+
+def t_STRINGVAL(token):
+    r'[\"][^"]*[\"]'
+    token.type = keywords.get(token.value, 'STRINGVAL')
+    token.value = str(token.value)[1:-1]
     return token
 
 
@@ -185,7 +190,7 @@ def p_varcte(p):
     | FLOATNUM
     | TRUE
     | FALSE
-    | STRING
+    | STRINGVAL
     | ID CORCHIZQ varcte CORCHDER
     | ID PUNTO ID
     | ID PARIZQ llamada_param PARDER
@@ -419,8 +424,9 @@ def p_estatutor(p):
 
 def p_escritura(p):
     '''
-    escritura : WRITE PARIZQ esc1 esc2 PARDER
+    escritura : WRITE PARIZQ esc1 esc2 PARDER COLON
     '''
+    p[0] = Write(p[3] + p[4])
 
 
 def p_esc1(p):
@@ -428,6 +434,7 @@ def p_esc1(p):
     esc1 : expresion
     | STRING
     '''
+    p[0] = [p[1]]
 
 
 def p_esc2(p):
@@ -435,6 +442,10 @@ def p_esc2(p):
     esc2 : COMA esc1 esc2
     | empty
     '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = p[2] + p[3]
 
 
 def p_tipo(p):
@@ -584,7 +595,7 @@ def p_when2(p):
     if len(p) == 2:
         p[0] = None
     elif len(p) == 4:
-        p[0] = WhenBranch(ConstantVar('True', 'TRUE'), p[3], None)
+        p[0] = WhenBranch(None, p[3], None)
     else:
         p[0] = WhenBranch(p[1], p[3], p[4])
 
@@ -750,7 +761,7 @@ while True:
     fun_directory.print()
 '''
 
-with open("test/test2.txt", 'r') as f:
+with open("test/fibonacci.txt", 'r') as f:
     input = f.read()
     res: Class = parser.parse(input)
 

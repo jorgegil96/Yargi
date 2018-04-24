@@ -1,0 +1,18 @@
+class Factorial() {
+
+    fun factorial(int n): int {
+        int x;
+        if (n <= 1) {
+            x = 1;
+        } else {
+            x = n * factorial(n - 1);
+        }
+        return x;
+    }
+
+	main() {
+	    int n;
+	    n = 5;
+	    write("Factorial de ", n, " es => ", factorial(5));
+	}
+}

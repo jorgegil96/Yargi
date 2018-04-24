@@ -619,22 +619,44 @@ class WhenBranch(BaseExpression):
             .format(self.base_exp, self.stmts, self.next_branch)
 
     def eval(self):
-        exp_address, exp_type = self.base_exp.eval()
-        if exp_type != 'bool':
-            raise Exception("When branch must evaluate to bool")
+        if self.base_exp is not None:
+            exp_address, exp_type = self.base_exp.eval()
+            if exp_type != 'bool':
+                raise Exception("When branch must evaluate to bool")
 
-        gotof = ["GOTOF", exp_address, '', '']
-        quadruples.append(gotof)
+            gotof = ["GOTOF", exp_address, '', '']
+            quadruples.append(gotof)
 
-        for stmt in self.stmts:
-            stmt.eval()
+            for stmt in self.stmts:
+                stmt.eval()
 
-        goto = ["GOTO", '', '', '']
-        quadruples.append(goto)
+            goto = ["GOTO", '', '', '']
+            quadruples.append(goto)
 
-        gotof[3] = len(quadruples)
+            gotof[3] = len(quadruples)
 
-        if self.next_branch is not None:
-            self.next_branch.eval()
+            if self.next_branch is not None:
+                self.next_branch.eval()
 
-        goto[3] = len(quadruples)
+            goto[3] = len(quadruples)
+        else:
+            for stmt in self.stmts:
+                stmt.eval()
+
+            goto = ["GOTO", '', '', '']
+            quadruples.append(goto)
+            goto[3] = len(quadruples)
+
+
+class Write(BaseExpression):
+    def __init__(self, args: List[BaseExpression]):
+        self.args = args
+
+    def __repr__(self):
+        return '<Write args={0}>'.format(self.args)
+
+    def eval(self):
+        for arg in self.args:
+            address, _ = arg.eval()
+            quadruples.append(['WRITE', address, '', ''])
+        quadruples.append(['WRITE', '', '', ''])
