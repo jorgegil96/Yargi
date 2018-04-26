@@ -24,6 +24,7 @@ keywords = {
     'write': 'WRITE',
     'read': 'READ',
     'global': 'GLOBAL',
+    'data': 'DATA',
     'class': 'CLASS',
     'list': 'LIST',
     'range': 'RANGE',
@@ -170,8 +171,12 @@ def p_classr(p):
 def p_class(p):
     '''
     class : CLASS CID classparams class2 body
+        | DATA CLASS CID classparams
     '''
-    p[0] = Class(name=p[2], members=p[3], body=p[5])
+    if len(p) == 6:
+        p[0] = Class(name=p[2], members=p[3], body=p[5])
+    else:
+        p[0] = Class(name=p[3], members=p[4], body=None)
 
 
 def p_class2(p):
@@ -823,7 +828,7 @@ while True:
     fun_directory.print()
 '''
 
-with open("test/factorial.txt", 'r') as f:
+with open("test/data_classes.txt", 'r') as f:
     input = f.read()
     file: List[Class] = parser.parse(input)
     model.quadruples.append(['GOTO', '', '', ''])

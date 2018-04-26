@@ -1,6 +1,6 @@
-class Pair(int first, int second)
+data class Pair(int first, int second)
 
-class Quadruple(int first, int second, int third, int fourth)
+data class Quadruple(int first, int second, int third, int fourth)
 
 class Test {
 
