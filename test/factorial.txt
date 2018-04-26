@@ -1,4 +1,4 @@
-class Factorial() {
+class Factorial {
 
     fun factorial(int n): int {
         int x;

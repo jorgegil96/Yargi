@@ -1,11 +1,22 @@
-class Test() {
+class Pair(int first, int second)
+
+class Quadruple(int first, int second, int third, int fourth)
+
+class Test {
+
+    Pair pair;
 
     main() {
-        bool x;
+        Quadruple quad;
 
-        x = read("dame un numero => ");
+        quad = Quadruple(1, 2, 3, 4);
+        pair = Pair(8, 10);
 
-        write(x);
+        if (pair.second < quad.fourth) {
+            write(pair.first + quad.first);
+        } else {
+            write(quad.second + quad.third + pair.second);
+        }
     }
 
 }

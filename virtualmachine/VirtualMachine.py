@@ -1,14 +1,21 @@
 from typing import List
 from util.utils import operator_from_symbol
+from semantics.semantic_analyser import SymbolTable
+import copy
 
 
 class VirtualMachine:
-    memory = {}
+    classes_memory = {}
     fun_stack = []
+    obj_const_stack = []
+    current_class_mem = None
 
-    def __init__(self, quadruples: List, globals: dict):
+    def __init__(self, quadruples: List, symbol_tables: List[SymbolTable]):
         self.quadruples = quadruples
-        self.globals = globals
+        self.symbol_tables = symbol_tables
+
+    def current_sym_table(self):
+        return self.symbol_tables[len(self.symbol_tables) - 1]
 
     def current_mem(self):
         '''
@@ -17,7 +24,7 @@ class VirtualMachine:
         if len(self.fun_stack) > 0:
             return self.fun_stack[len(self.fun_stack) - 1][1]
         else:
-            return self.memory
+            return self.current_class_mem
 
     def next_mem_excluding_top(self):
         '''
@@ -26,7 +33,7 @@ class VirtualMachine:
         if len(self.fun_stack) > 1:
             return self.fun_stack[len(self.fun_stack) - 2][1]
         else:
-            return self.memory
+            return self.current_class_mem
 
     def value(self, address):
         '''
@@ -35,7 +42,7 @@ class VirtualMachine:
         '''
         if address in self.current_mem():
             return self.current_mem()[address]
-        return self.memory[address]
+        return self.current_class_mem[address]
 
     def value_excluding_top(self, address):
         '''
@@ -43,34 +50,39 @@ class VirtualMachine:
         '''
         if address in self.fun_stack[len(self.fun_stack) - 2][1]:
             return self.fun_stack[len(self.fun_stack) - 2][1][address]
-        return self.memory[address]
+        return self.current_class_mem[address]
 
     def execute(self):
-        for type in self.globals.keys():
-            for key in self.globals[type]:
-                if type == 'bool':
-                    if key == "True":
-                        default_val = True
+        for sym_table in self.symbol_tables:
+            memory = {}
+            self.classes_memory[sym_table.cid] = memory
+            globals = sym_table.get_global_table()
+            for type in globals.keys():
+                for key in globals[type]:
+                    if type == 'bool':
+                        if key == "True":
+                            default_val = True
+                        else:
+                            default_val = False
+                    elif type == 'int':
+                        try:
+                            default_val = int(key)
+                        except ValueError:
+                            default_val = 0
+                    elif type == 'float':
+                        try:
+                            default_val = float(key)
+                        except ValueError:
+                            default_val = 0.0
+                    elif type == 'string':
+                        try:
+                            default_val = str(key)
+                        except ValueError:
+                            default_val = ""
                     else:
-                        default_val = False
-                elif type == 'int':
-                    try:
-                        default_val = int(key)
-                    except ValueError:
-                        default_val = 0
-                elif type == 'float':
-                    try:
-                        default_val = float(key)
-                    except ValueError:
-                        default_val = 0.0
-                elif type == 'string':
-                    try:
-                        default_val = str(key)
-                    except ValueError:
-                        default_val = ""
-                else:
-                    raise Exception("Unsupported type " + type)
-                self.memory[self.globals[type][key]] = default_val
+                        default_val = None
+                    memory[globals[type][key]] = default_val
+            self.current_class_mem = memory
 
         print("Executing...")
         i = 0
@@ -101,7 +113,7 @@ class VirtualMachine:
                 # Adds a 4-value tuple to the stack. It will be later set to store:
                 # 1. The index of the quadruples that we must jump to after executing the
                 # function.
-                # 2. The memory address/value map used to local variables.
+                # 2. The memory address/value map used to store local variables.
                 # 3. A list of the memory addresses where the function arguments that are
                 # being sent are stored.
                 # 4. The temporary memory address that stores the result of the function
@@ -127,7 +139,7 @@ class VirtualMachine:
                     self.fun_stack[len(self.fun_stack) - 2][1][dest_address] = self.value(value)
                 else:
                     # If we're only 1 level deep then we set the result to global memory.
-                    self.memory[dest_address] = self.value(value)
+                    self.current_class_mem[dest_address] = self.value(value)
             elif quad[0] == '=':
                 value = quad[1]
                 assignee = quad[3]
@@ -135,7 +147,7 @@ class VirtualMachine:
                 i += 1
             elif quad[0] in ['+', '-', '*', '/', '>', '<', '>=', '<=', '==', '!=']:
                 if len(self.fun_stack) == 0:
-                    self.memory[quad[3]] = operator_from_symbol(quad[0])(self.value(quad[1]), self.value(quad[2]))
+                    self.current_class_mem[quad[3]] = operator_from_symbol(quad[0])(self.value(quad[1]), self.value(quad[2]))
                 else:
                     # Check whether we should use the current memory (top of the stack or global) or the memory of the
                     # previous level. This is necessary because when evaluating quadruples inside a function a call such
@@ -163,12 +175,42 @@ class VirtualMachine:
             elif quad[0] == 'WRITE':
                 address = quad[1]
                 if address != '':
-                    print(str(self.value(address)), end='')
+                    value = self.value(address)
+                    print(str(value), end='')
                 else:
                     print()
+                i += 1
+            elif quad[0] == 'NEW_OBJ':
+                cid = quad[1]
+                assignee = quad[2]
+                self.current_mem()[assignee] = copy.deepcopy(self.classes_memory[cid])
+                self.obj_const_stack.append(['', [], assignee])
+                i += 1
+            elif quad[0] == 'OBJ_MEMBER':
+                value_address = quad[1]
+                self.obj_const_stack[len(self.obj_const_stack) - 1][1].append(value_address)
+                i += 1
+            elif quad[0] == 'ASG_MEMBER':
+                member_dest_address = quad[3]
+                next_quad, members, obj_address = self.obj_const_stack[len(self.obj_const_stack) - 1]
+                self.current_mem()[obj_address][member_dest_address] = self.value(members.pop(0))
+                if len(members) > 0:
+                    i += 1
+                else:
+                    i = next_quad
+            elif quad[0] == 'OBJ_CONST':
+                self.obj_const_stack[len(self.obj_const_stack) - 1][0] = i + 1
+                i = quad[3]
+            elif quad[0] == 'START_CLASS':
+                i += 1
+            elif quad[0] == 'END_CLASS':
+                i += 1
+            elif quad[0] == 'GET_OBJ_MEM':
+                obj_address = quad[1]
+                member_address = quad[2]
+                res_address = quad[3]
+                self.current_mem()[res_address] = self.current_mem()[obj_address][member_address]
                 i += 1
             else:
                 raise Exception("Unexpected operation code: " + quad[0])
         print("Execution finished")
-        for key in self.current_mem():
-            print(str(key) + " => " + str(self.current_mem()[key]))

@@ -4,8 +4,21 @@ import operator
 from semantic_cube import cube
 from util import utils
 
-symbol_table = SymbolTable()
+# Each element in the list stores the SymbolTable for a class.
+symbol_tables = []
+
+# Once a class is parsed (poped from the 'symbol_tables' stack it is stored here for
+# future use.
+final_sym_tables = []
+
 quadruples = []
+
+
+def last_symbol_table():
+    '''
+    Returns the symbol table at the top of the stack without poping it.
+    '''
+    return symbol_tables[len(symbol_tables) - 1]
 
 
 class BaseExpression:
@@ -28,7 +41,7 @@ class VarDeclaration(BaseExpression):
             .format(self.name, self.type, self.visibility, self.value)
 
     def eval(self):
-        return symbol_table.add_sym(self.name, self.type)
+        return last_symbol_table().add_sym(self.name, self.type)
 
 
 class Main(BaseExpression):
@@ -41,17 +54,16 @@ class Main(BaseExpression):
         return '<Main vars={0} stmts={1}>'.format(self.vars, self.stmts)
 
     def eval(self):
-        quadruples[0][3] = len(quadruples)
         quadruples.append(['STARTPROC', self.name, '', ''])
-        symbol_table.add_fun(self)
-        symbol_table.set_scope("LOCAL")
+        last_symbol_table().add_fun(self)
+        last_symbol_table().set_scope("LOCAL")
 
         for var in self.vars:
             var.eval()
         for stmt in self.stmts:
             stmt.eval()
 
-        symbol_table.set_scope("GLOBAL")
+        last_symbol_table().set_scope("GLOBAL")
 
         quadruples.append(['ENDPROC', self.name, '', ''])
 
@@ -95,10 +107,10 @@ class Fun(BaseExpression):
 
     def eval(self):
         quadruples.append(['STARTPROC', self.name, '', ''])
-        symbol_table.add_fun(self)
-        symbol_table.set_scope("LOCAL")
+        last_symbol_table().add_fun(self)
+        last_symbol_table().set_scope("LOCAL")
         self.body.eval()
-        symbol_table.set_scope("GLOBAL")
+        last_symbol_table().set_scope("GLOBAL")
 
         last_quad = quadruples[len(quadruples) - 1]
         if self.type != 'void':
@@ -122,7 +134,7 @@ class FunCall(BaseExpression):
     def eval(self):
         quadruples.append(["ERA", self.fun_name, '', ''])
 
-        fun: Fun = symbol_table.get_fun(self.fun_name)
+        fun: Fun = last_symbol_table().get_fun(self.fun_name)
         if len(fun.body.params) != len(self.params):
             raise Exception("Fun {0} expected {1} arguments but was {2}"
                             .format(self.fun_name, len(fun.body.params), len(self.params)))
@@ -150,7 +162,7 @@ class FunCall(BaseExpression):
             raise Exception("Use of undefined function %s" % self.fun_name)
 
         if fun.type != 'void':
-            address = symbol_table.add_temp(fun.type)
+            address = last_symbol_table().add_temp(fun.type)
         else:
             address = ''
 
@@ -173,20 +185,32 @@ class ClassBody(BaseExpression):
             var.eval()
         for fun in self.funs:
             fun.eval()
-        self.main.eval()
+        if self.main is not None:
+            quadruples[0][3] = len(quadruples)
+            self.main.eval()
 
 
 class Class(BaseExpression):
-    def __init__(self, name, body: ClassBody):
+    def __init__(self, name, members: List[VarDeclaration], body: ClassBody):
         self.name = name
+        self.members = members
         self.body = body
 
     def __repr__(self):
-        return '<Class name={0} body={1}>'.format(self.name, self.body)
+        return '<Class name={0} members={1} body={2}>'.format(self.name, self.members, self.body)
 
     def eval(self):
-        quadruples.append(['GOTO', '', '', ''])
-        self.body.eval()
+        symbol_tables.append(SymbolTable(self.name, 65000 * (len(symbol_tables))))
+        quadruples.append(['START_CLASS', self.name, '', ''])
+        for member in self.members:
+            address = member.eval()
+            quadruples.append(['ASG_MEMBER', '', '', address])
+        if self.body is not None:
+            self.body.eval()
+        quadruples.append(['END_CLASS', self.name, '', ''])
+        table: SymbolTable = symbol_tables.pop()
+        final_sym_tables.append(table)
+        print(table)
 
 
 class Assignment(BaseExpression):
@@ -200,7 +224,7 @@ class Assignment(BaseExpression):
     def eval(self):
         if isinstance(self.value, Read):
             input = self.value.eval()
-            assignee_address, assignee_type = symbol_table.get_sym_address_and_type(self.id)
+            assignee_address, assignee_type = last_symbol_table().get_sym_address_and_type(self.id)
 
             if assignee_type == 'bool':
                 if input == "true":
@@ -218,16 +242,35 @@ class Assignment(BaseExpression):
             else:
                 raise Exception("Invalid input type at assignment " + input)
 
-            address = symbol_table.add_sym(str(val), assignee_type, is_constant=True)
+            address = last_symbol_table().add_sym(str(val), assignee_type, is_constant=True)
             quadruples.append(['=', address, '', assignee_address])
             print()
+        elif isinstance(self.value, NewObject):
+            assignee_address, assignee_type = last_symbol_table().get_sym_address_and_type(self.id)
+            quadruples.append(['NEW_OBJ', self.value.type, assignee_address, ''])
+
+            for param_index in range(0, len(self.value.members)):
+                param = self.value.members[param_index]
+                address, type = param.eval()
+
+                # TODO: verificar que los tipos sean compatibles
+
+                quadruples.append(['OBJ_MEMBER', address, '', 'objMember' + str(param_index)])
+                param_index += 1
+
+            for i in range(0, len(quadruples)):
+                quad = quadruples[i]
+                if quad[0] == 'START_CLASS' and quad[1] == self.value.type:
+                    class_start_quad_index = i
+                    break
+            quadruples.append(['OBJ_CONST', self.value.type, assignee_address, class_start_quad_index])
         else:
             address, type = self.value.eval()  # address and type of the result.
 
             # Verify that the variable to assign to exists and is of correct type. Throws if invalid.
-            symbol_table.verify_sym_declared_with_correct_type(self.id, utils.parser_type_to_cube_type(type))
+            last_symbol_table().verify_sym_declared_with_correct_type(self.id, utils.parser_type_to_cube_type(type))
 
-            assignee_address, assignee_type = symbol_table.get_sym_address_and_type(self.id)
+            assignee_address, assignee_type = last_symbol_table().get_sym_address_and_type(self.id)
 
             quadruples.append(['=', address, '', assignee_address])
 
@@ -242,7 +285,7 @@ class ConstantVar(BaseExpression):
 
     def eval(self):
         if self.type == "ID":
-            return symbol_table.get_sym_address_and_type(self.varcte)
+            return last_symbol_table().get_sym_address_and_type(self.varcte)
 
         # Varcte if a primitive
         cube_type = utils.parser_type_to_cube_type(self.type)
@@ -250,7 +293,7 @@ class ConstantVar(BaseExpression):
         # Add constant primititive to symbol table with its a value as its name.
         # e.g. for varcte = 5 of type INTNUM, call add_sym('5', 'int').
         # This creates a record(memory address) in the symbol table for the constant 5 indexed as '5'.
-        address = symbol_table.add_sym(str(self.varcte), cube_type, is_constant=True)
+        address = last_symbol_table().add_sym(str(self.varcte), cube_type, is_constant=True)
         return address, cube_type
 
 
@@ -293,7 +336,7 @@ class TerminoR(BaseExpression):
                 raise Exception("Invalid operation {0} for {1} and {2}".format(op_type, left_type, right_type))
 
             # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
-            address = symbol_table.add_temp(res_type)
+            address = last_symbol_table().add_temp(res_type)
             quadruples.append([op_type, left_address, right_address, address])
             return address, res_type
 
@@ -319,7 +362,7 @@ class Termino(BaseExpression):
                 raise Exception("Invalid operation {0} for {1} and {2}".format(op_type, left_type, right_type))
 
             # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
-            address = symbol_table.add_temp(res_type)
+            address = last_symbol_table().add_temp(res_type)
             quadruples.append([op_type, left_address, right_address, address])
             return address, res_type
 
@@ -367,7 +410,7 @@ class ExpR(BaseExpression):
                 raise Exception("Invalid operation {0} for {1} and {2}".format(opType, left_type, right_type))
 
             # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
-            address = symbol_table.add_temp(res_type)
+            address = last_symbol_table().add_temp(res_type)
             quadruples.append([opType, left_address, right_address, address])
             return address, res_type
 
@@ -393,7 +436,7 @@ class Exp(BaseExpression):
                 raise Exception("Invalid operation {0} for {1} and {2}".format(op_type, left_type, right_type))
 
             # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
-            address = symbol_table.add_temp(res_type)
+            address = last_symbol_table().add_temp(res_type)
             quadruples.append([op_type, left_address, right_address, address])
             return address, res_type
 
@@ -432,7 +475,7 @@ class RelationalOperation(BaseExpression):
                 raise Exception("Invalid operation {0} for {1} and {2}".format(op_type, left_type, right_type))
 
             # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
-            address = symbol_table.add_temp(res_type)
+            address = last_symbol_table().add_temp(res_type)
             quadruples.append([op_type, left_address, right_address, address])
             return address, res_type
 
@@ -460,7 +503,7 @@ class LogicalOperand(BaseExpression):
                 raise Exception("Invalid operation {0} for {1} and {2}".format(op_type, left_type, right_type))
 
             # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
-            address = symbol_table.add_temp(res_type)
+            address = last_symbol_table().add_temp(res_type)
             quadruples.append([op_type, left_address, right_address, address])
             return address, res_type
 
@@ -487,7 +530,7 @@ class LogicalOperation(BaseExpression):
                 raise Exception("Invalid operation {0} for {1} and {2}".format(op_type, left_type, right_type))
 
             # Add a temp var to the symbol table for the result of the operation e.g. t1 in (+ a b t1)
-            address = symbol_table.add_temp(res_type)
+            address = last_symbol_table().add_temp(res_type)
             quadruples.append([op_type, left_address, right_address, address])
             return address, res_type
 
@@ -558,10 +601,10 @@ class ForIn(BaseExpression):
     def eval(self):
         # Create constant '1' in case it doesn't exist since it will be used to + 1 the counter.
         ConstantVar(1, 'INTNUM').eval()
-        one_const_address, one_const_type = symbol_table.get_sym_address_and_type('1')
+        one_const_address, one_const_type = last_symbol_table().get_sym_address_and_type('1')
 
         start_address, start_type, end_address, end_type = self.range.eval()
-        id_address, id_type = symbol_table.get_sym_address_and_type(self.id)
+        id_address, id_type = last_symbol_table().get_sym_address_and_type(self.id)
 
         if id_type != 'int':
             raise Exception("For iterable must be of type int")
@@ -577,7 +620,7 @@ class ForIn(BaseExpression):
             raise Exception("Illegal state: result type should be of type bool")
 
         # Add register for temp result.
-        address = symbol_table.add_temp(res_type)
+        address = last_symbol_table().add_temp(res_type)
         # Create quadruple for the "x < b" operation.
         quadruples.append([op_type, id_address, end_address, address])
 
@@ -593,7 +636,7 @@ class ForIn(BaseExpression):
 
         # Generate quadruple for temp = x + 1.
         res_type_2 = cube[id_type][one_const_type]['+']
-        address = symbol_table.add_temp(res_type_2)
+        address = last_symbol_table().add_temp(res_type_2)
         quadruples.append(['+', id_address, one_const_address, address])
 
         # Generate quadruple for x = temp.
@@ -697,3 +740,49 @@ class Read(BaseExpression):
         if self.message is None:
             return input()
         return input(self.message)
+
+
+class ObjectMember(BaseExpression):
+    def __init__(self, object, member):
+        self.object = object
+        self.member = member
+
+    def __repr__(self):
+        return '<ObjectMember object={0} member={1}>'.format(self.object, self.member)
+
+    def eval(self):
+        # Find the type and address of the object.
+        obj_address, obj_type = last_symbol_table().get_sym_address_and_type(self.object)
+
+        # Find the type and address of the member of the object.
+        member_type = None
+        member_address = None
+        for symbol_table in final_sym_tables:
+            if symbol_table.cid == obj_type:
+                for type in symbol_table.get_global_table().keys():
+                    if self.member in symbol_table.get_global_table()[type]:
+                        member_type = type
+                        member_address = symbol_table.get_global_table()[type][self.member]
+                        break
+
+        if obj_address is None or member_address is None:
+            raise Exception("Illegal State: Object and member address should not be None.")
+
+        # The temp address where the value of object.member will be stored.
+        temp_res_address = last_symbol_table().add_temp(member_type)
+
+        quadruples.append(['GET_OBJ_MEM', obj_address, member_address, temp_res_address])
+        return temp_res_address, member_type
+
+
+class NewObject(BaseExpression):
+    def __init__(self, type, members: List[BaseExpression]):
+        self.type = type
+        self.members = members
+
+    def __repr__(self):
+        return '<NewObject type={0} members={1}>'.format(self.type, self.members)
+
+    def eval(self):
+        for member in self.members:
+            member.eval()

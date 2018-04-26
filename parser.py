@@ -149,38 +149,70 @@ def t_EOL(token):
     token.lexer.lineno += token.value.count("\n")
 
 
-def p_resultado(p):
+def p_file(p):
     '''
-    resultado : class
+    file : class classr
     '''
+    p[0] = [p[1]] + p[2]
+
+
+def p_classr(p):
+    '''
+    classr : class classr
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [p[1]] + p[2]
 
 
 def p_class(p):
     '''
     class : CLASS CID classparams class2 body
     '''
-    result = Class(name=p[2], body=p[5])
-    p[0] = result
+    p[0] = Class(name=p[2], members=p[3], body=p[5])
 
 
 def p_class2(p):
     '''
     class2 : DOSPUNTOS ID PARIZQ vars2 PARDER
-    | empty
+        | empty
     '''
+    p[0] = None
 
 
 def p_classparams(p):
     '''
     classparams : PARIZQ classparams2 PARDER
+        | empty
     '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = p[2]
 
 
 def p_classparams2(p):
     '''
-    classparams2 : vars
+    classparams2 : vars3 tipo ID classparams3
     | empty
     '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [VarDeclaration(p[3], p[2], p[1])] + p[4]
+
+
+def p_classparams3(p):
+    '''
+    classparams3 : COMA vars3 tipo ID classparams3
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [VarDeclaration(p[4], p[3], p[2])] + p[5]
 
 
 def p_varcte(p):
@@ -200,6 +232,8 @@ def p_varcte(p):
         p[0] = ConstantVar(p[1], type)
     elif len(p) == 5:
         p[0] = FunCall(p[1], p[3])
+    elif len(p) == 4:
+        p[0] = ObjectMember(p[1], p[3])
 
 
 def p_expresion(p):
@@ -340,11 +374,14 @@ def p_asignacion2(p):
     asignacion2 : expresion
     | CORCHDER expresion asignacion2r CORCHIZQ
     | READ PARIZQ assign_read PARDER
+    | CID PARIZQ expresion expresionr PARDER
     '''
     if len(p) == 2:
         p[0] = p[1]
     elif len(p) == 5:
         p[0] = Read(p[3])
+    elif len(p) == 6:
+        p[0] = NewObject(p[1], [p[3]] + p[4])
 
 
 def p_assign_read(p):
@@ -683,9 +720,24 @@ def p_opc2(p):
 
 def p_body(p):
     '''
-    body : LLAVEIZQ body2 funr MAIN PARIZQ PARDER mainbloque LLAVEDER
+    body : LLAVEIZQ body2 funr body_main LLAVEDER
+        | empty
     '''
-    p[0] = ClassBody(vars=p[2], funs=p[3], main=p[7])
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = ClassBody(vars=p[2], funs=p[3], main=p[4])
+
+
+def p_body_main(p):
+    '''
+    body_main : MAIN PARIZQ PARDER mainbloque
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = p[4]
 
 
 def p_body2(p):
@@ -759,7 +811,7 @@ def p_empty(p):
 
 
 lex.lex()
-parser = yacc.yacc(start='class')
+parser = yacc.yacc(start='file')
 
 '''
 while True:
@@ -773,15 +825,17 @@ while True:
 
 with open("test/factorial.txt", 'r') as f:
     input = f.read()
-    res: Class = parser.parse(input)
+    file: List[Class] = parser.parse(input)
+    model.quadruples.append(['GOTO', '', '', ''])
 
-    res.eval()
+    for cls in file:
+        cls.eval()
 
     pp = pprint.PrettyPrinter()
-    pp.pprint(res)
-    pp.pprint(model.symbol_table)
+    pp.pprint(file)
+    pp.pprint(model.symbol_tables)
     for i in range(0, len(quadruples)):
         print(str(i) + ": " + str(quadruples[i]))
 
-    vm = VirtualMachine(model.quadruples, model.symbol_table.get_global_table())
+    vm = VirtualMachine(model.quadruples, model.final_sym_tables)
     vm.execute()

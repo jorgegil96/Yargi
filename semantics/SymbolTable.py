@@ -3,30 +3,35 @@ SCOPE_LOCAL = "LOCAL"
 
 
 class SymbolTable:
-    # Stores the functions of the program
-    __fun_dir = {}
-    # Stores the variable table of the global scope
-    __global_sym_table = {}
-    __global_int_pointer = 0
-    __global_float_pointer = 5000
-    __global_bool_pointer = 10000
-    __global_string_pointer = 15000
-    # Stores a list a variable tables of local scope
-    __local_sym_tables = []
-    __local_int_pointer = 20000
-    __local_float_pointer = 25000
-    __local_bool_pointer = 30000
-    __local_string_pointer = 35000
-    # Stores the variable table for temporary vars
-    __temp_sym_table = {}
-    __temp_int_pointer = 40000
-    __temp_float_pointer = 45000
-    __temp_bool_pointer = 50000
-    __temp_string_pointer = 55000
+    def __init__(self, cid,  n):
+        self.cid = cid
 
-    __temp_counter = 0
+        # Stores the functions of the program
+        self.__fun_dir = {}
+        # Stores the variable table of the global scope
+        self.__global_sym_table = {}
+        self.__global_int_pointer = 0 + n
+        self.__global_float_pointer = 5000 + n
+        self.__global_bool_pointer = 10000 + n
+        self.__global_string_pointer = 15000 + n
+        # Stores a list a variable tables of local scope
+        self.__local_sym_tables = []
+        self.__local_int_pointer = 20000 + n
+        self.__local_float_pointer = 25000 + n
+        self.__local_bool_pointer = 30000 + n
+        self.__local_string_pointer = 35000 + n
+        # Stores the variable table for temporary vars
+        self.__temp_sym_table = {}
+        self.__temp_int_pointer = 40000 + n
+        self.__temp_float_pointer = 45000 + n
+        self.__temp_bool_pointer = 50000 + n
+        self.__temp_string_pointer = 55000 + n
 
-    __last_pointer = 0
+        self.__obj_pointer = 60000 + n
+
+        self.__temp_counter = 0 + n
+
+        self.__last_pointer = 0 + n
 
     def __repr__(self):
         return '<SymbolTable\n fun_dir={0}\n global_sym_table={1}\n local_sym_tables={2}>' \
@@ -54,9 +59,6 @@ class SymbolTable:
         if scope == SCOPE_LOCAL:
             self.__local_sym_tables.append({})
         else:
-            print("LOCAL TABLE START")
-            print(self.get_local_table())
-            print("LOCAL TABLE END")
             self.__local_sym_tables.pop()
 
     def add_fun(self, fun):
@@ -130,7 +132,8 @@ class SymbolTable:
                 self.__global_string_pointer += 1
                 return self.__global_string_pointer - 1
             else:
-                raise Exception("Illegal state")
+                self.__obj_pointer +=  1
+                return self.__obj_pointer - 1
         elif table_type == "LOCAL":
             if var_type == "int":
                 self.__local_int_pointer += 1
@@ -145,7 +148,8 @@ class SymbolTable:
                 self.__local_string_pointer += 1
                 return self.__local_string_pointer - 1
             else:
-                raise Exception("Illegal state")
+                self.__obj_pointer += 1
+                return self.__obj_pointer - 1
         elif table_type == "TEMP":
             if var_type == "int":
                 self.__temp_int_pointer += 1
@@ -160,7 +164,8 @@ class SymbolTable:
                 self.__temp_string_pointer += 1
                 return self.__temp_string_pointer - 1
             else:
-                raise Exception("Illegal state")
+                self.__obj_pointer += 1
+                return self.__obj_pointer - 1
         else:
             raise Exception("Illegal state")
 

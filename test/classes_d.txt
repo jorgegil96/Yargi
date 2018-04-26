@@ -1,0 +1,70 @@
+class Pair(int first, int second)
+
+class Main {
+
+    Pair pair;
+
+    main {
+        pair = Pair(1, 2);
+    }
+}
+
+---- COMPILACION ----
+Al parsear cada clase se crea un SymbolTable con el rango de direcciones siguientes.
+
+Por ejemplo...
+1. Para la clase Pair -> SymbolTable('Pair', 65000 * n), n = 0
+    - donde N es el numero de SymbolTables existentes
+2. Para la clase Main -> SymbolTable('Main', 65000 * 1), n = 1
+
+Cada SymbolTable tiene:
+    - Un directorio de funciones (mapa de funname->Fun)
+    - Una tabla de variables global (mapa de tipo->nombre)
+    - Una tabla de variables local (mapa de tipo->nombre)
+    - Una tabla de variables temporal (mapa de tipo->nombre)
+
+El espacio de memoria de una SymbolTable (65000) está seccionado en:
+    - 0..5000 -> ints globales
+    - 5000..10000 -> floats globales
+    - 10000..15000 -> bools globales
+    - 15000..20000 -> strings globales
+    - 20000..25000 -> ints locales
+    - 25000..30000
+    - 30000..35000
+    - 35000..40000 -> strings locales
+    - 40000..45000 -> ints temporales
+    - 45000..50000
+    - 50000..55000
+    - 55000..60000 -> strings temporales
+    - 60000..65000 -> objetos
+
+Durante el proceso de compilación se utilizan tres estructuras para almacenar información:
+1. Stack de symbol tables
+    -- agrega una SymbolTable al iniciar el parseo de la clase
+    -- hace pop al terminar el parseo de la clase
+2. Lista de symbol tables finales
+    -- Almacena todas las SymbolTables generadas para el programa,
+    -- son utiles para la etapa de ejecución
+3. Lista de quadruplos
+
+---- EJECUCION ----
+Se crea un objeto VirtualMachine que almacena:
+ - Un mapa de memoria para cada clase (no instancia)
+   Al iniciar la ejecución de la maquina virtual, se recorren todas SymbolTables generadas
+   en compilación (1 para cada clase) y se le asignan a las direcciones internas los valores
+   default dependiendo del tipo.
+        Por ejemplo..
+            classes_memory = {
+                'Pair': {
+                    0 -> 0, (dirección 0 (first) almacena un valor default de 0 por ser int)
+                    1 -> 0, (dirección 1 (second) almacena un valor default de 0 por ser int)
+                },
+                'Main': {
+                    60000 -> None, (direccion 6000 (pair) almacena un valor default nulo por se objeto)
+                }
+            }
+ - Una referencia a la memoria de la clase que contiene el main.
+
+ -- Utilerias ---
+ Python 3.6
+ PyCharm
