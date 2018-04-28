@@ -9,7 +9,7 @@ symbol_tables = []
 
 # Once a class is parsed (poped from the 'symbol_tables' stack it is stored here for
 # future use.
-final_sym_tables = []
+final_sym_tables: List[SymbolTable] = []
 
 quadruples = []
 
@@ -19,6 +19,12 @@ def last_symbol_table():
     Returns the symbol table at the top of the stack without poping it.
     '''
     return symbol_tables[len(symbol_tables) - 1]
+
+
+def symbol_table_for_type(type):
+    for sym_table in final_sym_tables:
+        if sym_table.cid == type:
+            return sym_table
 
 
 class BaseExpression:
@@ -124,17 +130,31 @@ class Fun(BaseExpression):
 
 
 class FunCall(BaseExpression):
-    def __init__(self, fun_name, params: List[BaseExpression]):
+    def __init__(self, fun_name, params: List[BaseExpression], of_object=None):
         self.fun_name = fun_name
         self.params = params
+        self.of_object = of_object
 
     def __repr__(self):
         return '<FunCall fun_name={0} params={1}>'.format(self.fun_name, self.params)
 
     def eval(self):
-        quadruples.append(["ERA", self.fun_name, '', ''])
+        # The symbol table to be used depends on how the fun call was made.
+        # If it was a normal 'foo()' call, i.e. a function of the class we're in then we must use the symbol table of
+        # the current class, whoever, if the call was of the form 'object.foo()' then we must use the symbol table of
+        # the instance of the class of that object.
+        if self.of_object is not None:
+            obj_address, obj_type = last_symbol_table().get_sym_address_and_type(self.of_object)
+            symbol_table = symbol_table_for_type(obj_type)
+        else:
+            obj_type = None
+            obj_address = None
+            symbol_table = last_symbol_table()
 
-        fun: Fun = last_symbol_table().get_fun(self.fun_name)
+        fun: Fun = symbol_table.get_fun(self.fun_name)
+
+        quadruples.append(["ERA", self.fun_name, obj_type, obj_address])
+
         if len(fun.body.params) != len(self.params):
             raise Exception("Fun {0} expected {1} arguments but was {2}"
                             .format(self.fun_name, len(fun.body.params), len(self.params)))
@@ -268,11 +288,11 @@ class Assignment(BaseExpression):
             address, type = self.value.eval()  # address and type of the result.
 
             # Verify that the variable to assign to exists and is of correct type. Throws if invalid.
-            last_symbol_table().verify_sym_declared_with_correct_type(self.id, utils.parser_type_to_cube_type(type))
+            is_global = last_symbol_table().verify_sym_declared_with_correct_type(self.id, utils.parser_type_to_cube_type(type))
 
             assignee_address, assignee_type = last_symbol_table().get_sym_address_and_type(self.id)
 
-            quadruples.append(['=', address, '', assignee_address])
+            quadruples.append(['=', address, is_global, assignee_address])
 
 
 class ConstantVar(BaseExpression):

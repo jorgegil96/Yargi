@@ -204,15 +204,19 @@ class SymbolTable:
             if not declared:
                 raise Exception("Use of undefined variable %s" % id)
 
+        is_global = None
         found = False
         local_table = self.get_local_table()
         if type in local_table and id in local_table[type]:
             found = True
+            is_global = False
         if type in self.__global_sym_table and id in self.__global_sym_table[type]:
             found = True
+            is_global = True
 
         if not found:
             raise Exception("Assignment of type %s to var of different type" % type)
+        return is_global
 
     def get_sym_address_and_type(self, name):
         '''

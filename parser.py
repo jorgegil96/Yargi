@@ -229,26 +229,39 @@ def p_varcte(p):
     | FALSE
     | STRINGVAL
     | ID CORCHIZQ varcte CORCHDER
-    | ID PUNTO ID
+    | ID PUNTO ID varcte_param_fun
     | ID PARIZQ llamada_param PARDER
     '''
     if len(p) == 2:
         type = p.slice[1].type
         p[0] = ConstantVar(p[1], type)
     elif len(p) == 5:
-        p[0] = FunCall(p[1], p[3])
-    elif len(p) == 4:
-        p[0] = ObjectMember(p[1], p[3])
+        type = p.slice[2].type
+        if type == "PARIZQ":
+            p[0] = FunCall(p[1], p[3])
+        else:
+            if p[4] is None:
+                p[0] = ObjectMember(p[1], p[3])
+            else:
+                p[0] = FunCall(p[3], p[4], p[1])
+
+
+def p_varcte_param_fun(p):
+    '''
+    varcte_param_fun : PARIZQ llamada_param PARDER
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = p[2]
 
 
 def p_expresion(p):
     '''
     expresion : megaexp
-   '''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        print("TODO")
+    '''
+    p[0] = p[1]
 
 
 def p_expresionr(p):
@@ -359,6 +372,7 @@ def p_estatuto(p):
     | while estatuto
     | when estatuto
     | llamada estatuto
+    | obj_call estatuto
     | empty
     '''
     if len(p) == 2:
@@ -379,14 +393,25 @@ def p_asignacion2(p):
     asignacion2 : expresion
     | CORCHDER expresion asignacion2r CORCHIZQ
     | READ PARIZQ assign_read PARDER
-    | CID PARIZQ expresion expresionr PARDER
+    | CID PARIZQ class_call_args expresionr PARDER
     '''
     if len(p) == 2:
         p[0] = p[1]
     elif len(p) == 5:
         p[0] = Read(p[3])
     elif len(p) == 6:
-        p[0] = NewObject(p[1], [p[3]] + p[4])
+        p[0] = NewObject(p[1], p[3] + p[4])
+
+
+def p_class_call_args(p):
+    '''
+    class_call_args : expresion
+        | empty
+    '''
+    if p[1] is None:
+        p[0] = []
+    else:
+        p[0] = [p[1]]
 
 
 def p_assign_read(p):
@@ -793,6 +818,14 @@ def p_llamada(p):
     p[0] = FunCall(p[1], p[3])
 
 
+def p_obj_call(p):
+    '''
+    obj_call : ID PUNTO ID PARIZQ llamada_param PARDER COLON
+    | empty
+    '''
+    p[0] = FunCall(p[3], p[5], p[1])
+
+
 def p_llamada_param(p):
     '''
     llamada_param : expresion expresionr
@@ -818,17 +851,7 @@ def p_empty(p):
 lex.lex()
 parser = yacc.yacc(start='file')
 
-'''
-while True:
-    try:
-        s = input('calc > ')
-    except EOFError:
-        break
-    parser.parse(s)
-    fun_directory.print()
-'''
-
-with open("test/data_classes.txt", 'r') as f:
+with open("test/classes.txt", 'r') as f:
     input = f.read()
     file: List[Class] = parser.parse(input)
     model.quadruples.append(['GOTO', '', '', ''])

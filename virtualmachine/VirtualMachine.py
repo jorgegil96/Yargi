@@ -8,7 +8,8 @@ class VirtualMachine:
     classes_memory = {}
     fun_stack = []
     obj_const_stack = []
-    current_class_mem = None
+    # Stack to keep the current context (i.e. the class instance currently active)
+    current_class_stack = []
 
     def __init__(self, quadruples: List, symbol_tables: List[SymbolTable]):
         self.quadruples = quadruples
@@ -24,7 +25,7 @@ class VirtualMachine:
         if len(self.fun_stack) > 0:
             return self.fun_stack[len(self.fun_stack) - 1][1]
         else:
-            return self.current_class_mem
+            return self.current_class_stack[len(self.current_class_stack) - 1]
 
     def next_mem_excluding_top(self):
         '''
@@ -33,7 +34,7 @@ class VirtualMachine:
         if len(self.fun_stack) > 1:
             return self.fun_stack[len(self.fun_stack) - 2][1]
         else:
-            return self.current_class_mem
+            return self.current_class_stack[len(self.current_class_stack) - 1]
 
     def value(self, address):
         '''
@@ -42,15 +43,19 @@ class VirtualMachine:
         '''
         if address in self.current_mem():
             return self.current_mem()[address]
-        return self.current_class_mem[address]
 
-    def value_excluding_top(self, address):
+        return self.current_class_stack[len(self.current_class_stack) - 1][address]
+
+    def value_excluding_top(self, address, skip_top_class=False):
         '''
-        Similar to self.value() except the memory a the top of the stack is skipped.
+        Similar to self.value() except the memory a the top of the fun stack is skipped.
         '''
         if address in self.fun_stack[len(self.fun_stack) - 2][1]:
             return self.fun_stack[len(self.fun_stack) - 2][1][address]
-        return self.current_class_mem[address]
+        if skip_top_class:
+            return self.current_class_stack[len(self.current_class_stack) - 2][address]
+        else:
+            return self.current_class_stack[len(self.current_class_stack) - 1][address]
 
     def execute(self):
         for sym_table in self.symbol_tables:
@@ -82,7 +87,8 @@ class VirtualMachine:
                     else:
                         default_val = None
                     memory[globals[type][key]] = default_val
-            self.current_class_mem = memory
+        # Set the main class memory as the current instance memory.
+        self.current_class_stack.append(memory)
 
         print("Executing...")
         i = 0
@@ -98,15 +104,28 @@ class VirtualMachine:
             elif quad[0] == 'STARTPROC':
                 i += 1
             elif quad[0] == 'ASG_PARAM':
-                i += 1
                 assignee = quad[3]
                 # Pop the first value in the list of arguments from the stack's top 4-value tuple.
                 value = self.fun_stack[len(self.fun_stack) - 1][2].pop(0)
+
+                # Skip the class instance memory if the called function is of another class instance.
+                skip_top_class = self.fun_stack[len(self.fun_stack) - 1][4] is not None
+
                 # Assign to the parameter var the value sent to the function.
-                self.current_mem()[assignee] = self.value_excluding_top(value)
+                self.current_mem()[assignee] = self.value_excluding_top(value, skip_top_class=skip_top_class)
+                i += 1
             elif quad[0] == 'ENDPROC':
                 if len(self.fun_stack) > 0:
-                    i, _, _, _ = self.fun_stack.pop()
+                    # Pop the class instance stack if the fun we're finishing did not have a return
+                    # statement and the function belonged to an instance of a class other than the main.
+                    #
+                    # If the function had a return statement and the class stack needed to be poped it was
+                    # poped in the RETURN quad.
+                    if self.quadruples[i - 1][0] != 'RETURN':
+                        if self.fun_stack[len(self.fun_stack) - 1][4] is not None:
+                            self.current_class_stack.pop()
+
+                    i, _, _, _, _ = self.fun_stack.pop()
                 else:
                     i += 1
             elif quad[0] == 'ERA':
@@ -118,12 +137,20 @@ class VirtualMachine:
                 # being sent are stored.
                 # 4. The temporary memory address that stores the result of the function
                 # (if it has a return statement).
-                self.fun_stack.append(['', {}, [], ''])
+                # 5. The address of the object that this call belongs to. E.g. if objA.foo()
+                # was the call then the tuple's 5th element is the address of objA.
+                # If the call was of no object, e.g. foo() then the 5th value is set to None.
+                self.fun_stack.append(['', {}, [], '', quad[3]])
+                curr_mem = self.current_class_stack[len(self.current_class_stack) - 1]
+                if quad[3] is not None:
+                    # If the call belonged to an object then we set that object's memory as
+                    # the current
+                    self.current_class_stack.append(curr_mem[quad[3]])
                 i += 1
             elif quad[0] == 'param':
-                i += 1
                 # Add the address of this parameter to the list in the stacks' 4-value tuple.
                 self.fun_stack[len(self.fun_stack) - 1][2].append(quad[1])
+                i += 1
             elif quad[0] == 'GOSUB':
                 # Set the index to jump to after executing the function.
                 self.fun_stack[len(self.fun_stack) - 1][0] = i + 1
@@ -132,22 +159,44 @@ class VirtualMachine:
                 i = quad[3]
             elif quad[0] == 'RETURN':
                 i += 1
-                value = quad[1]
+                address = quad[1]
                 dest_address = self.fun_stack[len(self.fun_stack) - 1][3]
                 if len(self.fun_stack) - 2 >= 0:
                     # If we're at least 2 levels deep then we set the result to the previous function's memory.
-                    self.fun_stack[len(self.fun_stack) - 2][1][dest_address] = self.value(value)
+                    self.fun_stack[len(self.fun_stack) - 2][1][dest_address] = self.value(address)
                 else:
                     # If we're only 1 level deep then we set the result to global memory.
-                    self.current_class_mem[dest_address] = self.value(value)
+
+                    # The global memory is the top of the class stack.
+                    if self.fun_stack[0][4] is not None:
+                        # If the function call was of an object then we must pop the class stack
+                        # because we're exiting the function and thus that object's scope.
+                        class_mem = self.current_class_stack.pop()
+                    else:
+                        # If the fun call wasn't of an object then we don't pop it because the
+                        # instance scope remains the same.
+                        class_mem = self.current_class_stack[len(self.current_class_stack) - 1]
+
+                    # TODO: The true branch might not be necessary...
+                    if address in self.current_mem():
+                        value = self.current_mem()[address]
+                    else:
+                        value = class_mem[address]
+
+                    self.current_class_stack[len(self.current_class_stack) - 1][dest_address] = value
             elif quad[0] == '=':
                 value = quad[1]
                 assignee = quad[3]
-                self.current_mem()[assignee] = self.value(value)
+                if quad[2]:
+                    # is global = true
+                    self.current_class_stack[len(self.current_class_stack) - 1][assignee] = self.value(value)
+                else:
+                    self.current_mem()[assignee] = self.value(value)
                 i += 1
             elif quad[0] in ['+', '-', '*', '/', '>', '<', '>=', '<=', '==', '!=']:
                 if len(self.fun_stack) == 0:
-                    self.current_class_mem[quad[3]] = operator_from_symbol(quad[0])(self.value(quad[1]), self.value(quad[2]))
+                    curr_mem = self.current_class_stack[len(self.current_class_stack) - 1]
+                    curr_mem[quad[3]] = operator_from_symbol(quad[0])(self.value(quad[1]), self.value(quad[2]))
                 else:
                     # Check whether we should use the current memory (top of the stack or global) or the memory of the
                     # previous level. This is necessary because when evaluating quadruples inside a function a call such
@@ -162,8 +211,10 @@ class VirtualMachine:
                     if self.fun_stack[len(self.fun_stack) - 1][0] != '':
                         # If the first value of the fun stack's top tuple has been set, then we know we have already
                         # passed the GOSUB op code, so we must use the memory at the top of the stack.
+                        left_value = self.value(quad[1])
+                        right_value = self.value(quad[2])
                         self.current_mem()[quad[3]] = \
-                            operator_from_symbol(quad[0])(self.value(quad[1]), self.value(quad[2]))
+                            operator_from_symbol(quad[0])(left_value, right_value)
                     else:
                         # If the first value of the fun stack's top tuple has not been set, then we know we have not
                         # already passed the GOSUB op code, so we must use the memory below the top of the stack (as
@@ -200,7 +251,14 @@ class VirtualMachine:
                     i = next_quad
             elif quad[0] == 'OBJ_CONST':
                 self.obj_const_stack[len(self.obj_const_stack) - 1][0] = i + 1
-                i = quad[3]
+
+                _, members, _ = self.obj_const_stack[len(self.obj_const_stack) - 1]
+                if len(members) > 0:
+                    # Jump to the class constructor to assign the params.
+                    i = quad[3]
+                else:
+                    # No need to jump to the class' constructor if there are no params to assign
+                    i = i + 1
             elif quad[0] == 'START_CLASS':
                 i += 1
             elif quad[0] == 'END_CLASS':

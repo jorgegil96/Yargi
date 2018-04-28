@@ -1,0 +1,38 @@
+class Calculator(int acum) {
+
+    fun acum(): int {
+        return acum;
+    }
+
+    fun add(int n) {
+        acum = acum + n;
+    }
+
+    fun sum(int a, int b): int {
+        return a + b;
+    }
+
+    fun sub(int a, int b): int {
+        return a - b;
+    }
+}
+
+class Main {
+
+    Calculator calculator, c2;
+
+    main() {
+        int result;
+
+        calculator = Calculator(50);
+        c2 = Calculator(800);
+
+        write(calculator.acum());
+        write(c2.acum());
+        c2.add(30);
+        write(calculator.acum());
+        calculator.add(10);
+        write(calculator.acum());
+        write(c2.acum());
+    }
+}
