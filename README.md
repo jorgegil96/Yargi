@@ -135,4 +135,74 @@ while (x < 10 ) {
   write(x);
   x = x + 1;
 }
+```  
+
+### Classes
+Classes are defined with the following syntax:  
+```
+class CLASS_NAME( [CONSTRUCTOR_ARGS,] ) {
+  [ global vars ]
+  
+  [ functions ]
+  
+  [ main() { < statements >}
+}
+```
+#### Examples
+```
+class Calculator(int total) {
+
+    fun total(): int {
+        return total;
+    }
+
+    fun add(int n) {
+        total = total + n;
+    }
+
+    fun sum(int a, int b): int {
+        return a + b;
+    }
+
+    fun sub(int a, int b): int {
+        return a - b;
+    }
+}
+```
+```
+class Main {
+
+    Calculator calculator;
+
+    main() {
+        calculator = Calculator(50);
+
+        write(calculator.total()); // prints 50.
+        calculator.add(30);
+        write(calculator.total()); // prints 80.
+        
+        write(calculator.sum(2, 2)); // prints 4.
+        write(calculator.sub(2, 2)); // prints 0.
+    }
+}
+```
+### Data Classes
+Yargi supports a special tyoe of class whose main purpose is to hold data. Its fields are public and immutable.  
+Its syntax is as follows:  
+```  
+data class([<ARGS>,])
+```
+#### Examples
+```  
+data class Person(int id, string name, string lastname)
+```
+```  
+data class Dog(
+  int id,
+  string name,
+  string breed,
+  int age,
+  string color,
+  int owner
+)
 ```
