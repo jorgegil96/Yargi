@@ -180,6 +180,9 @@ class SymbolTable:
         Verifies that the given symbol is declared in the appropriate scope and that its type matches the given type.
         Throws if verification fails.
         '''
+        if type == "NULL":
+            return True
+
         if self.get_current_scope() == SCOPE_GLOBAL:
             declared = False
             for type_table in self.__global_sym_table.keys():
@@ -235,3 +238,15 @@ class SymbolTable:
                     return self.__global_sym_table[key][id], key
 
         raise Exception("Variable %s does not exist" % name)
+
+    def is_global(self, name):
+        if self.get_current_scope() == SCOPE_LOCAL:
+            for key in self.get_local_table().keys():
+                for id in self.get_local_table()[key]:
+                    if id == name:
+                        return False
+
+        for key in self.__global_sym_table.keys():
+            for id in self.__global_sym_table[key]:
+                if id == name:
+                    return True

@@ -1,0 +1,75 @@
+class Node(int value, Node next) {
+
+    fun getValue(): int {
+        return value;
+    }
+
+    fun setValue(int v) {
+        value = v;
+    }
+
+    fun getNext(): Node {
+        return next;
+    }
+
+    fun setNext(Node n) {
+        next = n;
+    }
+}
+
+class List {
+
+    Node head;
+    int size;
+
+    fun add(int value) {
+        Node node, new;
+
+        new = Node(value, null);
+
+        if (size == 0) {
+            head = new;
+        } else {
+            node = head;
+            while (node.getNext() != null) {
+                node = node.getNext();
+            }
+            node.setNext(new);
+        }
+
+        size = size + 1;
+    }
+
+    fun get(int index): int {
+        int i;
+        Node node;
+
+        i = 0;
+        node = head;
+        while (i != index) {
+            node = node.next;
+            i = i + 1;
+        }
+
+        return node.value;
+    }
+}
+
+class Main {
+
+    main() {
+        List lst;
+        lst = List();
+
+        lst.add(7);
+        lst.add(18);
+        lst.add(40);
+        lst.add(55);
+
+        write(lst.get(0));
+        write(lst.get(1));
+        write(lst.get(2));
+        write(lst.get(3));
+    }
+
+}

@@ -63,6 +63,7 @@ tokens = [
              'PUNTOSRANGO',
              'FLECHITA',
              'STRINGVAL',
+             'NULL',
              'ID',
              'CID',
              'EOL'
@@ -120,6 +121,13 @@ def t_FALSE(token):
     'false'
     token.type = keywords.get(token.value, 'FALSE')
     token.value = False
+    return token
+
+
+def t_NULL(token):
+    'null'
+    token.type = keywords.get(token.value, 'NULL')
+    token.value = None
     return token
 
 
@@ -228,6 +236,7 @@ def p_varcte(p):
     | TRUE
     | FALSE
     | STRINGVAL
+    | NULL
     | ID CORCHIZQ varcte CORCHDER
     | ID PUNTO ID varcte_param_fun
     | ID PARIZQ llamada_param PARDER

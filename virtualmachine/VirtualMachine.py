@@ -41,6 +41,10 @@ class VirtualMachine:
         Returns the value of the given memory address that is stored in the currently active function memory, or global
         memory if there aren't any funs in the stack.
         '''
+        # None address means null values.
+        if address is None:
+            return None
+
         if address in self.current_mem():
             return self.current_mem()[address]
 
@@ -140,12 +144,15 @@ class VirtualMachine:
                 # 5. The address of the object that this call belongs to. E.g. if objA.foo()
                 # was the call then the tuple's 5th element is the address of objA.
                 # If the call was of no object, e.g. foo() then the 5th value is set to None.
-                self.fun_stack.append(['', {}, [], '', quad[3]])
-                curr_mem = self.current_class_stack[len(self.current_class_stack) - 1]
                 if quad[3] is not None:
                     # If the call belonged to an object then we set that object's memory as
                     # the current
+                    if quad[3] in self.current_mem():
+                        curr_mem = self.current_mem()
+                    else:
+                        curr_mem = self.current_class_stack[len(self.current_class_stack) - 1]
                     self.current_class_stack.append(curr_mem[quad[3]])
+                self.fun_stack.append(['', {}, [], '', quad[3]])
                 i += 1
             elif quad[0] == 'param':
                 # Add the address of this parameter to the list in the stacks' 4-value tuple.
@@ -164,6 +171,10 @@ class VirtualMachine:
                 if len(self.fun_stack) - 2 >= 0:
                     # If we're at least 2 levels deep then we set the result to the previous function's memory.
                     self.fun_stack[len(self.fun_stack) - 2][1][dest_address] = self.value(address)
+
+                    # Pop the class instance memory stack if we're exiting an object's function.
+                    if self.fun_stack[0][4] is not None:
+                        self.current_class_stack.pop()
                 else:
                     # If we're only 1 level deep then we set the result to global memory.
 
@@ -234,7 +245,11 @@ class VirtualMachine:
             elif quad[0] == 'NEW_OBJ':
                 cid = quad[1]
                 assignee = quad[2]
-                self.current_mem()[assignee] = copy.deepcopy(self.classes_memory[cid])
+                is_global = quad[3]
+                if is_global:
+                    self.current_class_stack[len(self.current_class_stack) - 1][assignee] = copy.deepcopy(self.classes_memory[cid])
+                else:
+                    self.current_mem()[assignee] = copy.deepcopy(self.classes_memory[cid])
                 self.obj_const_stack.append(['', [], assignee])
                 i += 1
             elif quad[0] == 'OBJ_MEMBER':
@@ -244,7 +259,12 @@ class VirtualMachine:
             elif quad[0] == 'ASG_MEMBER':
                 member_dest_address = quad[3]
                 next_quad, members, obj_address = self.obj_const_stack[len(self.obj_const_stack) - 1]
-                self.current_mem()[obj_address][member_dest_address] = self.value(members.pop(0))
+
+                if obj_address in self.current_mem():
+                    self.current_mem()[obj_address][member_dest_address] = self.value(members.pop(0))
+                else:
+                    self.current_class_stack[len(self.current_class_stack) - 1][obj_address][member_dest_address] = self.value(members.pop(0))
+
                 if len(members) > 0:
                     i += 1
                 else:
@@ -267,7 +287,13 @@ class VirtualMachine:
                 obj_address = quad[1]
                 member_address = quad[2]
                 res_address = quad[3]
-                self.current_mem()[res_address] = self.current_mem()[obj_address][member_address]
+
+                if obj_address in self.current_mem():
+                    mem = self.current_mem()
+                else:
+                    mem = self.current_class_stack[len(self.current_class_stack) - 1]
+
+                self.current_mem()[res_address] = mem[obj_address][member_address]
                 i += 1
             else:
                 raise Exception("Unexpected operation code: " + quad[0])

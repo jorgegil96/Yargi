@@ -12,8 +12,10 @@ def parser_type_to_cube_type(type):
         return "float"
     elif type == "STRINGVAL":
         return "string"
+    elif type == "NULL":
+        return "NULL"
     else:
-        raise Exception("Invalid type %s" % type)
+        return type
 
 
 def operator_from_symbol(symbol):

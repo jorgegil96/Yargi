@@ -267,7 +267,11 @@ class Assignment(BaseExpression):
             print()
         elif isinstance(self.value, NewObject):
             assignee_address, assignee_type = last_symbol_table().get_sym_address_and_type(self.id)
-            quadruples.append(['NEW_OBJ', self.value.type, assignee_address, ''])
+
+            # Flag that indicates if this symbol is of global scope or local (function) scope,
+            is_global = last_symbol_table().is_global(self.id)
+
+            quadruples.append(['NEW_OBJ', self.value.type, assignee_address, is_global])
 
             for param_index in range(0, len(self.value.members)):
                 param = self.value.members[param_index]
@@ -288,7 +292,8 @@ class Assignment(BaseExpression):
             address, type = self.value.eval()  # address and type of the result.
 
             # Verify that the variable to assign to exists and is of correct type. Throws if invalid.
-            is_global = last_symbol_table().verify_sym_declared_with_correct_type(self.id, utils.parser_type_to_cube_type(type))
+            is_global = last_symbol_table().verify_sym_declared_with_correct_type(self.id,
+                                                                                  utils.parser_type_to_cube_type(type))
 
             assignee_address, assignee_type = last_symbol_table().get_sym_address_and_type(self.id)
 
@@ -306,6 +311,9 @@ class ConstantVar(BaseExpression):
     def eval(self):
         if self.type == "ID":
             return last_symbol_table().get_sym_address_and_type(self.varcte)
+
+        if self.type == "NULL":
+            return None, "NULL"
 
         # Varcte if a primitive
         cube_type = utils.parser_type_to_cube_type(self.type)
@@ -490,7 +498,12 @@ class RelationalOperation(BaseExpression):
             right_address, right_type = self.relational_operand.eval()
             op_type = self.relational_operand.type
 
-            res_type = cube[left_type][right_type][op_type]
+            # If both operands are not primitives (meaning they're objects or null) and the operators are of equality,
+            # then the resulting type is a boolean.
+            if left_type not in cube.keys() and right_type not in cube.keys() and (op_type == "==" or op_type == "!="):
+                res_type = "bool"
+            else:
+                res_type = cube[left_type][right_type][op_type]
             if res_type is "Error":
                 raise Exception("Invalid operation {0} for {1} and {2}".format(op_type, left_type, right_type))
 
