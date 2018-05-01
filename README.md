@@ -1,4 +1,6 @@
-# Yargi
+<img src="res/yargi.png" width="30%;"/>  
+
+# Yargi Programming Language
 A statically typed object-oriented programming language written in Python
 
 ## Features
