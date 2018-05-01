@@ -264,40 +264,6 @@ def p_class_extras_2(p):
             raise Exception("Illegal state")
 
 
-def p_class_extras_3(p):
-    '''
-    class_extras_3 : COMA CID class_parent
-        | PARIZQ vars2 PARDER
-        | empty
-    '''
-    if len(p) == 2:
-        p[0] = None
-    else:
-        p[0] = p[2]
-
-
-def p_class_interfaces_r(p):
-    '''
-    class_interfaces_r : COMA CID class_interfaces_r
-        | empty
-    '''
-    if len(p) == 2:
-        p[0] = []
-    else:
-        p[0] = [p[2]] + p[3],
-
-
-def p_class_parent(p):
-    '''
-    class_parent : CID PARIZQ vars2 PARDER
-        | empty
-    '''
-    if len(p) == 2:
-        p[0] = None
-    else:
-        p[0] = ClassParent(p[1], p[3])
-
-
 def p_classparams(p):
     '''
     classparams : PARIZQ classparams2 PARDER
