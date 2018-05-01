@@ -4,14 +4,14 @@
 A statically typed object-oriented programming language written in Python
 
 ## Features
-* Variables  
-* Functions
-* Flow control statements (if, else, when)
-* Loops (while, for..in)
-* Classes
-* Data Classes
-* Inheritance
-* Interfaces
+* [Variables](#primitives--variables)  
+* [Operators](#operators)  
+* [Functions](#functions)  
+* [Flow control statements](#flow-control)  
+* [Loops](#loops)  
+* [Classes](#classes)  
+* [Data Classes](#data-classes)  
+* [Interfaces](#interfaces)  
 
 ### Primitives & Variables
 Variables can be declared in single variable form `int x;` or multiple variable form `int x, y;`
@@ -299,7 +299,7 @@ class RoadBike : Bike, AccidentListener {
     }
 
     fun onCrash() {
-
+        // TODO: implement
     }
 }
 ```
