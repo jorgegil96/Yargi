@@ -554,7 +554,7 @@ def p_factor(p):
     factor : PARIZQ expresion PARDER
     | factor2 varcte
     '''
-    if p[0] is None:
+    if p[1] is None:
         p[0] = p[2]
     else:
         p[0] = ArithmeticOperand(p[1], p[2])
@@ -864,7 +864,7 @@ def p_empty(p):
 lex.lex()
 parser = yacc.yacc(start='file')
 
-with open("test/inheritance.yi", 'r') as f:
+with open("test/sortlist.yi", 'r') as f:
     input = f.read()
     file: List[Class] = parser.parse(input)
     model.quadruples.append(['GOTO', '', '', ''])

@@ -470,6 +470,11 @@ class Termino(BaseExpression):
 
     def eval(self):
         if self.termino_r is None:
+            if isinstance(self.factor, ArithmeticOperand) and self.factor.op == operator.sub:
+                # If its an ArithmeticOperand but has no termino_r then its not really an operation
+                # like "5 - 2" but a negative constant such as "-3".
+                # Create a copy of the ConstantVar but with the constant (3) multiplied by -1
+                return ConstantVar(str(-1 * self.factor.varcte.varcte), self.factor.varcte.type).eval()
             return self.factor.eval()
         else:
             left_address, left_type = self.factor.eval()

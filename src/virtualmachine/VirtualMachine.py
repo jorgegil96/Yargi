@@ -35,7 +35,7 @@ class VirtualMachine:
         if len(self.fun_stack) > 1:
             return self.fun_stack[len(self.fun_stack) - 2][1]
         else:
-            return self.current_class_stack[len(self.current_class_stack) - 1]
+            return self.current_class_stack[len(self.current_class_stack) - 2]
 
     def value(self, address):
         '''
@@ -60,7 +60,7 @@ class VirtualMachine:
         if skip_top_class:
             return self.current_class_stack[len(self.current_class_stack) - 2][address]
         else:
-            return self.current_class_stack[len(self.current_class_stack) - 1][address]
+            return self.current_class_stack[len(self.current_class_stack) - 2][address]
 
     def execute(self):
         for sym_table in self.symbol_tables:

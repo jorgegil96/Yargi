@@ -62,18 +62,33 @@ class List {
 class Main {
 
     main() {
-        List lst;
-        lst = List();
+        List myList;
+        int i, size, index, value;
 
-        lst.add(7);
-        lst.add(18);
-        lst.add(40);
-        lst.add(55);
+        myList = List();
 
-        write(lst.get(0));
-        write(lst.get(1));
-        write(lst.get(2));
-        write(lst.get(3));
+        myList.add(7);
+        myList.add(18);
+        myList.add(1001);
+        myList.add(55);
+        myList.add(2);
+        myList.add(444);
+        myList.add(19);
+        myList.add(0);
+
+
+        value = read("Num to find => ");
+
+
+        size = myList.size();
+        index = -1;
+
+        for (i in 0..size) {
+            if (myList.get(i) == value) {
+                index = i;
+            }
+        }
+
+        write(index);
     }
-
 }
