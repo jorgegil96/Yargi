@@ -1,8 +1,9 @@
-from typing import List
-from semantics.semantic_analyser import SymbolTable
 import operator
-from semantic_cube import cube
-from util import utils
+from typing import List
+
+from src.semantics.SemanticCube import cube
+from src.semantics.SymbolTable import SymbolTable
+from src.util import utils
 
 # Each element in the list stores the SymbolTable for a class.
 symbol_tables = []

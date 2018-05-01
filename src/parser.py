@@ -1,10 +1,11 @@
+import pprint
+
 import ply.lex as lex
 import ply.yacc as yacc
-from model import *
-import operator
-import pprint
-import model
-from virtualmachine.VirtualMachine import VirtualMachine
+
+from src.semantics import model
+from src.semantics.model import *
+from src.virtualmachine.VirtualMachine import VirtualMachine
 
 keywords = {
     'if': 'IF',

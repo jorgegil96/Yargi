@@ -1,7 +1,8 @@
-from typing import List
-from util.utils import operator_from_symbol
-from semantics.semantic_analyser import SymbolTable
 import copy
+from typing import List
+
+from src.semantics.SymbolTable import SymbolTable
+from src.util.utils import operator_from_symbol
 
 
 class VirtualMachine:

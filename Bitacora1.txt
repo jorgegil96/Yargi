@@ -1,3 +1,0 @@
-Avance 1
-Se trabajó en la gramática del lenguaje, se realizaron todos los diagramas y se pasaron a código utlizando PLY.
-Aún contiene errores para ciertos casos de prueba, pero la mayoría del trabajo funciona correctamente.
