@@ -16,7 +16,7 @@ Rule 2     classr -> class classr
 Rule 3     classr -> empty
 Rule 4     class -> CLASS CID classparams class2 body
 Rule 5     class -> DATA CLASS CID classparams
-Rule 6     class2 -> DOSPUNTOS ID PARIZQ vars2 PARDER
+Rule 6     class2 -> DOSPUNTOS CID PARIZQ vars2 PARDER
 Rule 7     class2 -> empty
 Rule 8     classparams -> PARIZQ classparams2 PARDER
 Rule 9     classparams -> empty
@@ -150,7 +150,7 @@ Rule 136   body_main -> empty
 Rule 137   body2 -> vars multvarsdecl
 Rule 138   body2 -> empty
 Rule 139   mainbloque -> LLAVEIZQ body2 estatuto LLAVEDER
-Rule 140   multvarsdecl -> vars
+Rule 140   multvarsdecl -> vars multvarsdecl
 Rule 141   multvarsdecl -> empty
 Rule 142   funr -> fun funr
 Rule 143   funr -> empty
@@ -166,7 +166,7 @@ Terminals, with rules where they appear
 
 AND                  : 40
 BOOL                 : 91
-CID                  : 4 5 63 93
+CID                  : 4 5 6 63 93
 CLASS                : 4 5
 COLON                : 43 44 59 80 84 144 146
 COMA                 : 12 27 45 68 87 104 124
@@ -186,7 +186,7 @@ FLOATNUM             : 16
 FOR                  : 109
 FUN                  : 121
 GLOBAL               : 
-ID                   : 6 10 12 14 21 22 22 23 45 47 59 71 109 110 113 113 114 115 121 122 124 144 146 146
+ID                   : 10 12 14 21 22 22 23 45 47 59 71 109 110 113 113 114 115 121 122 124 144 146 146
 IF                   : 73 75
 IGUAL                : 59
 IGUALIGUAL           : 37
@@ -273,7 +273,7 @@ llamada_param        : 23 24 144 146
 mainbloque           : 135
 megaexp              : 26
 megaexpr             : 39 40 41
-multvarsdecl         : 129 137
+multvarsdecl         : 129 137 140
 obj_call             : 57
 opc1                 : 128
 opc2                 : 128
@@ -411,7 +411,7 @@ state 10
 state 11
 
     (4) class -> CLASS CID classparams . class2 body
-    (6) class2 -> . DOSPUNTOS ID PARIZQ vars2 PARDER
+    (6) class2 -> . DOSPUNTOS CID PARIZQ vars2 PARDER
     (7) class2 -> . empty
     (150) empty -> .
 
@@ -488,9 +488,9 @@ state 15
 
 state 16
 
-    (6) class2 -> DOSPUNTOS . ID PARIZQ vars2 PARDER
+    (6) class2 -> DOSPUNTOS . CID PARIZQ vars2 PARDER
 
-    ID              shift and go to state 26
+    CID             shift and go to state 26
 
 
 state 17
@@ -610,7 +610,7 @@ state 25
 
 state 26
 
-    (6) class2 -> DOSPUNTOS ID . PARIZQ vars2 PARDER
+    (6) class2 -> DOSPUNTOS CID . PARIZQ vars2 PARDER
 
     PARIZQ          shift and go to state 38
 
@@ -701,7 +701,7 @@ state 34
 state 35
 
     (137) body2 -> vars . multvarsdecl
-    (140) multvarsdecl -> . vars
+    (140) multvarsdecl -> . vars multvarsdecl
     (141) multvarsdecl -> . empty
     (43) vars -> . vars3 tipo vars2 COLON
     (44) vars -> . vars3 tipo LIST vars2 COLON
@@ -775,12 +775,12 @@ state 37
 
 state 38
 
-    (6) class2 -> DOSPUNTOS ID PARIZQ . vars2 PARDER
+    (6) class2 -> DOSPUNTOS CID PARIZQ . vars2 PARDER
     (47) vars2 -> . ID varsr
 
-    ID              shift and go to state 48
+    ID              shift and go to state 49
 
-    vars2                          shift and go to state 49
+    vars2                          shift and go to state 48
 
 state 39
 
@@ -847,20 +847,39 @@ state 43
 
 state 44
 
-    (140) multvarsdecl -> vars .
+    (140) multvarsdecl -> vars . multvarsdecl
+    (140) multvarsdecl -> . vars multvarsdecl
+    (141) multvarsdecl -> . empty
+    (43) vars -> . vars3 tipo vars2 COLON
+    (44) vars -> . vars3 tipo LIST vars2 COLON
+    (150) empty -> .
+    (48) vars3 -> . PRIVATE
+    (49) vars3 -> . empty
 
-    PRIVATE         reduce using rule 140 (multvarsdecl -> vars .)
-    MAIN            reduce using rule 140 (multvarsdecl -> vars .)
-    LLAVEDER        reduce using rule 140 (multvarsdecl -> vars .)
-    FUN             reduce using rule 140 (multvarsdecl -> vars .)
-    ID              reduce using rule 140 (multvarsdecl -> vars .)
-    IF              reduce using rule 140 (multvarsdecl -> vars .)
-    WRITE           reduce using rule 140 (multvarsdecl -> vars .)
-    FOR             reduce using rule 140 (multvarsdecl -> vars .)
-    WHILE           reduce using rule 140 (multvarsdecl -> vars .)
-    WHEN            reduce using rule 140 (multvarsdecl -> vars .)
-    RETURN          reduce using rule 140 (multvarsdecl -> vars .)
+  ! shift/reduce conflict for PRIVATE resolved as shift
+    MAIN            reduce using rule 150 (empty -> .)
+    LLAVEDER        reduce using rule 150 (empty -> .)
+    FUN             reduce using rule 150 (empty -> .)
+    ID              reduce using rule 150 (empty -> .)
+    IF              reduce using rule 150 (empty -> .)
+    WRITE           reduce using rule 150 (empty -> .)
+    FOR             reduce using rule 150 (empty -> .)
+    WHILE           reduce using rule 150 (empty -> .)
+    WHEN            reduce using rule 150 (empty -> .)
+    RETURN          reduce using rule 150 (empty -> .)
+    INT             reduce using rule 150 (empty -> .)
+    FLOAT           reduce using rule 150 (empty -> .)
+    BOOL            reduce using rule 150 (empty -> .)
+    STRING          reduce using rule 150 (empty -> .)
+    CID             reduce using rule 150 (empty -> .)
+    PRIVATE         shift and go to state 21
 
+  ! PRIVATE         [ reduce using rule 150 (empty -> .) ]
+
+    vars                           shift and go to state 44
+    multvarsdecl                   shift and go to state 58
+    empty                          shift and go to state 46
+    vars3                          shift and go to state 37
 
 state 45
 
@@ -907,31 +926,31 @@ state 47
     (44) vars -> vars3 tipo . LIST vars2 COLON
     (47) vars2 -> . ID varsr
 
-    LIST            shift and go to state 59
-    ID              shift and go to state 48
+    LIST            shift and go to state 60
+    ID              shift and go to state 49
 
-    vars2                          shift and go to state 58
+    vars2                          shift and go to state 59
 
 state 48
+
+    (6) class2 -> DOSPUNTOS CID PARIZQ vars2 . PARDER
+
+    PARDER          shift and go to state 61
+
+
+state 49
 
     (47) vars2 -> ID . varsr
     (45) varsr -> . COMA ID varsr
     (46) varsr -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 61
+    COMA            shift and go to state 63
     PARDER          reduce using rule 150 (empty -> .)
     COLON           reduce using rule 150 (empty -> .)
 
-    varsr                          shift and go to state 60
-    empty                          shift and go to state 62
-
-state 49
-
-    (6) class2 -> DOSPUNTOS ID PARIZQ vars2 . PARDER
-
-    PARDER          shift and go to state 63
-
+    varsr                          shift and go to state 62
+    empty                          shift and go to state 64
 
 state 50
 
@@ -954,8 +973,8 @@ state 51
     STRING          reduce using rule 150 (empty -> .)
     CID             reduce using rule 150 (empty -> .)
 
-    vars3                          shift and go to state 64
-    empty                          shift and go to state 65
+    vars3                          shift and go to state 65
+    empty                          shift and go to state 66
 
 state 52
 
@@ -968,14 +987,14 @@ state 53
 
     (133) body -> LLAVEIZQ body2 funr body_main . LLAVEDER
 
-    LLAVEDER        shift and go to state 66
+    LLAVEDER        shift and go to state 67
 
 
 state 54
 
     (135) body_main -> MAIN . PARIZQ PARDER mainbloque
 
-    PARIZQ          shift and go to state 67
+    PARIZQ          shift and go to state 68
 
 
 state 55
@@ -997,26 +1016,53 @@ state 57
 
     (121) fun -> vars3 FUN . ID PARIZQ fun2 PARDER fun3 funbody
 
-    ID              shift and go to state 68
+    ID              shift and go to state 69
 
 
 state 58
 
-    (43) vars -> vars3 tipo vars2 . COLON
+    (140) multvarsdecl -> vars multvarsdecl .
 
-    COLON           shift and go to state 69
+    PRIVATE         reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    MAIN            reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    LLAVEDER        reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    FUN             reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    ID              reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    IF              reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    WRITE           reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    FOR             reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    WHILE           reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    WHEN            reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
+    RETURN          reduce using rule 140 (multvarsdecl -> vars multvarsdecl .)
 
 
 state 59
 
+    (43) vars -> vars3 tipo vars2 . COLON
+
+    COLON           shift and go to state 70
+
+
+state 60
+
     (44) vars -> vars3 tipo LIST . vars2 COLON
     (47) vars2 -> . ID varsr
 
-    ID              shift and go to state 48
+    ID              shift and go to state 49
 
-    vars2                          shift and go to state 70
+    vars2                          shift and go to state 71
 
-state 60
+state 61
+
+    (6) class2 -> DOSPUNTOS CID PARIZQ vars2 PARDER .
+
+    LLAVEIZQ        reduce using rule 6 (class2 -> DOSPUNTOS CID PARIZQ vars2 PARDER .)
+    CLASS           reduce using rule 6 (class2 -> DOSPUNTOS CID PARIZQ vars2 PARDER .)
+    DATA            reduce using rule 6 (class2 -> DOSPUNTOS CID PARIZQ vars2 PARDER .)
+    $end            reduce using rule 6 (class2 -> DOSPUNTOS CID PARIZQ vars2 PARDER .)
+
+
+state 62
 
     (47) vars2 -> ID varsr .
 
@@ -1024,14 +1070,14 @@ state 60
     COLON           reduce using rule 47 (vars2 -> ID varsr .)
 
 
-state 61
+state 63
 
     (45) varsr -> COMA . ID varsr
 
-    ID              shift and go to state 71
+    ID              shift and go to state 72
 
 
-state 62
+state 64
 
     (46) varsr -> empty .
 
@@ -1039,17 +1085,7 @@ state 62
     COLON           reduce using rule 46 (varsr -> empty .)
 
 
-state 63
-
-    (6) class2 -> DOSPUNTOS ID PARIZQ vars2 PARDER .
-
-    LLAVEIZQ        reduce using rule 6 (class2 -> DOSPUNTOS ID PARIZQ vars2 PARDER .)
-    CLASS           reduce using rule 6 (class2 -> DOSPUNTOS ID PARIZQ vars2 PARDER .)
-    DATA            reduce using rule 6 (class2 -> DOSPUNTOS ID PARIZQ vars2 PARDER .)
-    $end            reduce using rule 6 (class2 -> DOSPUNTOS ID PARIZQ vars2 PARDER .)
-
-
-state 64
+state 65
 
     (12) classparams3 -> COMA vars3 . tipo ID classparams3
     (89) tipo -> . INT
@@ -1064,9 +1100,9 @@ state 64
     STRING          shift and go to state 32
     CID             shift and go to state 33
 
-    tipo                           shift and go to state 72
+    tipo                           shift and go to state 73
 
-state 65
+state 66
 
     (49) vars3 -> empty .
 
@@ -1077,7 +1113,7 @@ state 65
     CID             reduce using rule 49 (vars3 -> empty .)
 
 
-state 66
+state 67
 
     (133) body -> LLAVEIZQ body2 funr body_main LLAVEDER .
 
@@ -1086,21 +1122,21 @@ state 66
     $end            reduce using rule 133 (body -> LLAVEIZQ body2 funr body_main LLAVEDER .)
 
 
-state 67
+state 68
 
     (135) body_main -> MAIN PARIZQ . PARDER mainbloque
 
-    PARDER          shift and go to state 73
-
-
-state 68
-
-    (121) fun -> vars3 FUN ID . PARIZQ fun2 PARDER fun3 funbody
-
-    PARIZQ          shift and go to state 74
+    PARDER          shift and go to state 74
 
 
 state 69
+
+    (121) fun -> vars3 FUN ID . PARIZQ fun2 PARDER fun3 funbody
+
+    PARIZQ          shift and go to state 75
+
+
+state 70
 
     (43) vars -> vars3 tipo vars2 COLON .
 
@@ -1122,44 +1158,44 @@ state 69
     RETURN          reduce using rule 43 (vars -> vars3 tipo vars2 COLON .)
 
 
-state 70
+state 71
 
     (44) vars -> vars3 tipo LIST vars2 . COLON
 
-    COLON           shift and go to state 75
+    COLON           shift and go to state 76
 
 
-state 71
+state 72
 
     (45) varsr -> COMA ID . varsr
     (45) varsr -> . COMA ID varsr
     (46) varsr -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 61
+    COMA            shift and go to state 63
     PARDER          reduce using rule 150 (empty -> .)
     COLON           reduce using rule 150 (empty -> .)
 
-    varsr                          shift and go to state 76
-    empty                          shift and go to state 62
+    varsr                          shift and go to state 77
+    empty                          shift and go to state 64
 
-state 72
+state 73
 
     (12) classparams3 -> COMA vars3 tipo . ID classparams3
 
-    ID              shift and go to state 77
+    ID              shift and go to state 78
 
 
-state 73
+state 74
 
     (135) body_main -> MAIN PARIZQ PARDER . mainbloque
     (139) mainbloque -> . LLAVEIZQ body2 estatuto LLAVEDER
 
-    LLAVEIZQ        shift and go to state 79
+    LLAVEIZQ        shift and go to state 80
 
-    mainbloque                     shift and go to state 78
+    mainbloque                     shift and go to state 79
 
-state 74
+state 75
 
     (121) fun -> vars3 FUN ID PARIZQ . fun2 PARDER fun3 funbody
     (122) fun2 -> . tipo ID funparamr
@@ -1178,11 +1214,11 @@ state 74
     CID             shift and go to state 33
     PARDER          reduce using rule 150 (empty -> .)
 
-    fun2                           shift and go to state 80
-    tipo                           shift and go to state 81
-    empty                          shift and go to state 82
+    fun2                           shift and go to state 81
+    tipo                           shift and go to state 82
+    empty                          shift and go to state 83
 
-state 75
+state 76
 
     (44) vars -> vars3 tipo LIST vars2 COLON .
 
@@ -1204,7 +1240,7 @@ state 75
     RETURN          reduce using rule 44 (vars -> vars3 tipo LIST vars2 COLON .)
 
 
-state 76
+state 77
 
     (45) varsr -> COMA ID varsr .
 
@@ -1212,7 +1248,7 @@ state 76
     COLON           reduce using rule 45 (varsr -> COMA ID varsr .)
 
 
-state 77
+state 78
 
     (12) classparams3 -> COMA vars3 tipo ID . classparams3
     (12) classparams3 -> . COMA vars3 tipo ID classparams3
@@ -1222,17 +1258,17 @@ state 77
     COMA            shift and go to state 51
     PARDER          reduce using rule 150 (empty -> .)
 
-    classparams3                   shift and go to state 83
+    classparams3                   shift and go to state 84
     empty                          shift and go to state 52
 
-state 78
+state 79
 
     (135) body_main -> MAIN PARIZQ PARDER mainbloque .
 
     LLAVEDER        reduce using rule 135 (body_main -> MAIN PARIZQ PARDER mainbloque .)
 
 
-state 79
+state 80
 
     (139) mainbloque -> LLAVEIZQ . body2 estatuto LLAVEDER
     (137) body2 -> . vars multvarsdecl
@@ -1257,40 +1293,40 @@ state 79
     CID             reduce using rule 150 (empty -> .)
     PRIVATE         shift and go to state 21
 
-    body2                          shift and go to state 84
+    body2                          shift and go to state 85
     vars                           shift and go to state 35
     empty                          shift and go to state 36
     vars3                          shift and go to state 37
 
-state 80
+state 81
 
     (121) fun -> vars3 FUN ID PARIZQ fun2 . PARDER fun3 funbody
 
-    PARDER          shift and go to state 85
-
-
-state 81
-
-    (122) fun2 -> tipo . ID funparamr
-
-    ID              shift and go to state 86
+    PARDER          shift and go to state 86
 
 
 state 82
+
+    (122) fun2 -> tipo . ID funparamr
+
+    ID              shift and go to state 87
+
+
+state 83
 
     (123) fun2 -> empty .
 
     PARDER          reduce using rule 123 (fun2 -> empty .)
 
 
-state 83
+state 84
 
     (12) classparams3 -> COMA vars3 tipo ID classparams3 .
 
     PARDER          reduce using rule 12 (classparams3 -> COMA vars3 tipo ID classparams3 .)
 
 
-state 84
+state 85
 
     (139) mainbloque -> LLAVEIZQ body2 . estatuto LLAVEDER
     (50) estatuto -> . asignacion estatuto
@@ -1320,12 +1356,12 @@ state 84
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
 
   ! ID              [ reduce using rule 150 (empty -> .) ]
@@ -1335,51 +1371,51 @@ state 84
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    estatuto                       shift and go to state 87
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    estatuto                       shift and go to state 88
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 85
+state 86
 
     (121) fun -> vars3 FUN ID PARIZQ fun2 PARDER . fun3 funbody
     (126) fun3 -> . DOSPUNTOS tipo
     (127) fun3 -> . empty
     (150) empty -> .
 
-    DOSPUNTOS       shift and go to state 104
+    DOSPUNTOS       shift and go to state 105
     LLAVEIZQ        reduce using rule 150 (empty -> .)
 
-    fun3                           shift and go to state 103
-    empty                          shift and go to state 105
+    fun3                           shift and go to state 104
+    empty                          shift and go to state 106
 
-state 86
+state 87
 
     (122) fun2 -> tipo ID . funparamr
     (124) funparamr -> . COMA tipo ID funparamr
     (125) funparamr -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 107
+    COMA            shift and go to state 108
     PARDER          reduce using rule 150 (empty -> .)
 
-    funparamr                      shift and go to state 106
-    empty                          shift and go to state 108
+    funparamr                      shift and go to state 107
+    empty                          shift and go to state 109
 
-state 87
+state 88
 
     (139) mainbloque -> LLAVEIZQ body2 estatuto . LLAVEDER
 
-    LLAVEDER        shift and go to state 109
+    LLAVEDER        shift and go to state 110
 
 
-state 88
+state 89
 
     (50) estatuto -> asignacion . estatuto
     (50) estatuto -> . asignacion estatuto
@@ -1409,12 +1445,12 @@ state 88
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
@@ -1425,18 +1461,18 @@ state 88
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    asignacion                     shift and go to state 88
-    estatuto                       shift and go to state 110
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    asignacion                     shift and go to state 89
+    estatuto                       shift and go to state 111
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 89
+state 90
 
     (51) estatuto -> condicion . estatuto
     (50) estatuto -> . asignacion estatuto
@@ -1466,12 +1502,12 @@ state 89
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
@@ -1482,18 +1518,18 @@ state 89
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    condicion                      shift and go to state 89
-    estatuto                       shift and go to state 111
-    asignacion                     shift and go to state 88
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    condicion                      shift and go to state 90
+    estatuto                       shift and go to state 112
+    asignacion                     shift and go to state 89
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 90
+state 91
 
     (52) estatuto -> escritura . estatuto
     (50) estatuto -> . asignacion estatuto
@@ -1523,12 +1559,12 @@ state 90
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
@@ -1539,18 +1575,18 @@ state 90
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    escritura                      shift and go to state 90
-    estatuto                       shift and go to state 112
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    escritura                      shift and go to state 91
+    estatuto                       shift and go to state 113
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 91
+state 92
 
     (53) estatuto -> for . estatuto
     (50) estatuto -> . asignacion estatuto
@@ -1580,12 +1616,12 @@ state 91
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
@@ -1596,18 +1632,18 @@ state 91
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    for                            shift and go to state 91
-    estatuto                       shift and go to state 113
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    for                            shift and go to state 92
+    estatuto                       shift and go to state 114
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 92
+state 93
 
     (54) estatuto -> while . estatuto
     (50) estatuto -> . asignacion estatuto
@@ -1637,12 +1673,12 @@ state 92
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
@@ -1653,18 +1689,18 @@ state 92
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    while                          shift and go to state 92
-    estatuto                       shift and go to state 114
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    while                          shift and go to state 93
+    estatuto                       shift and go to state 115
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 93
+state 94
 
     (55) estatuto -> when . estatuto
     (50) estatuto -> . asignacion estatuto
@@ -1694,12 +1730,12 @@ state 93
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
@@ -1710,18 +1746,18 @@ state 93
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    when                           shift and go to state 93
-    estatuto                       shift and go to state 115
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    when                           shift and go to state 94
+    estatuto                       shift and go to state 116
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 94
+state 95
 
     (56) estatuto -> llamada . estatuto
     (50) estatuto -> . asignacion estatuto
@@ -1751,12 +1787,12 @@ state 94
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
@@ -1767,18 +1803,18 @@ state 94
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    llamada                        shift and go to state 94
-    estatuto                       shift and go to state 116
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    llamada                        shift and go to state 95
+    estatuto                       shift and go to state 117
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 95
+state 96
 
     (57) estatuto -> obj_call . estatuto
     (50) estatuto -> . asignacion estatuto
@@ -1808,12 +1844,12 @@ state 95
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
@@ -1824,18 +1860,18 @@ state 95
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    obj_call                       shift and go to state 95
-    estatuto                       shift and go to state 117
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    empty                          shift and go to state 96
+    obj_call                       shift and go to state 96
+    estatuto                       shift and go to state 118
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    empty                          shift and go to state 97
 
-state 96
+state 97
 
     (58) estatuto -> empty .
     (145) llamada -> empty .
@@ -1872,7 +1908,7 @@ state 96
   ! RETURN          [ reduce using rule 147 (obj_call -> empty .) ]
 
 
-state 97
+state 98
 
     (59) asignacion -> ID . asignacion3 IGUAL asignacion2 COLON
     (144) llamada -> ID . PARIZQ llamada_param PARDER COLON
@@ -1882,61 +1918,61 @@ state 97
     (72) asignacion3 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 119
-    PUNTO           shift and go to state 120
-    CORCHIZQ        shift and go to state 121
+    PARIZQ          shift and go to state 120
+    PUNTO           shift and go to state 121
+    CORCHIZQ        shift and go to state 122
     IGUAL           reduce using rule 150 (empty -> .)
 
-    asignacion3                    shift and go to state 118
-    empty                          shift and go to state 122
+    asignacion3                    shift and go to state 119
+    empty                          shift and go to state 123
 
-state 98
+state 99
 
     (73) condicion -> IF . condicion2 estatutor
     (74) condicion2 -> . PARIZQ expresion PARDER bloque
 
-    PARIZQ          shift and go to state 124
-
-    condicion2                     shift and go to state 123
-
-state 99
-
-    (84) escritura -> WRITE . PARIZQ esc1 esc2 PARDER COLON
-
     PARIZQ          shift and go to state 125
 
+    condicion2                     shift and go to state 124
 
 state 100
 
-    (109) for -> FOR . PARIZQ ID IN for2 PARDER bloque
+    (84) escritura -> WRITE . PARIZQ esc1 esc2 PARDER COLON
 
     PARIZQ          shift and go to state 126
 
 
 state 101
 
-    (116) while -> WHILE . PARIZQ expresion PARDER bloque
+    (109) for -> FOR . PARIZQ ID IN for2 PARDER bloque
 
     PARIZQ          shift and go to state 127
 
 
 state 102
 
-    (117) when -> WHEN . LLAVEIZQ when2 LLAVEDER
+    (116) while -> WHILE . PARIZQ expresion PARDER bloque
 
-    LLAVEIZQ        shift and go to state 128
+    PARIZQ          shift and go to state 128
 
 
 state 103
 
+    (117) when -> WHEN . LLAVEIZQ when2 LLAVEDER
+
+    LLAVEIZQ        shift and go to state 129
+
+
+state 104
+
     (121) fun -> vars3 FUN ID PARIZQ fun2 PARDER fun3 . funbody
     (128) funbody -> . LLAVEIZQ opc1 opc2 bloque2 LLAVEDER
 
-    LLAVEIZQ        shift and go to state 130
+    LLAVEIZQ        shift and go to state 131
 
-    funbody                        shift and go to state 129
+    funbody                        shift and go to state 130
 
-state 104
+state 105
 
     (126) fun3 -> DOSPUNTOS . tipo
     (89) tipo -> . INT
@@ -1951,23 +1987,23 @@ state 104
     STRING          shift and go to state 32
     CID             shift and go to state 33
 
-    tipo                           shift and go to state 131
+    tipo                           shift and go to state 132
 
-state 105
+state 106
 
     (127) fun3 -> empty .
 
     LLAVEIZQ        reduce using rule 127 (fun3 -> empty .)
 
 
-state 106
+state 107
 
     (122) fun2 -> tipo ID funparamr .
 
     PARDER          reduce using rule 122 (fun2 -> tipo ID funparamr .)
 
 
-state 107
+state 108
 
     (124) funparamr -> COMA . tipo ID funparamr
     (89) tipo -> . INT
@@ -1982,23 +2018,23 @@ state 107
     STRING          shift and go to state 32
     CID             shift and go to state 33
 
-    tipo                           shift and go to state 132
+    tipo                           shift and go to state 133
 
-state 108
+state 109
 
     (125) funparamr -> empty .
 
     PARDER          reduce using rule 125 (funparamr -> empty .)
 
 
-state 109
+state 110
 
     (139) mainbloque -> LLAVEIZQ body2 estatuto LLAVEDER .
 
     LLAVEDER        reduce using rule 139 (mainbloque -> LLAVEIZQ body2 estatuto LLAVEDER .)
 
 
-state 110
+state 111
 
     (50) estatuto -> asignacion estatuto .
 
@@ -2006,7 +2042,7 @@ state 110
     RETURN          reduce using rule 50 (estatuto -> asignacion estatuto .)
 
 
-state 111
+state 112
 
     (51) estatuto -> condicion estatuto .
 
@@ -2014,7 +2050,7 @@ state 111
     RETURN          reduce using rule 51 (estatuto -> condicion estatuto .)
 
 
-state 112
+state 113
 
     (52) estatuto -> escritura estatuto .
 
@@ -2022,7 +2058,7 @@ state 112
     RETURN          reduce using rule 52 (estatuto -> escritura estatuto .)
 
 
-state 113
+state 114
 
     (53) estatuto -> for estatuto .
 
@@ -2030,7 +2066,7 @@ state 113
     RETURN          reduce using rule 53 (estatuto -> for estatuto .)
 
 
-state 114
+state 115
 
     (54) estatuto -> while estatuto .
 
@@ -2038,7 +2074,7 @@ state 114
     RETURN          reduce using rule 54 (estatuto -> while estatuto .)
 
 
-state 115
+state 116
 
     (55) estatuto -> when estatuto .
 
@@ -2046,7 +2082,7 @@ state 115
     RETURN          reduce using rule 55 (estatuto -> when estatuto .)
 
 
-state 116
+state 117
 
     (56) estatuto -> llamada estatuto .
 
@@ -2054,7 +2090,7 @@ state 116
     RETURN          reduce using rule 56 (estatuto -> llamada estatuto .)
 
 
-state 117
+state 118
 
     (57) estatuto -> obj_call estatuto .
 
@@ -2062,14 +2098,14 @@ state 117
     RETURN          reduce using rule 57 (estatuto -> obj_call estatuto .)
 
 
-state 118
+state 119
 
     (59) asignacion -> ID asignacion3 . IGUAL asignacion2 COLON
 
-    IGUAL           shift and go to state 133
+    IGUAL           shift and go to state 134
 
 
-state 119
+state 120
 
     (144) llamada -> ID PARIZQ . llamada_param PARDER COLON
     (148) llamada_param -> . expresion expresionr
@@ -2094,29 +2130,29 @@ state 119
     FALSE           reduce using rule 150 (empty -> .)
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
 
-    llamada_param                  shift and go to state 135
-    expresion                      shift and go to state 136
-    empty                          shift and go to state 137
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
+    llamada_param                  shift and go to state 136
+    expresion                      shift and go to state 137
+    empty                          shift and go to state 138
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
 
-state 120
+state 121
 
     (146) obj_call -> ID PUNTO . ID PARIZQ llamada_param PARDER COLON
     (71) asignacion3 -> PUNTO . ID
 
-    ID              shift and go to state 146
+    ID              shift and go to state 147
 
 
-state 121
+state 122
 
     (70) asignacion3 -> CORCHIZQ . expresion CORCHDER
     (26) expresion -> . megaexp
@@ -2131,9 +2167,9 @@ state 121
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -2142,30 +2178,30 @@ state 121
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    expresion                      shift and go to state 147
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    expresion                      shift and go to state 148
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 122
+state 123
 
     (72) asignacion3 -> empty .
 
     IGUAL           reduce using rule 72 (asignacion3 -> empty .)
 
 
-state 123
+state 124
 
     (73) condicion -> IF condicion2 . estatutor
     (82) estatutor -> . ELSE bloque
     (83) estatutor -> . empty
     (150) empty -> .
 
-    ELSE            shift and go to state 150
+    ELSE            shift and go to state 151
     ID              reduce using rule 150 (empty -> .)
     IF              reduce using rule 150 (empty -> .)
     WRITE           reduce using rule 150 (empty -> .)
@@ -2175,10 +2211,10 @@ state 123
     LLAVEDER        reduce using rule 150 (empty -> .)
     RETURN          reduce using rule 150 (empty -> .)
 
-    estatutor                      shift and go to state 149
-    empty                          shift and go to state 151
+    estatutor                      shift and go to state 150
+    empty                          shift and go to state 152
 
-state 124
+state 125
 
     (74) condicion2 -> PARIZQ . expresion PARDER bloque
     (26) expresion -> . megaexp
@@ -2193,9 +2229,9 @@ state 124
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -2204,16 +2240,16 @@ state 124
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    expresion                      shift and go to state 152
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    expresion                      shift and go to state 153
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 125
+state 126
 
     (84) escritura -> WRITE PARIZQ . esc1 esc2 PARDER COLON
     (85) esc1 -> . expresion
@@ -2230,10 +2266,10 @@ state 125
     (108) factor2 -> . empty
     (150) empty -> .
 
-    STRING          shift and go to state 155
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    STRING          shift and go to state 156
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -2242,24 +2278,24 @@ state 125
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    esc1                           shift and go to state 153
-    expresion                      shift and go to state 154
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    esc1                           shift and go to state 154
+    expresion                      shift and go to state 155
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 126
+state 127
 
     (109) for -> FOR PARIZQ . ID IN for2 PARDER bloque
 
-    ID              shift and go to state 156
+    ID              shift and go to state 157
 
 
-state 127
+state 128
 
     (116) while -> WHILE PARIZQ . expresion PARDER bloque
     (26) expresion -> . megaexp
@@ -2274,9 +2310,9 @@ state 127
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -2285,16 +2321,16 @@ state 127
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    expresion                      shift and go to state 157
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    expresion                      shift and go to state 158
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 128
+state 129
 
     (117) when -> WHEN LLAVEIZQ . when2 LLAVEDER
     (118) when2 -> . expresion FLECHITA bloque when2
@@ -2312,7 +2348,7 @@ state 128
     (107) factor2 -> . MENOS
     (108) factor2 -> . empty
 
-    ELSE            shift and go to state 160
+    ELSE            shift and go to state 161
     LLAVEDER        reduce using rule 150 (empty -> .)
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
@@ -2321,21 +2357,21 @@ state 128
     FALSE           reduce using rule 150 (empty -> .)
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
 
-    when2                          shift and go to state 158
-    expresion                      shift and go to state 159
-    empty                          shift and go to state 161
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
+    when2                          shift and go to state 159
+    expresion                      shift and go to state 160
+    empty                          shift and go to state 162
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
 
-state 129
+state 130
 
     (121) fun -> vars3 FUN ID PARIZQ fun2 PARDER fun3 funbody .
 
@@ -2345,7 +2381,7 @@ state 129
     LLAVEDER        reduce using rule 121 (fun -> vars3 FUN ID PARIZQ fun2 PARDER fun3 funbody .)
 
 
-state 130
+state 131
 
     (128) funbody -> LLAVEIZQ . opc1 opc2 bloque2 LLAVEDER
     (129) opc1 -> . vars multvarsdecl
@@ -2371,26 +2407,26 @@ state 130
     CID             reduce using rule 150 (empty -> .)
     PRIVATE         shift and go to state 21
 
-    opc1                           shift and go to state 162
-    vars                           shift and go to state 163
-    empty                          shift and go to state 164
+    opc1                           shift and go to state 163
+    vars                           shift and go to state 164
+    empty                          shift and go to state 165
     vars3                          shift and go to state 37
 
-state 131
+state 132
 
     (126) fun3 -> DOSPUNTOS tipo .
 
     LLAVEIZQ        reduce using rule 126 (fun3 -> DOSPUNTOS tipo .)
 
 
-state 132
+state 133
 
     (124) funparamr -> COMA tipo . ID funparamr
 
-    ID              shift and go to state 165
+    ID              shift and go to state 166
 
 
-state 133
+state 134
 
     (59) asignacion -> ID asignacion3 IGUAL . asignacion2 COLON
     (60) asignacion2 -> . expresion
@@ -2409,12 +2445,12 @@ state 133
     (108) factor2 -> . empty
     (150) empty -> .
 
-    CORCHDER        shift and go to state 168
-    READ            shift and go to state 169
-    CID             shift and go to state 170
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    CORCHDER        shift and go to state 169
+    READ            shift and go to state 170
+    CID             shift and go to state 171
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -2423,17 +2459,17 @@ state 133
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    asignacion2                    shift and go to state 166
-    expresion                      shift and go to state 167
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    asignacion2                    shift and go to state 167
+    expresion                      shift and go to state 168
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 134
+state 135
 
     (94) factor -> PARIZQ . expresion PARDER
     (26) expresion -> . megaexp
@@ -2448,9 +2484,9 @@ state 134
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -2459,36 +2495,36 @@ state 134
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    expresion                      shift and go to state 171
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    expresion                      shift and go to state 172
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 135
+state 136
 
     (144) llamada -> ID PARIZQ llamada_param . PARDER COLON
 
-    PARDER          shift and go to state 172
+    PARDER          shift and go to state 173
 
 
-state 136
+state 137
 
     (148) llamada_param -> expresion . expresionr
     (27) expresionr -> . COMA expresion expresionr
     (28) expresionr -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 174
+    COMA            shift and go to state 175
     PARDER          reduce using rule 150 (empty -> .)
 
-    expresionr                     shift and go to state 173
-    empty                          shift and go to state 175
+    expresionr                     shift and go to state 174
+    empty                          shift and go to state 176
 
-state 137
+state 138
 
     (149) llamada_param -> empty .
     (108) factor2 -> empty .
@@ -2503,7 +2539,7 @@ state 137
     NULL            reduce using rule 108 (factor2 -> empty .)
 
 
-state 138
+state 139
 
     (26) expresion -> megaexp .
 
@@ -2515,7 +2551,7 @@ state 138
     CORCHIZQ        reduce using rule 26 (expresion -> megaexp .)
 
 
-state 139
+state 140
 
     (39) megaexp -> superexp . megaexpr
     (40) megaexpr -> . AND superexp megaexpr
@@ -2523,8 +2559,8 @@ state 139
     (42) megaexpr -> . empty
     (150) empty -> .
 
-    AND             shift and go to state 177
-    OR              shift and go to state 178
+    AND             shift and go to state 178
+    OR              shift and go to state 179
     COMA            reduce using rule 150 (empty -> .)
     PARDER          reduce using rule 150 (empty -> .)
     CORCHDER        reduce using rule 150 (empty -> .)
@@ -2532,10 +2568,10 @@ state 139
     COLON           reduce using rule 150 (empty -> .)
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
-    megaexpr                       shift and go to state 176
-    empty                          shift and go to state 179
+    megaexpr                       shift and go to state 177
+    empty                          shift and go to state 180
 
-state 140
+state 141
 
     (31) superexp -> exp . oplog
     (32) oplog -> . MAYORQUE exp
@@ -2547,12 +2583,12 @@ state 140
     (38) oplog -> . empty
     (150) empty -> .
 
-    MAYORQUE        shift and go to state 181
-    MENORQUE        shift and go to state 182
-    DIFERENTE       shift and go to state 183
-    MAYOROIGUAL     shift and go to state 184
-    MENOROIGUAL     shift and go to state 185
-    IGUALIGUAL      shift and go to state 186
+    MAYORQUE        shift and go to state 182
+    MENORQUE        shift and go to state 183
+    DIFERENTE       shift and go to state 184
+    MAYOROIGUAL     shift and go to state 185
+    MENOROIGUAL     shift and go to state 186
+    IGUALIGUAL      shift and go to state 187
     AND             reduce using rule 150 (empty -> .)
     OR              reduce using rule 150 (empty -> .)
     COMA            reduce using rule 150 (empty -> .)
@@ -2562,10 +2598,10 @@ state 140
     COLON           reduce using rule 150 (empty -> .)
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
-    oplog                          shift and go to state 180
-    empty                          shift and go to state 187
+    oplog                          shift and go to state 181
+    empty                          shift and go to state 188
 
-state 141
+state 142
 
     (100) exp -> termino . expr
     (101) expr -> . MAS termino expr
@@ -2573,8 +2609,8 @@ state 141
     (103) expr -> . empty
     (150) empty -> .
 
-    MAS             shift and go to state 189
-    MENOS           shift and go to state 190
+    MAS             shift and go to state 190
+    MENOS           shift and go to state 191
     MAYORQUE        reduce using rule 150 (empty -> .)
     MENORQUE        reduce using rule 150 (empty -> .)
     DIFERENTE       reduce using rule 150 (empty -> .)
@@ -2590,10 +2626,10 @@ state 141
     COLON           reduce using rule 150 (empty -> .)
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
-    expr                           shift and go to state 188
-    empty                          shift and go to state 191
+    expr                           shift and go to state 189
+    empty                          shift and go to state 192
 
-state 142
+state 143
 
     (99) termino -> factor . terminor
     (96) terminor -> . POR factor terminor
@@ -2601,8 +2637,8 @@ state 142
     (98) terminor -> . empty
     (150) empty -> .
 
-    POR             shift and go to state 193
-    SOBRE           shift and go to state 194
+    POR             shift and go to state 194
+    SOBRE           shift and go to state 195
     MAS             reduce using rule 150 (empty -> .)
     MENOS           reduce using rule 150 (empty -> .)
     MAYORQUE        reduce using rule 150 (empty -> .)
@@ -2620,10 +2656,10 @@ state 142
     COLON           reduce using rule 150 (empty -> .)
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
-    terminor                       shift and go to state 192
-    empty                          shift and go to state 195
+    terminor                       shift and go to state 193
+    empty                          shift and go to state 196
 
-state 143
+state 144
 
     (95) factor -> factor2 . varcte
     (14) varcte -> . ID
@@ -2637,17 +2673,17 @@ state 143
     (22) varcte -> . ID PUNTO ID varcte_param_fun
     (23) varcte -> . ID PARIZQ llamada_param PARDER
 
-    ID              shift and go to state 197
-    INTNUM          shift and go to state 198
-    FLOATNUM        shift and go to state 199
-    TRUE            shift and go to state 200
-    FALSE           shift and go to state 201
-    STRINGVAL       shift and go to state 202
-    NULL            shift and go to state 203
+    ID              shift and go to state 198
+    INTNUM          shift and go to state 199
+    FLOATNUM        shift and go to state 200
+    TRUE            shift and go to state 201
+    FALSE           shift and go to state 202
+    STRINGVAL       shift and go to state 203
+    NULL            shift and go to state 204
 
-    varcte                         shift and go to state 196
+    varcte                         shift and go to state 197
 
-state 144
+state 145
 
     (106) factor2 -> MAS .
 
@@ -2660,7 +2696,7 @@ state 144
     NULL            reduce using rule 106 (factor2 -> MAS .)
 
 
-state 145
+state 146
 
     (107) factor2 -> MENOS .
 
@@ -2673,23 +2709,23 @@ state 145
     NULL            reduce using rule 107 (factor2 -> MENOS .)
 
 
-state 146
+state 147
 
     (146) obj_call -> ID PUNTO ID . PARIZQ llamada_param PARDER COLON
     (71) asignacion3 -> PUNTO ID .
 
-    PARIZQ          shift and go to state 204
+    PARIZQ          shift and go to state 205
     IGUAL           reduce using rule 71 (asignacion3 -> PUNTO ID .)
 
 
-state 147
+state 148
 
     (70) asignacion3 -> CORCHIZQ expresion . CORCHDER
 
-    CORCHDER        shift and go to state 205
+    CORCHDER        shift and go to state 206
 
 
-state 148
+state 149
 
     (108) factor2 -> empty .
 
@@ -2702,7 +2738,7 @@ state 148
     NULL            reduce using rule 108 (factor2 -> empty .)
 
 
-state 149
+state 150
 
     (73) condicion -> IF condicion2 estatutor .
 
@@ -2716,16 +2752,16 @@ state 149
     RETURN          reduce using rule 73 (condicion -> IF condicion2 estatutor .)
 
 
-state 150
+state 151
 
     (82) estatutor -> ELSE . bloque
     (77) bloque -> . LLAVEIZQ estatuto bloque2 LLAVEDER
 
-    LLAVEIZQ        shift and go to state 207
+    LLAVEIZQ        shift and go to state 208
 
-    bloque                         shift and go to state 206
+    bloque                         shift and go to state 207
 
-state 151
+state 152
 
     (83) estatutor -> empty .
 
@@ -2739,27 +2775,27 @@ state 151
     RETURN          reduce using rule 83 (estatutor -> empty .)
 
 
-state 152
+state 153
 
     (74) condicion2 -> PARIZQ expresion . PARDER bloque
 
-    PARDER          shift and go to state 208
+    PARDER          shift and go to state 209
 
 
-state 153
+state 154
 
     (84) escritura -> WRITE PARIZQ esc1 . esc2 PARDER COLON
     (87) esc2 -> . COMA esc1 esc2
     (88) esc2 -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 210
+    COMA            shift and go to state 211
     PARDER          reduce using rule 150 (empty -> .)
 
-    esc2                           shift and go to state 209
-    empty                          shift and go to state 211
+    esc2                           shift and go to state 210
+    empty                          shift and go to state 212
 
-state 154
+state 155
 
     (85) esc1 -> expresion .
 
@@ -2767,7 +2803,7 @@ state 154
     PARDER          reduce using rule 85 (esc1 -> expresion .)
 
 
-state 155
+state 156
 
     (86) esc1 -> STRING .
 
@@ -2775,42 +2811,42 @@ state 155
     PARDER          reduce using rule 86 (esc1 -> STRING .)
 
 
-state 156
+state 157
 
     (109) for -> FOR PARIZQ ID . IN for2 PARDER bloque
 
-    IN              shift and go to state 212
-
-
-state 157
-
-    (116) while -> WHILE PARIZQ expresion . PARDER bloque
-
-    PARDER          shift and go to state 213
+    IN              shift and go to state 213
 
 
 state 158
 
-    (117) when -> WHEN LLAVEIZQ when2 . LLAVEDER
+    (116) while -> WHILE PARIZQ expresion . PARDER bloque
 
-    LLAVEDER        shift and go to state 214
+    PARDER          shift and go to state 214
 
 
 state 159
 
-    (118) when2 -> expresion . FLECHITA bloque when2
+    (117) when -> WHEN LLAVEIZQ when2 . LLAVEDER
 
-    FLECHITA        shift and go to state 215
+    LLAVEDER        shift and go to state 215
 
 
 state 160
 
-    (119) when2 -> ELSE . FLECHITA bloque
+    (118) when2 -> expresion . FLECHITA bloque when2
 
     FLECHITA        shift and go to state 216
 
 
 state 161
+
+    (119) when2 -> ELSE . FLECHITA bloque
+
+    FLECHITA        shift and go to state 217
+
+
+state 162
 
     (120) when2 -> empty .
     (108) factor2 -> empty .
@@ -2825,7 +2861,7 @@ state 161
     NULL            reduce using rule 108 (factor2 -> empty .)
 
 
-state 162
+state 163
 
     (128) funbody -> LLAVEIZQ opc1 . opc2 bloque2 LLAVEDER
     (131) opc2 -> . estatuto
@@ -2859,12 +2895,12 @@ state 162
   ! shift/reduce conflict for WHEN resolved as shift
     RETURN          reduce using rule 150 (empty -> .)
     LLAVEDER        reduce using rule 150 (empty -> .)
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
 
   ! ID              [ reduce using rule 150 (empty -> .) ]
   ! IF              [ reduce using rule 150 (empty -> .) ]
@@ -2873,22 +2909,22 @@ state 162
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    opc2                           shift and go to state 217
-    estatuto                       shift and go to state 218
-    empty                          shift and go to state 219
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
+    opc2                           shift and go to state 218
+    estatuto                       shift and go to state 219
+    empty                          shift and go to state 220
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
 
-state 163
+state 164
 
     (129) opc1 -> vars . multvarsdecl
-    (140) multvarsdecl -> . vars
+    (140) multvarsdecl -> . vars multvarsdecl
     (141) multvarsdecl -> . empty
     (43) vars -> . vars3 tipo vars2 COLON
     (44) vars -> . vars3 tipo LIST vars2 COLON
@@ -2912,11 +2948,11 @@ state 163
     PRIVATE         shift and go to state 21
 
     vars                           shift and go to state 44
-    multvarsdecl                   shift and go to state 220
+    multvarsdecl                   shift and go to state 221
     empty                          shift and go to state 46
     vars3                          shift and go to state 37
 
-state 164
+state 165
 
     (130) opc1 -> empty .
     (49) vars3 -> empty .
@@ -2936,34 +2972,34 @@ state 164
     CID             reduce using rule 49 (vars3 -> empty .)
 
 
-state 165
+state 166
 
     (124) funparamr -> COMA tipo ID . funparamr
     (124) funparamr -> . COMA tipo ID funparamr
     (125) funparamr -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 107
+    COMA            shift and go to state 108
     PARDER          reduce using rule 150 (empty -> .)
 
-    funparamr                      shift and go to state 221
-    empty                          shift and go to state 108
+    funparamr                      shift and go to state 222
+    empty                          shift and go to state 109
 
-state 166
+state 167
 
     (59) asignacion -> ID asignacion3 IGUAL asignacion2 . COLON
 
-    COLON           shift and go to state 222
+    COLON           shift and go to state 223
 
 
-state 167
+state 168
 
     (60) asignacion2 -> expresion .
 
     COLON           reduce using rule 60 (asignacion2 -> expresion .)
 
 
-state 168
+state 169
 
     (61) asignacion2 -> CORCHDER . expresion asignacion2r CORCHIZQ
     (26) expresion -> . megaexp
@@ -2978,9 +3014,9 @@ state 168
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -2989,51 +3025,51 @@ state 168
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    expresion                      shift and go to state 223
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
-
-state 169
-
-    (62) asignacion2 -> READ . PARIZQ assign_read PARDER
-
-    PARIZQ          shift and go to state 224
-
+    expresion                      shift and go to state 224
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
 state 170
 
-    (63) asignacion2 -> CID . PARIZQ class_call_args expresionr PARDER
+    (62) asignacion2 -> READ . PARIZQ assign_read PARDER
 
     PARIZQ          shift and go to state 225
 
 
 state 171
 
-    (94) factor -> PARIZQ expresion . PARDER
+    (63) asignacion2 -> CID . PARIZQ class_call_args expresionr PARDER
 
-    PARDER          shift and go to state 226
+    PARIZQ          shift and go to state 226
 
 
 state 172
 
-    (144) llamada -> ID PARIZQ llamada_param PARDER . COLON
+    (94) factor -> PARIZQ expresion . PARDER
 
-    COLON           shift and go to state 227
+    PARDER          shift and go to state 227
 
 
 state 173
+
+    (144) llamada -> ID PARIZQ llamada_param PARDER . COLON
+
+    COLON           shift and go to state 228
+
+
+state 174
 
     (148) llamada_param -> expresion expresionr .
 
     PARDER          reduce using rule 148 (llamada_param -> expresion expresionr .)
 
 
-state 174
+state 175
 
     (27) expresionr -> COMA . expresion expresionr
     (26) expresion -> . megaexp
@@ -3048,9 +3084,9 @@ state 174
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3059,23 +3095,23 @@ state 174
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    expresion                      shift and go to state 228
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    expresion                      shift and go to state 229
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 175
+state 176
 
     (28) expresionr -> empty .
 
     PARDER          reduce using rule 28 (expresionr -> empty .)
 
 
-state 176
+state 177
 
     (39) megaexp -> superexp megaexpr .
 
@@ -3087,7 +3123,7 @@ state 176
     CORCHIZQ        reduce using rule 39 (megaexp -> superexp megaexpr .)
 
 
-state 177
+state 178
 
     (40) megaexpr -> AND . superexp megaexpr
     (31) superexp -> . exp oplog
@@ -3100,9 +3136,9 @@ state 177
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3111,14 +3147,14 @@ state 177
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    superexp                       shift and go to state 229
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    superexp                       shift and go to state 230
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 178
+state 179
 
     (41) megaexpr -> OR . superexp megaexpr
     (31) superexp -> . exp oplog
@@ -3131,9 +3167,9 @@ state 178
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3142,14 +3178,14 @@ state 178
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    superexp                       shift and go to state 230
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    superexp                       shift and go to state 231
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 179
+state 180
 
     (42) megaexpr -> empty .
 
@@ -3161,7 +3197,7 @@ state 179
     CORCHIZQ        reduce using rule 42 (megaexpr -> empty .)
 
 
-state 180
+state 181
 
     (31) superexp -> exp oplog .
 
@@ -3175,7 +3211,7 @@ state 180
     CORCHIZQ        reduce using rule 31 (superexp -> exp oplog .)
 
 
-state 181
+state 182
 
     (32) oplog -> MAYORQUE . exp
     (100) exp -> . termino expr
@@ -3187,9 +3223,9 @@ state 181
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3198,13 +3234,13 @@ state 181
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    exp                            shift and go to state 231
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    exp                            shift and go to state 232
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 182
+state 183
 
     (33) oplog -> MENORQUE . exp
     (100) exp -> . termino expr
@@ -3216,9 +3252,9 @@ state 182
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3227,13 +3263,13 @@ state 182
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    exp                            shift and go to state 232
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    exp                            shift and go to state 233
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 183
+state 184
 
     (34) oplog -> DIFERENTE . exp
     (100) exp -> . termino expr
@@ -3245,9 +3281,9 @@ state 183
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3256,13 +3292,13 @@ state 183
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    exp                            shift and go to state 233
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    exp                            shift and go to state 234
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 184
+state 185
 
     (35) oplog -> MAYOROIGUAL . exp
     (100) exp -> . termino expr
@@ -3274,9 +3310,9 @@ state 184
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3285,13 +3321,13 @@ state 184
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    exp                            shift and go to state 234
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    exp                            shift and go to state 235
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 185
+state 186
 
     (36) oplog -> MENOROIGUAL . exp
     (100) exp -> . termino expr
@@ -3303,9 +3339,9 @@ state 185
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3314,13 +3350,13 @@ state 185
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    exp                            shift and go to state 235
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    exp                            shift and go to state 236
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 186
+state 187
 
     (37) oplog -> IGUALIGUAL . exp
     (100) exp -> . termino expr
@@ -3332,9 +3368,9 @@ state 186
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3343,13 +3379,13 @@ state 186
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    exp                            shift and go to state 236
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    exp                            shift and go to state 237
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 187
+state 188
 
     (38) oplog -> empty .
 
@@ -3363,7 +3399,7 @@ state 187
     CORCHIZQ        reduce using rule 38 (oplog -> empty .)
 
 
-state 188
+state 189
 
     (100) exp -> termino expr .
 
@@ -3383,7 +3419,7 @@ state 188
     CORCHIZQ        reduce using rule 100 (exp -> termino expr .)
 
 
-state 189
+state 190
 
     (101) expr -> MAS . termino expr
     (99) termino -> . factor terminor
@@ -3394,9 +3430,9 @@ state 189
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3405,12 +3441,12 @@ state 189
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    termino                        shift and go to state 237
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    termino                        shift and go to state 238
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 190
+state 191
 
     (102) expr -> MENOS . termino expr
     (99) termino -> . factor terminor
@@ -3421,9 +3457,9 @@ state 190
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3432,12 +3468,12 @@ state 190
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    termino                        shift and go to state 238
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    termino                        shift and go to state 239
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 191
+state 192
 
     (103) expr -> empty .
 
@@ -3457,7 +3493,7 @@ state 191
     CORCHIZQ        reduce using rule 103 (expr -> empty .)
 
 
-state 192
+state 193
 
     (99) termino -> factor terminor .
 
@@ -3479,7 +3515,7 @@ state 192
     CORCHIZQ        reduce using rule 99 (termino -> factor terminor .)
 
 
-state 193
+state 194
 
     (96) terminor -> POR . factor terminor
     (94) factor -> . PARIZQ expresion PARDER
@@ -3489,34 +3525,9 @@ state 193
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
-    ID              reduce using rule 150 (empty -> .)
-    INTNUM          reduce using rule 150 (empty -> .)
-    FLOATNUM        reduce using rule 150 (empty -> .)
-    TRUE            reduce using rule 150 (empty -> .)
-    FALSE           reduce using rule 150 (empty -> .)
-    STRINGVAL       reduce using rule 150 (empty -> .)
-    NULL            reduce using rule 150 (empty -> .)
-
-    factor                         shift and go to state 239
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
-
-state 194
-
-    (97) terminor -> SOBRE . factor terminor
-    (94) factor -> . PARIZQ expresion PARDER
-    (95) factor -> . factor2 varcte
-    (106) factor2 -> . MAS
-    (107) factor2 -> . MENOS
-    (108) factor2 -> . empty
-    (150) empty -> .
-
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3526,10 +3537,35 @@ state 194
     NULL            reduce using rule 150 (empty -> .)
 
     factor                         shift and go to state 240
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
 state 195
+
+    (97) terminor -> SOBRE . factor terminor
+    (94) factor -> . PARIZQ expresion PARDER
+    (95) factor -> . factor2 varcte
+    (106) factor2 -> . MAS
+    (107) factor2 -> . MENOS
+    (108) factor2 -> . empty
+    (150) empty -> .
+
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
+    ID              reduce using rule 150 (empty -> .)
+    INTNUM          reduce using rule 150 (empty -> .)
+    FLOATNUM        reduce using rule 150 (empty -> .)
+    TRUE            reduce using rule 150 (empty -> .)
+    FALSE           reduce using rule 150 (empty -> .)
+    STRINGVAL       reduce using rule 150 (empty -> .)
+    NULL            reduce using rule 150 (empty -> .)
+
+    factor                         shift and go to state 241
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
+
+state 196
 
     (98) terminor -> empty .
 
@@ -3551,7 +3587,7 @@ state 195
     CORCHIZQ        reduce using rule 98 (terminor -> empty .)
 
 
-state 196
+state 197
 
     (95) factor -> factor2 varcte .
 
@@ -3575,7 +3611,7 @@ state 196
     CORCHIZQ        reduce using rule 95 (factor -> factor2 varcte .)
 
 
-state 197
+state 198
 
     (14) varcte -> ID .
     (21) varcte -> ID . CORCHIZQ varcte CORCHDER
@@ -3600,14 +3636,14 @@ state 197
     CORCHDER        reduce using rule 14 (varcte -> ID .)
     FLECHITA        reduce using rule 14 (varcte -> ID .)
     COLON           reduce using rule 14 (varcte -> ID .)
-    CORCHIZQ        shift and go to state 241
-    PUNTO           shift and go to state 242
-    PARIZQ          shift and go to state 243
+    CORCHIZQ        shift and go to state 242
+    PUNTO           shift and go to state 243
+    PARIZQ          shift and go to state 244
 
   ! CORCHIZQ        [ reduce using rule 14 (varcte -> ID .) ]
 
 
-state 198
+state 199
 
     (15) varcte -> INTNUM .
 
@@ -3631,7 +3667,7 @@ state 198
     CORCHIZQ        reduce using rule 15 (varcte -> INTNUM .)
 
 
-state 199
+state 200
 
     (16) varcte -> FLOATNUM .
 
@@ -3655,7 +3691,7 @@ state 199
     CORCHIZQ        reduce using rule 16 (varcte -> FLOATNUM .)
 
 
-state 200
+state 201
 
     (17) varcte -> TRUE .
 
@@ -3679,7 +3715,7 @@ state 200
     CORCHIZQ        reduce using rule 17 (varcte -> TRUE .)
 
 
-state 201
+state 202
 
     (18) varcte -> FALSE .
 
@@ -3703,7 +3739,7 @@ state 201
     CORCHIZQ        reduce using rule 18 (varcte -> FALSE .)
 
 
-state 202
+state 203
 
     (19) varcte -> STRINGVAL .
 
@@ -3727,7 +3763,7 @@ state 202
     CORCHIZQ        reduce using rule 19 (varcte -> STRINGVAL .)
 
 
-state 203
+state 204
 
     (20) varcte -> NULL .
 
@@ -3751,7 +3787,7 @@ state 203
     CORCHIZQ        reduce using rule 20 (varcte -> NULL .)
 
 
-state 204
+state 205
 
     (146) obj_call -> ID PUNTO ID PARIZQ . llamada_param PARDER COLON
     (148) llamada_param -> . expresion expresionr
@@ -3776,28 +3812,28 @@ state 204
     FALSE           reduce using rule 150 (empty -> .)
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
 
-    llamada_param                  shift and go to state 244
-    expresion                      shift and go to state 136
-    empty                          shift and go to state 137
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
+    llamada_param                  shift and go to state 245
+    expresion                      shift and go to state 137
+    empty                          shift and go to state 138
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
 
-state 205
+state 206
 
     (70) asignacion3 -> CORCHIZQ expresion CORCHDER .
 
     IGUAL           reduce using rule 70 (asignacion3 -> CORCHIZQ expresion CORCHDER .)
 
 
-state 206
+state 207
 
     (82) estatutor -> ELSE bloque .
 
@@ -3811,7 +3847,7 @@ state 206
     RETURN          reduce using rule 82 (estatutor -> ELSE bloque .)
 
 
-state 207
+state 208
 
     (77) bloque -> LLAVEIZQ . estatuto bloque2 LLAVEDER
     (50) estatuto -> . asignacion estatuto
@@ -3841,12 +3877,12 @@ state 207
   ! shift/reduce conflict for FOR resolved as shift
   ! shift/reduce conflict for WHILE resolved as shift
   ! shift/reduce conflict for WHEN resolved as shift
-    ID              shift and go to state 97
-    IF              shift and go to state 98
-    WRITE           shift and go to state 99
-    FOR             shift and go to state 100
-    WHILE           shift and go to state 101
-    WHEN            shift and go to state 102
+    ID              shift and go to state 98
+    IF              shift and go to state 99
+    WRITE           shift and go to state 100
+    FOR             shift and go to state 101
+    WHILE           shift and go to state 102
+    WHEN            shift and go to state 103
     RETURN          reduce using rule 150 (empty -> .)
     LLAVEDER        reduce using rule 150 (empty -> .)
 
@@ -3857,34 +3893,34 @@ state 207
   ! WHILE           [ reduce using rule 150 (empty -> .) ]
   ! WHEN            [ reduce using rule 150 (empty -> .) ]
 
-    estatuto                       shift and go to state 245
-    asignacion                     shift and go to state 88
-    condicion                      shift and go to state 89
-    escritura                      shift and go to state 90
-    for                            shift and go to state 91
-    while                          shift and go to state 92
-    when                           shift and go to state 93
-    llamada                        shift and go to state 94
-    obj_call                       shift and go to state 95
-    empty                          shift and go to state 96
+    estatuto                       shift and go to state 246
+    asignacion                     shift and go to state 89
+    condicion                      shift and go to state 90
+    escritura                      shift and go to state 91
+    for                            shift and go to state 92
+    while                          shift and go to state 93
+    when                           shift and go to state 94
+    llamada                        shift and go to state 95
+    obj_call                       shift and go to state 96
+    empty                          shift and go to state 97
 
-state 208
+state 209
 
     (74) condicion2 -> PARIZQ expresion PARDER . bloque
     (77) bloque -> . LLAVEIZQ estatuto bloque2 LLAVEDER
 
-    LLAVEIZQ        shift and go to state 207
+    LLAVEIZQ        shift and go to state 208
 
-    bloque                         shift and go to state 246
+    bloque                         shift and go to state 247
 
-state 209
+state 210
 
     (84) escritura -> WRITE PARIZQ esc1 esc2 . PARDER COLON
 
-    PARDER          shift and go to state 247
+    PARDER          shift and go to state 248
 
 
-state 210
+state 211
 
     (87) esc2 -> COMA . esc1 esc2
     (85) esc1 -> . expresion
@@ -3901,10 +3937,10 @@ state 210
     (108) factor2 -> . empty
     (150) empty -> .
 
-    STRING          shift and go to state 155
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    STRING          shift and go to state 156
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -3913,24 +3949,24 @@ state 210
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    esc1                           shift and go to state 248
-    expresion                      shift and go to state 154
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    esc1                           shift and go to state 249
+    expresion                      shift and go to state 155
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 211
+state 212
 
     (88) esc2 -> empty .
 
     PARDER          reduce using rule 88 (esc2 -> empty .)
 
 
-state 212
+state 213
 
     (109) for -> FOR PARIZQ ID IN . for2 PARDER bloque
     (110) for2 -> . ID
@@ -3940,22 +3976,22 @@ state 212
     (114) range -> . ID PUNTOSRANGO INTNUM
     (115) range -> . INTNUM PUNTOSRANGO ID
 
-    ID              shift and go to state 249
-    INTNUM          shift and go to state 252
+    ID              shift and go to state 250
+    INTNUM          shift and go to state 253
 
-    for2                           shift and go to state 250
-    range                          shift and go to state 251
+    for2                           shift and go to state 251
+    range                          shift and go to state 252
 
-state 213
+state 214
 
     (116) while -> WHILE PARIZQ expresion PARDER . bloque
     (77) bloque -> . LLAVEIZQ estatuto bloque2 LLAVEDER
 
-    LLAVEIZQ        shift and go to state 207
+    LLAVEIZQ        shift and go to state 208
 
-    bloque                         shift and go to state 253
+    bloque                         shift and go to state 254
 
-state 214
+state 215
 
     (117) when -> WHEN LLAVEIZQ when2 LLAVEDER .
 
@@ -3969,38 +4005,38 @@ state 214
     RETURN          reduce using rule 117 (when -> WHEN LLAVEIZQ when2 LLAVEDER .)
 
 
-state 215
+state 216
 
     (118) when2 -> expresion FLECHITA . bloque when2
     (77) bloque -> . LLAVEIZQ estatuto bloque2 LLAVEDER
 
-    LLAVEIZQ        shift and go to state 207
-
-    bloque                         shift and go to state 254
-
-state 216
-
-    (119) when2 -> ELSE FLECHITA . bloque
-    (77) bloque -> . LLAVEIZQ estatuto bloque2 LLAVEDER
-
-    LLAVEIZQ        shift and go to state 207
+    LLAVEIZQ        shift and go to state 208
 
     bloque                         shift and go to state 255
 
 state 217
+
+    (119) when2 -> ELSE FLECHITA . bloque
+    (77) bloque -> . LLAVEIZQ estatuto bloque2 LLAVEDER
+
+    LLAVEIZQ        shift and go to state 208
+
+    bloque                         shift and go to state 256
+
+state 218
 
     (128) funbody -> LLAVEIZQ opc1 opc2 . bloque2 LLAVEDER
     (78) bloque2 -> . RETURN bloque3
     (79) bloque2 -> . empty
     (150) empty -> .
 
-    RETURN          shift and go to state 257
+    RETURN          shift and go to state 258
     LLAVEDER        reduce using rule 150 (empty -> .)
 
-    bloque2                        shift and go to state 256
-    empty                          shift and go to state 258
+    bloque2                        shift and go to state 257
+    empty                          shift and go to state 259
 
-state 218
+state 219
 
     (131) opc2 -> estatuto .
 
@@ -4008,7 +4044,7 @@ state 218
     LLAVEDER        reduce using rule 131 (opc2 -> estatuto .)
 
 
-state 219
+state 220
 
     (132) opc2 -> empty .
     (58) estatuto -> empty .
@@ -4050,7 +4086,7 @@ state 219
   ! LLAVEDER        [ reduce using rule 147 (obj_call -> empty .) ]
 
 
-state 220
+state 221
 
     (129) opc1 -> vars multvarsdecl .
 
@@ -4064,14 +4100,14 @@ state 220
     LLAVEDER        reduce using rule 129 (opc1 -> vars multvarsdecl .)
 
 
-state 221
+state 222
 
     (124) funparamr -> COMA tipo ID funparamr .
 
     PARDER          reduce using rule 124 (funparamr -> COMA tipo ID funparamr .)
 
 
-state 222
+state 223
 
     (59) asignacion -> ID asignacion3 IGUAL asignacion2 COLON .
 
@@ -4085,33 +4121,33 @@ state 222
     RETURN          reduce using rule 59 (asignacion -> ID asignacion3 IGUAL asignacion2 COLON .)
 
 
-state 223
+state 224
 
     (61) asignacion2 -> CORCHDER expresion . asignacion2r CORCHIZQ
     (68) asignacion2r -> . COMA expresion asignacion2r
     (69) asignacion2r -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 260
+    COMA            shift and go to state 261
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
-    asignacion2r                   shift and go to state 259
-    empty                          shift and go to state 261
+    asignacion2r                   shift and go to state 260
+    empty                          shift and go to state 262
 
-state 224
+state 225
 
     (62) asignacion2 -> READ PARIZQ . assign_read PARDER
     (66) assign_read -> . STRINGVAL
     (67) assign_read -> . empty
     (150) empty -> .
 
-    STRINGVAL       shift and go to state 263
+    STRINGVAL       shift and go to state 264
     PARDER          reduce using rule 150 (empty -> .)
 
-    assign_read                    shift and go to state 262
-    empty                          shift and go to state 264
+    assign_read                    shift and go to state 263
+    empty                          shift and go to state 265
 
-state 225
+state 226
 
     (63) asignacion2 -> CID PARIZQ . class_call_args expresionr PARDER
     (64) class_call_args -> . expresion
@@ -4137,21 +4173,21 @@ state 225
     FALSE           reduce using rule 150 (empty -> .)
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
 
-    class_call_args                shift and go to state 265
-    expresion                      shift and go to state 266
-    empty                          shift and go to state 267
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
+    class_call_args                shift and go to state 266
+    expresion                      shift and go to state 267
+    empty                          shift and go to state 268
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
 
-state 226
+state 227
 
     (94) factor -> PARIZQ expresion PARDER .
 
@@ -4175,7 +4211,7 @@ state 226
     CORCHIZQ        reduce using rule 94 (factor -> PARIZQ expresion PARDER .)
 
 
-state 227
+state 228
 
     (144) llamada -> ID PARIZQ llamada_param PARDER COLON .
 
@@ -4189,20 +4225,20 @@ state 227
     RETURN          reduce using rule 144 (llamada -> ID PARIZQ llamada_param PARDER COLON .)
 
 
-state 228
+state 229
 
     (27) expresionr -> COMA expresion . expresionr
     (27) expresionr -> . COMA expresion expresionr
     (28) expresionr -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 174
+    COMA            shift and go to state 175
     PARDER          reduce using rule 150 (empty -> .)
 
-    expresionr                     shift and go to state 268
-    empty                          shift and go to state 175
+    expresionr                     shift and go to state 269
+    empty                          shift and go to state 176
 
-state 229
+state 230
 
     (40) megaexpr -> AND superexp . megaexpr
     (40) megaexpr -> . AND superexp megaexpr
@@ -4210,28 +4246,8 @@ state 229
     (42) megaexpr -> . empty
     (150) empty -> .
 
-    AND             shift and go to state 177
-    OR              shift and go to state 178
-    COMA            reduce using rule 150 (empty -> .)
-    PARDER          reduce using rule 150 (empty -> .)
-    CORCHDER        reduce using rule 150 (empty -> .)
-    FLECHITA        reduce using rule 150 (empty -> .)
-    COLON           reduce using rule 150 (empty -> .)
-    CORCHIZQ        reduce using rule 150 (empty -> .)
-
-    megaexpr                       shift and go to state 269
-    empty                          shift and go to state 179
-
-state 230
-
-    (41) megaexpr -> OR superexp . megaexpr
-    (40) megaexpr -> . AND superexp megaexpr
-    (41) megaexpr -> . OR superexp megaexpr
-    (42) megaexpr -> . empty
-    (150) empty -> .
-
-    AND             shift and go to state 177
-    OR              shift and go to state 178
+    AND             shift and go to state 178
+    OR              shift and go to state 179
     COMA            reduce using rule 150 (empty -> .)
     PARDER          reduce using rule 150 (empty -> .)
     CORCHDER        reduce using rule 150 (empty -> .)
@@ -4240,9 +4256,29 @@ state 230
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
     megaexpr                       shift and go to state 270
-    empty                          shift and go to state 179
+    empty                          shift and go to state 180
 
 state 231
+
+    (41) megaexpr -> OR superexp . megaexpr
+    (40) megaexpr -> . AND superexp megaexpr
+    (41) megaexpr -> . OR superexp megaexpr
+    (42) megaexpr -> . empty
+    (150) empty -> .
+
+    AND             shift and go to state 178
+    OR              shift and go to state 179
+    COMA            reduce using rule 150 (empty -> .)
+    PARDER          reduce using rule 150 (empty -> .)
+    CORCHDER        reduce using rule 150 (empty -> .)
+    FLECHITA        reduce using rule 150 (empty -> .)
+    COLON           reduce using rule 150 (empty -> .)
+    CORCHIZQ        reduce using rule 150 (empty -> .)
+
+    megaexpr                       shift and go to state 271
+    empty                          shift and go to state 180
+
+state 232
 
     (32) oplog -> MAYORQUE exp .
 
@@ -4256,7 +4292,7 @@ state 231
     CORCHIZQ        reduce using rule 32 (oplog -> MAYORQUE exp .)
 
 
-state 232
+state 233
 
     (33) oplog -> MENORQUE exp .
 
@@ -4270,7 +4306,7 @@ state 232
     CORCHIZQ        reduce using rule 33 (oplog -> MENORQUE exp .)
 
 
-state 233
+state 234
 
     (34) oplog -> DIFERENTE exp .
 
@@ -4284,7 +4320,7 @@ state 233
     CORCHIZQ        reduce using rule 34 (oplog -> DIFERENTE exp .)
 
 
-state 234
+state 235
 
     (35) oplog -> MAYOROIGUAL exp .
 
@@ -4298,7 +4334,7 @@ state 234
     CORCHIZQ        reduce using rule 35 (oplog -> MAYOROIGUAL exp .)
 
 
-state 235
+state 236
 
     (36) oplog -> MENOROIGUAL exp .
 
@@ -4312,7 +4348,7 @@ state 235
     CORCHIZQ        reduce using rule 36 (oplog -> MENOROIGUAL exp .)
 
 
-state 236
+state 237
 
     (37) oplog -> IGUALIGUAL exp .
 
@@ -4326,7 +4362,7 @@ state 236
     CORCHIZQ        reduce using rule 37 (oplog -> IGUALIGUAL exp .)
 
 
-state 237
+state 238
 
     (101) expr -> MAS termino . expr
     (101) expr -> . MAS termino expr
@@ -4334,36 +4370,8 @@ state 237
     (103) expr -> . empty
     (150) empty -> .
 
-    MAS             shift and go to state 189
-    MENOS           shift and go to state 190
-    MAYORQUE        reduce using rule 150 (empty -> .)
-    MENORQUE        reduce using rule 150 (empty -> .)
-    DIFERENTE       reduce using rule 150 (empty -> .)
-    MAYOROIGUAL     reduce using rule 150 (empty -> .)
-    MENOROIGUAL     reduce using rule 150 (empty -> .)
-    IGUALIGUAL      reduce using rule 150 (empty -> .)
-    AND             reduce using rule 150 (empty -> .)
-    OR              reduce using rule 150 (empty -> .)
-    COMA            reduce using rule 150 (empty -> .)
-    PARDER          reduce using rule 150 (empty -> .)
-    CORCHDER        reduce using rule 150 (empty -> .)
-    FLECHITA        reduce using rule 150 (empty -> .)
-    COLON           reduce using rule 150 (empty -> .)
-    CORCHIZQ        reduce using rule 150 (empty -> .)
-
-    expr                           shift and go to state 271
-    empty                          shift and go to state 191
-
-state 238
-
-    (102) expr -> MENOS termino . expr
-    (101) expr -> . MAS termino expr
-    (102) expr -> . MENOS termino expr
-    (103) expr -> . empty
-    (150) empty -> .
-
-    MAS             shift and go to state 189
-    MENOS           shift and go to state 190
+    MAS             shift and go to state 190
+    MENOS           shift and go to state 191
     MAYORQUE        reduce using rule 150 (empty -> .)
     MENORQUE        reduce using rule 150 (empty -> .)
     DIFERENTE       reduce using rule 150 (empty -> .)
@@ -4380,20 +4388,18 @@ state 238
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
     expr                           shift and go to state 272
-    empty                          shift and go to state 191
+    empty                          shift and go to state 192
 
 state 239
 
-    (96) terminor -> POR factor . terminor
-    (96) terminor -> . POR factor terminor
-    (97) terminor -> . SOBRE factor terminor
-    (98) terminor -> . empty
+    (102) expr -> MENOS termino . expr
+    (101) expr -> . MAS termino expr
+    (102) expr -> . MENOS termino expr
+    (103) expr -> . empty
     (150) empty -> .
 
-    POR             shift and go to state 193
-    SOBRE           shift and go to state 194
-    MAS             reduce using rule 150 (empty -> .)
-    MENOS           reduce using rule 150 (empty -> .)
+    MAS             shift and go to state 190
+    MENOS           shift and go to state 191
     MAYORQUE        reduce using rule 150 (empty -> .)
     MENORQUE        reduce using rule 150 (empty -> .)
     DIFERENTE       reduce using rule 150 (empty -> .)
@@ -4409,19 +4415,19 @@ state 239
     COLON           reduce using rule 150 (empty -> .)
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
-    terminor                       shift and go to state 273
-    empty                          shift and go to state 195
+    expr                           shift and go to state 273
+    empty                          shift and go to state 192
 
 state 240
 
-    (97) terminor -> SOBRE factor . terminor
+    (96) terminor -> POR factor . terminor
     (96) terminor -> . POR factor terminor
     (97) terminor -> . SOBRE factor terminor
     (98) terminor -> . empty
     (150) empty -> .
 
-    POR             shift and go to state 193
-    SOBRE           shift and go to state 194
+    POR             shift and go to state 194
+    SOBRE           shift and go to state 195
     MAS             reduce using rule 150 (empty -> .)
     MENOS           reduce using rule 150 (empty -> .)
     MAYORQUE        reduce using rule 150 (empty -> .)
@@ -4440,9 +4446,39 @@ state 240
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
     terminor                       shift and go to state 274
-    empty                          shift and go to state 195
+    empty                          shift and go to state 196
 
 state 241
+
+    (97) terminor -> SOBRE factor . terminor
+    (96) terminor -> . POR factor terminor
+    (97) terminor -> . SOBRE factor terminor
+    (98) terminor -> . empty
+    (150) empty -> .
+
+    POR             shift and go to state 194
+    SOBRE           shift and go to state 195
+    MAS             reduce using rule 150 (empty -> .)
+    MENOS           reduce using rule 150 (empty -> .)
+    MAYORQUE        reduce using rule 150 (empty -> .)
+    MENORQUE        reduce using rule 150 (empty -> .)
+    DIFERENTE       reduce using rule 150 (empty -> .)
+    MAYOROIGUAL     reduce using rule 150 (empty -> .)
+    MENOROIGUAL     reduce using rule 150 (empty -> .)
+    IGUALIGUAL      reduce using rule 150 (empty -> .)
+    AND             reduce using rule 150 (empty -> .)
+    OR              reduce using rule 150 (empty -> .)
+    COMA            reduce using rule 150 (empty -> .)
+    PARDER          reduce using rule 150 (empty -> .)
+    CORCHDER        reduce using rule 150 (empty -> .)
+    FLECHITA        reduce using rule 150 (empty -> .)
+    COLON           reduce using rule 150 (empty -> .)
+    CORCHIZQ        reduce using rule 150 (empty -> .)
+
+    terminor                       shift and go to state 275
+    empty                          shift and go to state 196
+
+state 242
 
     (21) varcte -> ID CORCHIZQ . varcte CORCHDER
     (14) varcte -> . ID
@@ -4456,24 +4492,24 @@ state 241
     (22) varcte -> . ID PUNTO ID varcte_param_fun
     (23) varcte -> . ID PARIZQ llamada_param PARDER
 
-    ID              shift and go to state 197
-    INTNUM          shift and go to state 198
-    FLOATNUM        shift and go to state 199
-    TRUE            shift and go to state 200
-    FALSE           shift and go to state 201
-    STRINGVAL       shift and go to state 202
-    NULL            shift and go to state 203
+    ID              shift and go to state 198
+    INTNUM          shift and go to state 199
+    FLOATNUM        shift and go to state 200
+    TRUE            shift and go to state 201
+    FALSE           shift and go to state 202
+    STRINGVAL       shift and go to state 203
+    NULL            shift and go to state 204
 
-    varcte                         shift and go to state 275
+    varcte                         shift and go to state 276
 
-state 242
+state 243
 
     (22) varcte -> ID PUNTO . ID varcte_param_fun
 
-    ID              shift and go to state 276
+    ID              shift and go to state 277
 
 
-state 243
+state 244
 
     (23) varcte -> ID PARIZQ . llamada_param PARDER
     (148) llamada_param -> . expresion expresionr
@@ -4498,41 +4534,41 @@ state 243
     FALSE           reduce using rule 150 (empty -> .)
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
 
-    llamada_param                  shift and go to state 277
-    expresion                      shift and go to state 136
-    empty                          shift and go to state 137
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
+    llamada_param                  shift and go to state 278
+    expresion                      shift and go to state 137
+    empty                          shift and go to state 138
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
 
-state 244
+state 245
 
     (146) obj_call -> ID PUNTO ID PARIZQ llamada_param . PARDER COLON
 
-    PARDER          shift and go to state 278
+    PARDER          shift and go to state 279
 
 
-state 245
+state 246
 
     (77) bloque -> LLAVEIZQ estatuto . bloque2 LLAVEDER
     (78) bloque2 -> . RETURN bloque3
     (79) bloque2 -> . empty
     (150) empty -> .
 
-    RETURN          shift and go to state 257
+    RETURN          shift and go to state 258
     LLAVEDER        reduce using rule 150 (empty -> .)
 
-    bloque2                        shift and go to state 279
-    empty                          shift and go to state 258
+    bloque2                        shift and go to state 280
+    empty                          shift and go to state 259
 
-state 246
+state 247
 
     (74) condicion2 -> PARIZQ expresion PARDER bloque .
 
@@ -4547,59 +4583,59 @@ state 246
     RETURN          reduce using rule 74 (condicion2 -> PARIZQ expresion PARDER bloque .)
 
 
-state 247
+state 248
 
     (84) escritura -> WRITE PARIZQ esc1 esc2 PARDER . COLON
 
-    COLON           shift and go to state 280
+    COLON           shift and go to state 281
 
 
-state 248
+state 249
 
     (87) esc2 -> COMA esc1 . esc2
     (87) esc2 -> . COMA esc1 esc2
     (88) esc2 -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 210
+    COMA            shift and go to state 211
     PARDER          reduce using rule 150 (empty -> .)
 
-    esc2                           shift and go to state 281
-    empty                          shift and go to state 211
+    esc2                           shift and go to state 282
+    empty                          shift and go to state 212
 
-state 249
+state 250
 
     (110) for2 -> ID .
     (113) range -> ID . PUNTOSRANGO ID
     (114) range -> ID . PUNTOSRANGO INTNUM
 
     PARDER          reduce using rule 110 (for2 -> ID .)
-    PUNTOSRANGO     shift and go to state 282
-
-
-state 250
-
-    (109) for -> FOR PARIZQ ID IN for2 . PARDER bloque
-
-    PARDER          shift and go to state 283
+    PUNTOSRANGO     shift and go to state 283
 
 
 state 251
+
+    (109) for -> FOR PARIZQ ID IN for2 . PARDER bloque
+
+    PARDER          shift and go to state 284
+
+
+state 252
 
     (111) for2 -> range .
 
     PARDER          reduce using rule 111 (for2 -> range .)
 
 
-state 252
+state 253
 
     (112) range -> INTNUM . PUNTOSRANGO INTNUM
     (115) range -> INTNUM . PUNTOSRANGO ID
 
-    PUNTOSRANGO     shift and go to state 284
+    PUNTOSRANGO     shift and go to state 285
 
 
-state 253
+state 254
 
     (116) while -> WHILE PARIZQ expresion PARDER bloque .
 
@@ -4613,7 +4649,7 @@ state 253
     RETURN          reduce using rule 116 (while -> WHILE PARIZQ expresion PARDER bloque .)
 
 
-state 254
+state 255
 
     (118) when2 -> expresion FLECHITA bloque . when2
     (118) when2 -> . expresion FLECHITA bloque when2
@@ -4631,7 +4667,7 @@ state 254
     (107) factor2 -> . MENOS
     (108) factor2 -> . empty
 
-    ELSE            shift and go to state 160
+    ELSE            shift and go to state 161
     LLAVEDER        reduce using rule 150 (empty -> .)
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
@@ -4640,35 +4676,35 @@ state 254
     FALSE           reduce using rule 150 (empty -> .)
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
 
-    expresion                      shift and go to state 159
-    when2                          shift and go to state 285
-    empty                          shift and go to state 161
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
+    expresion                      shift and go to state 160
+    when2                          shift and go to state 286
+    empty                          shift and go to state 162
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
 
-state 255
+state 256
 
     (119) when2 -> ELSE FLECHITA bloque .
 
     LLAVEDER        reduce using rule 119 (when2 -> ELSE FLECHITA bloque .)
 
 
-state 256
+state 257
 
     (128) funbody -> LLAVEIZQ opc1 opc2 bloque2 . LLAVEDER
 
-    LLAVEDER        shift and go to state 286
+    LLAVEDER        shift and go to state 287
 
 
-state 257
+state 258
 
     (78) bloque2 -> RETURN . bloque3
     (80) bloque3 -> . expresion COLON
@@ -4693,35 +4729,35 @@ state 257
     FALSE           reduce using rule 150 (empty -> .)
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
 
-    bloque3                        shift and go to state 287
-    expresion                      shift and go to state 288
-    empty                          shift and go to state 289
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
+    bloque3                        shift and go to state 288
+    expresion                      shift and go to state 289
+    empty                          shift and go to state 290
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
 
-state 258
+state 259
 
     (79) bloque2 -> empty .
 
     LLAVEDER        reduce using rule 79 (bloque2 -> empty .)
 
 
-state 259
+state 260
 
     (61) asignacion2 -> CORCHDER expresion asignacion2r . CORCHIZQ
 
-    CORCHIZQ        shift and go to state 290
+    CORCHIZQ        shift and go to state 291
 
 
-state 260
+state 261
 
     (68) asignacion2r -> COMA . expresion asignacion2r
     (26) expresion -> . megaexp
@@ -4736,9 +4772,9 @@ state 260
     (108) factor2 -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
     ID              reduce using rule 150 (empty -> .)
     INTNUM          reduce using rule 150 (empty -> .)
     FLOATNUM        reduce using rule 150 (empty -> .)
@@ -4747,57 +4783,57 @@ state 260
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
 
-    expresion                      shift and go to state 291
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
-    empty                          shift and go to state 148
+    expresion                      shift and go to state 292
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
+    empty                          shift and go to state 149
 
-state 261
+state 262
 
     (69) asignacion2r -> empty .
 
     CORCHIZQ        reduce using rule 69 (asignacion2r -> empty .)
 
 
-state 262
+state 263
 
     (62) asignacion2 -> READ PARIZQ assign_read . PARDER
 
-    PARDER          shift and go to state 292
+    PARDER          shift and go to state 293
 
 
-state 263
+state 264
 
     (66) assign_read -> STRINGVAL .
 
     PARDER          reduce using rule 66 (assign_read -> STRINGVAL .)
 
 
-state 264
+state 265
 
     (67) assign_read -> empty .
 
     PARDER          reduce using rule 67 (assign_read -> empty .)
 
 
-state 265
+state 266
 
     (63) asignacion2 -> CID PARIZQ class_call_args . expresionr PARDER
     (27) expresionr -> . COMA expresion expresionr
     (28) expresionr -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 174
+    COMA            shift and go to state 175
     PARDER          reduce using rule 150 (empty -> .)
 
-    expresionr                     shift and go to state 293
-    empty                          shift and go to state 175
+    expresionr                     shift and go to state 294
+    empty                          shift and go to state 176
 
-state 266
+state 267
 
     (64) class_call_args -> expresion .
 
@@ -4805,7 +4841,7 @@ state 266
     PARDER          reduce using rule 64 (class_call_args -> expresion .)
 
 
-state 267
+state 268
 
     (65) class_call_args -> empty .
     (108) factor2 -> empty .
@@ -4821,14 +4857,14 @@ state 267
     NULL            reduce using rule 108 (factor2 -> empty .)
 
 
-state 268
+state 269
 
     (27) expresionr -> COMA expresion expresionr .
 
     PARDER          reduce using rule 27 (expresionr -> COMA expresion expresionr .)
 
 
-state 269
+state 270
 
     (40) megaexpr -> AND superexp megaexpr .
 
@@ -4840,7 +4876,7 @@ state 269
     CORCHIZQ        reduce using rule 40 (megaexpr -> AND superexp megaexpr .)
 
 
-state 270
+state 271
 
     (41) megaexpr -> OR superexp megaexpr .
 
@@ -4852,7 +4888,7 @@ state 270
     CORCHIZQ        reduce using rule 41 (megaexpr -> OR superexp megaexpr .)
 
 
-state 271
+state 272
 
     (101) expr -> MAS termino expr .
 
@@ -4872,7 +4908,7 @@ state 271
     CORCHIZQ        reduce using rule 101 (expr -> MAS termino expr .)
 
 
-state 272
+state 273
 
     (102) expr -> MENOS termino expr .
 
@@ -4892,7 +4928,7 @@ state 272
     CORCHIZQ        reduce using rule 102 (expr -> MENOS termino expr .)
 
 
-state 273
+state 274
 
     (96) terminor -> POR factor terminor .
 
@@ -4914,7 +4950,7 @@ state 273
     CORCHIZQ        reduce using rule 96 (terminor -> POR factor terminor .)
 
 
-state 274
+state 275
 
     (97) terminor -> SOBRE factor terminor .
 
@@ -4936,21 +4972,21 @@ state 274
     CORCHIZQ        reduce using rule 97 (terminor -> SOBRE factor terminor .)
 
 
-state 275
+state 276
 
     (21) varcte -> ID CORCHIZQ varcte . CORCHDER
 
-    CORCHDER        shift and go to state 294
+    CORCHDER        shift and go to state 295
 
 
-state 276
+state 277
 
     (22) varcte -> ID PUNTO ID . varcte_param_fun
     (24) varcte_param_fun -> . PARIZQ llamada_param PARDER
     (25) varcte_param_fun -> . empty
     (150) empty -> .
 
-    PARIZQ          shift and go to state 296
+    PARIZQ          shift and go to state 297
     POR             reduce using rule 150 (empty -> .)
     SOBRE           reduce using rule 150 (empty -> .)
     MAS             reduce using rule 150 (empty -> .)
@@ -4970,31 +5006,31 @@ state 276
     COLON           reduce using rule 150 (empty -> .)
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
-    varcte_param_fun               shift and go to state 295
-    empty                          shift and go to state 297
-
-state 277
-
-    (23) varcte -> ID PARIZQ llamada_param . PARDER
-
-    PARDER          shift and go to state 298
-
+    varcte_param_fun               shift and go to state 296
+    empty                          shift and go to state 298
 
 state 278
 
-    (146) obj_call -> ID PUNTO ID PARIZQ llamada_param PARDER . COLON
+    (23) varcte -> ID PARIZQ llamada_param . PARDER
 
-    COLON           shift and go to state 299
+    PARDER          shift and go to state 299
 
 
 state 279
 
-    (77) bloque -> LLAVEIZQ estatuto bloque2 . LLAVEDER
+    (146) obj_call -> ID PUNTO ID PARIZQ llamada_param PARDER . COLON
 
-    LLAVEDER        shift and go to state 300
+    COLON           shift and go to state 300
 
 
 state 280
+
+    (77) bloque -> LLAVEIZQ estatuto bloque2 . LLAVEDER
+
+    LLAVEDER        shift and go to state 301
+
+
+state 281
 
     (84) escritura -> WRITE PARIZQ esc1 esc2 PARDER COLON .
 
@@ -5008,48 +5044,48 @@ state 280
     RETURN          reduce using rule 84 (escritura -> WRITE PARIZQ esc1 esc2 PARDER COLON .)
 
 
-state 281
+state 282
 
     (87) esc2 -> COMA esc1 esc2 .
 
     PARDER          reduce using rule 87 (esc2 -> COMA esc1 esc2 .)
 
 
-state 282
+state 283
 
     (113) range -> ID PUNTOSRANGO . ID
     (114) range -> ID PUNTOSRANGO . INTNUM
 
-    ID              shift and go to state 301
-    INTNUM          shift and go to state 302
+    ID              shift and go to state 302
+    INTNUM          shift and go to state 303
 
 
-state 283
+state 284
 
     (109) for -> FOR PARIZQ ID IN for2 PARDER . bloque
     (77) bloque -> . LLAVEIZQ estatuto bloque2 LLAVEDER
 
-    LLAVEIZQ        shift and go to state 207
+    LLAVEIZQ        shift and go to state 208
 
-    bloque                         shift and go to state 303
+    bloque                         shift and go to state 304
 
-state 284
+state 285
 
     (112) range -> INTNUM PUNTOSRANGO . INTNUM
     (115) range -> INTNUM PUNTOSRANGO . ID
 
-    INTNUM          shift and go to state 304
-    ID              shift and go to state 305
+    INTNUM          shift and go to state 305
+    ID              shift and go to state 306
 
 
-state 285
+state 286
 
     (118) when2 -> expresion FLECHITA bloque when2 .
 
     LLAVEDER        reduce using rule 118 (when2 -> expresion FLECHITA bloque when2 .)
 
 
-state 286
+state 287
 
     (128) funbody -> LLAVEIZQ opc1 opc2 bloque2 LLAVEDER .
 
@@ -5059,21 +5095,21 @@ state 286
     LLAVEDER        reduce using rule 128 (funbody -> LLAVEIZQ opc1 opc2 bloque2 LLAVEDER .)
 
 
-state 287
+state 288
 
     (78) bloque2 -> RETURN bloque3 .
 
     LLAVEDER        reduce using rule 78 (bloque2 -> RETURN bloque3 .)
 
 
-state 288
+state 289
 
     (80) bloque3 -> expresion . COLON
 
-    COLON           shift and go to state 306
+    COLON           shift and go to state 307
 
 
-state 289
+state 290
 
     (81) bloque3 -> empty .
     (108) factor2 -> empty .
@@ -5088,41 +5124,41 @@ state 289
     NULL            reduce using rule 108 (factor2 -> empty .)
 
 
-state 290
+state 291
 
     (61) asignacion2 -> CORCHDER expresion asignacion2r CORCHIZQ .
 
     COLON           reduce using rule 61 (asignacion2 -> CORCHDER expresion asignacion2r CORCHIZQ .)
 
 
-state 291
+state 292
 
     (68) asignacion2r -> COMA expresion . asignacion2r
     (68) asignacion2r -> . COMA expresion asignacion2r
     (69) asignacion2r -> . empty
     (150) empty -> .
 
-    COMA            shift and go to state 260
+    COMA            shift and go to state 261
     CORCHIZQ        reduce using rule 150 (empty -> .)
 
-    asignacion2r                   shift and go to state 307
-    empty                          shift and go to state 261
+    asignacion2r                   shift and go to state 308
+    empty                          shift and go to state 262
 
-state 292
+state 293
 
     (62) asignacion2 -> READ PARIZQ assign_read PARDER .
 
     COLON           reduce using rule 62 (asignacion2 -> READ PARIZQ assign_read PARDER .)
 
 
-state 293
+state 294
 
     (63) asignacion2 -> CID PARIZQ class_call_args expresionr . PARDER
 
-    PARDER          shift and go to state 308
+    PARDER          shift and go to state 309
 
 
-state 294
+state 295
 
     (21) varcte -> ID CORCHIZQ varcte CORCHDER .
 
@@ -5146,7 +5182,7 @@ state 294
     CORCHIZQ        reduce using rule 21 (varcte -> ID CORCHIZQ varcte CORCHDER .)
 
 
-state 295
+state 296
 
     (22) varcte -> ID PUNTO ID varcte_param_fun .
 
@@ -5170,7 +5206,7 @@ state 295
     CORCHIZQ        reduce using rule 22 (varcte -> ID PUNTO ID varcte_param_fun .)
 
 
-state 296
+state 297
 
     (24) varcte_param_fun -> PARIZQ . llamada_param PARDER
     (148) llamada_param -> . expresion expresionr
@@ -5195,21 +5231,21 @@ state 296
     FALSE           reduce using rule 150 (empty -> .)
     STRINGVAL       reduce using rule 150 (empty -> .)
     NULL            reduce using rule 150 (empty -> .)
-    PARIZQ          shift and go to state 134
-    MAS             shift and go to state 144
-    MENOS           shift and go to state 145
+    PARIZQ          shift and go to state 135
+    MAS             shift and go to state 145
+    MENOS           shift and go to state 146
 
-    llamada_param                  shift and go to state 309
-    expresion                      shift and go to state 136
-    empty                          shift and go to state 137
-    megaexp                        shift and go to state 138
-    superexp                       shift and go to state 139
-    exp                            shift and go to state 140
-    termino                        shift and go to state 141
-    factor                         shift and go to state 142
-    factor2                        shift and go to state 143
+    llamada_param                  shift and go to state 310
+    expresion                      shift and go to state 137
+    empty                          shift and go to state 138
+    megaexp                        shift and go to state 139
+    superexp                       shift and go to state 140
+    exp                            shift and go to state 141
+    termino                        shift and go to state 142
+    factor                         shift and go to state 143
+    factor2                        shift and go to state 144
 
-state 297
+state 298
 
     (25) varcte_param_fun -> empty .
 
@@ -5233,7 +5269,7 @@ state 297
     CORCHIZQ        reduce using rule 25 (varcte_param_fun -> empty .)
 
 
-state 298
+state 299
 
     (23) varcte -> ID PARIZQ llamada_param PARDER .
 
@@ -5257,7 +5293,7 @@ state 298
     CORCHIZQ        reduce using rule 23 (varcte -> ID PARIZQ llamada_param PARDER .)
 
 
-state 299
+state 300
 
     (146) obj_call -> ID PUNTO ID PARIZQ llamada_param PARDER COLON .
 
@@ -5271,7 +5307,7 @@ state 299
     RETURN          reduce using rule 146 (obj_call -> ID PUNTO ID PARIZQ llamada_param PARDER COLON .)
 
 
-state 300
+state 301
 
     (77) bloque -> LLAVEIZQ estatuto bloque2 LLAVEDER .
 
@@ -5295,21 +5331,21 @@ state 300
     NULL            reduce using rule 77 (bloque -> LLAVEIZQ estatuto bloque2 LLAVEDER .)
 
 
-state 301
+state 302
 
     (113) range -> ID PUNTOSRANGO ID .
 
     PARDER          reduce using rule 113 (range -> ID PUNTOSRANGO ID .)
 
 
-state 302
+state 303
 
     (114) range -> ID PUNTOSRANGO INTNUM .
 
     PARDER          reduce using rule 114 (range -> ID PUNTOSRANGO INTNUM .)
 
 
-state 303
+state 304
 
     (109) for -> FOR PARIZQ ID IN for2 PARDER bloque .
 
@@ -5323,49 +5359,49 @@ state 303
     RETURN          reduce using rule 109 (for -> FOR PARIZQ ID IN for2 PARDER bloque .)
 
 
-state 304
+state 305
 
     (112) range -> INTNUM PUNTOSRANGO INTNUM .
 
     PARDER          reduce using rule 112 (range -> INTNUM PUNTOSRANGO INTNUM .)
 
 
-state 305
+state 306
 
     (115) range -> INTNUM PUNTOSRANGO ID .
 
     PARDER          reduce using rule 115 (range -> INTNUM PUNTOSRANGO ID .)
 
 
-state 306
+state 307
 
     (80) bloque3 -> expresion COLON .
 
     LLAVEDER        reduce using rule 80 (bloque3 -> expresion COLON .)
 
 
-state 307
+state 308
 
     (68) asignacion2r -> COMA expresion asignacion2r .
 
     CORCHIZQ        reduce using rule 68 (asignacion2r -> COMA expresion asignacion2r .)
 
 
-state 308
+state 309
 
     (63) asignacion2 -> CID PARIZQ class_call_args expresionr PARDER .
 
     COLON           reduce using rule 63 (asignacion2 -> CID PARIZQ class_call_args expresionr PARDER .)
 
 
-state 309
+state 310
 
     (24) varcte_param_fun -> PARIZQ llamada_param . PARDER
 
-    PARDER          shift and go to state 310
+    PARDER          shift and go to state 311
 
 
-state 310
+state 311
 
     (24) varcte_param_fun -> PARIZQ llamada_param PARDER .
 
@@ -5393,18 +5429,13 @@ WARNING: Conflicts:
 WARNING: 
 WARNING: shift/reduce conflict for PRIVATE in state 24 resolved as shift
 WARNING: shift/reduce conflict for PRIVATE in state 35 resolved as shift
-WARNING: shift/reduce conflict for ID in state 84 resolved as shift
-WARNING: shift/reduce conflict for IF in state 84 resolved as shift
-WARNING: shift/reduce conflict for WRITE in state 84 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 84 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 84 resolved as shift
-WARNING: shift/reduce conflict for WHEN in state 84 resolved as shift
-WARNING: shift/reduce conflict for ID in state 88 resolved as shift
-WARNING: shift/reduce conflict for IF in state 88 resolved as shift
-WARNING: shift/reduce conflict for WRITE in state 88 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 88 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 88 resolved as shift
-WARNING: shift/reduce conflict for WHEN in state 88 resolved as shift
+WARNING: shift/reduce conflict for PRIVATE in state 44 resolved as shift
+WARNING: shift/reduce conflict for ID in state 85 resolved as shift
+WARNING: shift/reduce conflict for IF in state 85 resolved as shift
+WARNING: shift/reduce conflict for WRITE in state 85 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 85 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 85 resolved as shift
+WARNING: shift/reduce conflict for WHEN in state 85 resolved as shift
 WARNING: shift/reduce conflict for ID in state 89 resolved as shift
 WARNING: shift/reduce conflict for IF in state 89 resolved as shift
 WARNING: shift/reduce conflict for WRITE in state 89 resolved as shift
@@ -5447,32 +5478,38 @@ WARNING: shift/reduce conflict for WRITE in state 95 resolved as shift
 WARNING: shift/reduce conflict for FOR in state 95 resolved as shift
 WARNING: shift/reduce conflict for WHILE in state 95 resolved as shift
 WARNING: shift/reduce conflict for WHEN in state 95 resolved as shift
-WARNING: shift/reduce conflict for ID in state 162 resolved as shift
-WARNING: shift/reduce conflict for IF in state 162 resolved as shift
-WARNING: shift/reduce conflict for WRITE in state 162 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 162 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 162 resolved as shift
-WARNING: shift/reduce conflict for WHEN in state 162 resolved as shift
-WARNING: shift/reduce conflict for CORCHIZQ in state 197 resolved as shift
-WARNING: shift/reduce conflict for ID in state 207 resolved as shift
-WARNING: shift/reduce conflict for IF in state 207 resolved as shift
-WARNING: shift/reduce conflict for WRITE in state 207 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 207 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 207 resolved as shift
-WARNING: shift/reduce conflict for WHEN in state 207 resolved as shift
-WARNING: reduce/reduce conflict in state 96 resolved using rule (estatuto -> empty)
-WARNING: rejected rule (llamada -> empty) in state 96
-WARNING: reduce/reduce conflict in state 96 resolved using rule (llamada -> empty)
-WARNING: rejected rule (obj_call -> empty) in state 96
-WARNING: reduce/reduce conflict in state 96 resolved using rule (estatuto -> empty)
-WARNING: rejected rule (obj_call -> empty) in state 96
-WARNING: reduce/reduce conflict in state 219 resolved using rule (estatuto -> empty)
-WARNING: rejected rule (opc2 -> empty) in state 219
-WARNING: reduce/reduce conflict in state 219 resolved using rule (estatuto -> empty)
-WARNING: rejected rule (llamada -> empty) in state 219
-WARNING: reduce/reduce conflict in state 219 resolved using rule (llamada -> empty)
-WARNING: rejected rule (obj_call -> empty) in state 219
-WARNING: reduce/reduce conflict in state 219 resolved using rule (estatuto -> empty)
-WARNING: rejected rule (obj_call -> empty) in state 219
+WARNING: shift/reduce conflict for ID in state 96 resolved as shift
+WARNING: shift/reduce conflict for IF in state 96 resolved as shift
+WARNING: shift/reduce conflict for WRITE in state 96 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 96 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 96 resolved as shift
+WARNING: shift/reduce conflict for WHEN in state 96 resolved as shift
+WARNING: shift/reduce conflict for ID in state 163 resolved as shift
+WARNING: shift/reduce conflict for IF in state 163 resolved as shift
+WARNING: shift/reduce conflict for WRITE in state 163 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 163 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 163 resolved as shift
+WARNING: shift/reduce conflict for WHEN in state 163 resolved as shift
+WARNING: shift/reduce conflict for CORCHIZQ in state 198 resolved as shift
+WARNING: shift/reduce conflict for ID in state 208 resolved as shift
+WARNING: shift/reduce conflict for IF in state 208 resolved as shift
+WARNING: shift/reduce conflict for WRITE in state 208 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 208 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 208 resolved as shift
+WARNING: shift/reduce conflict for WHEN in state 208 resolved as shift
+WARNING: reduce/reduce conflict in state 97 resolved using rule (estatuto -> empty)
+WARNING: rejected rule (llamada -> empty) in state 97
+WARNING: reduce/reduce conflict in state 97 resolved using rule (llamada -> empty)
+WARNING: rejected rule (obj_call -> empty) in state 97
+WARNING: reduce/reduce conflict in state 97 resolved using rule (estatuto -> empty)
+WARNING: rejected rule (obj_call -> empty) in state 97
+WARNING: reduce/reduce conflict in state 220 resolved using rule (estatuto -> empty)
+WARNING: rejected rule (opc2 -> empty) in state 220
+WARNING: reduce/reduce conflict in state 220 resolved using rule (estatuto -> empty)
+WARNING: rejected rule (llamada -> empty) in state 220
+WARNING: reduce/reduce conflict in state 220 resolved using rule (llamada -> empty)
+WARNING: rejected rule (obj_call -> empty) in state 220
+WARNING: reduce/reduce conflict in state 220 resolved using rule (estatuto -> empty)
+WARNING: rejected rule (obj_call -> empty) in state 220
 WARNING: Rule (obj_call -> empty) is never reduced
 WARNING: Rule (opc2 -> empty) is never reduced

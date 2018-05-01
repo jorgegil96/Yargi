@@ -94,7 +94,7 @@ class VirtualMachine:
         # Set the main class memory as the current instance memory.
         self.current_class_stack.append(memory)
 
-        print("Executing...")
+        print("Executing...\n")
         i = 0
         while i != len(self.quadruples):
             quad = self.quadruples[i]
@@ -297,4 +297,4 @@ class VirtualMachine:
                 i += 1
             else:
                 raise Exception("Unexpected operation code: " + quad[0])
-        print("Execution finished")
+        print("\nExecution finished")

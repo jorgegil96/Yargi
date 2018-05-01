@@ -1,0 +1,65 @@
+class Person(int id, string name) {
+    fun talk() {
+        write("Hi, my name is ", name);
+    }
+
+    fun walk() {
+        write(name, " is walking...");
+    }
+
+    fun getId(): int {
+        return id;
+    }
+}
+
+class Professor(int id, string name, int pid): Person(id, name) {
+    fun talk() {
+        write("Hi, my name is ", name, " and I'm a professor");
+    }
+}
+
+class Student(int id, string name, int studentId): Person(id, name) {
+    fun talk() {
+        write("Hi, my name is ", name, " and I'm a student with id=", studentId);
+    }
+}
+
+class CSStudent(int id, string name, string fav_lang, int studentId): Student(id, name, studentId) {
+    fun talk() {
+        write("Hi, my name is ", name, " and I'm a CS student with id=", studentId);
+    }
+
+    fun getId(): int {
+        return studentId;
+    }
+}
+
+class Main {
+
+    Person pepe;
+    Professor elda;
+    Student jorge;
+    CSStudent yareli;
+
+    main() {
+        pepe = Person(1, "Pepe");
+        elda = Professor(2, "Elda", 231);
+        jorge = Student(3, "Jorge", 513173);
+        yareli = CSStudent(4, "Yareli", "Python", 1280664);
+
+        pepe.talk();
+        elda.talk();
+        jorge.talk();
+        yareli.talk();
+
+        pepe.walk();
+        elda.walk();
+        jorge.walk();
+        yareli.walk();
+
+        write(pepe.getId());
+        write(elda.getId());
+        write(jorge.getId());
+        write(yareli.getId());
+    }
+}

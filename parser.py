@@ -182,17 +182,20 @@ def p_class(p):
         | DATA CLASS CID classparams
     '''
     if len(p) == 6:
-        p[0] = Class(name=p[2], members=p[3], body=p[5])
+        p[0] = Class(name=p[2], members=p[3], body=p[5], class_parent=p[4])
     else:
-        p[0] = Class(name=p[3], members=p[4], body=None)
+        p[0] = Class(name=p[3], members=p[4], body=None, class_parent=None)
 
 
 def p_class2(p):
     '''
-    class2 : DOSPUNTOS ID PARIZQ vars2 PARDER
+    class2 : DOSPUNTOS CID PARIZQ vars2 PARDER
         | empty
     '''
-    p[0] = None
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = ClassParent(p[2], p[4])
 
 
 def p_classparams(p):
@@ -799,13 +802,13 @@ def p_mainbloque(p):
 
 def p_multvarsdecl(p):
     '''
-    multvarsdecl : vars
+    multvarsdecl : vars multvarsdecl
     | empty
     '''
-    if p[1] is None:
+    if len(p) == 2:
         p[0] = []
     else:
-        p[0] = p[1]
+        p[0] = p[1] + p[2]
 
 
 def p_funr(p):
@@ -860,7 +863,7 @@ def p_empty(p):
 lex.lex()
 parser = yacc.yacc(start='file')
 
-with open("test/classes.txt", 'r') as f:
+with open("test/inheritance.yi", 'r') as f:
     input = f.read()
     file: List[Class] = parser.parse(input)
     model.quadruples.append(['GOTO', '', '', ''])
@@ -869,8 +872,8 @@ with open("test/classes.txt", 'r') as f:
         cls.eval()
 
     pp = pprint.PrettyPrinter()
-    pp.pprint(file)
-    pp.pprint(model.symbol_tables)
+    #pp.pprint(file)
+    #pp.pprint(model.symbol_tables)
     for i in range(0, len(quadruples)):
         print(str(i) + ": " + str(quadruples[i]))
 

@@ -147,7 +147,7 @@ class FunCall(BaseExpression):
             obj_address, obj_type = last_symbol_table().get_sym_address_and_type(self.of_object)
             symbol_table = symbol_table_for_type(obj_type)
         else:
-            obj_type = None
+            obj_type = last_symbol_table().cid
             obj_address = None
             symbol_table = last_symbol_table()
 
@@ -172,11 +172,16 @@ class FunCall(BaseExpression):
             param_index += 1
 
         fun_start_quad_index = None
+        curr_class = None
         for i in range(0, len(quadruples)):
             quad = quadruples[i]
-            if quad[0] == 'STARTPROC' and quad[1] == self.fun_name:
-                fun_start_quad_index = i
-                break
+            if quad[0] == 'START_CLASS':
+                # Save the class type we're currently at for later use...
+                curr_class = quad[1]
+            if quad[0] == 'STARTPROC' and quad[1] == self.fun_name and curr_class == obj_type:
+                if curr_class == obj_type:
+                    fun_start_quad_index = i
+                    break
 
         if fun_start_quad_index is None:
             raise Exception("Use of undefined function %s" % self.fun_name)
@@ -188,6 +193,12 @@ class FunCall(BaseExpression):
 
         quadruples.append(['GOSUB', self.fun_name, address, fun_start_quad_index])
         return address, fun.type
+
+
+class ClassParent(BaseExpression):
+    def __init__(self, name, params: List):
+        self.name = name
+        self.params = params
 
 
 class ClassBody(BaseExpression):
@@ -211,26 +222,85 @@ class ClassBody(BaseExpression):
 
 
 class Class(BaseExpression):
-    def __init__(self, name, members: List[VarDeclaration], body: ClassBody):
+    def __init__(self, name, members: List[VarDeclaration], body: ClassBody, class_parent: ClassParent):
         self.name = name
         self.members = members
         self.body = body
+        self.class_parent = class_parent
 
     def __repr__(self):
         return '<Class name={0} members={1} body={2}>'.format(self.name, self.members, self.body)
 
     def eval(self):
-        symbol_tables.append(SymbolTable(self.name, 65000 * (len(symbol_tables))))
+        symbol_tables.append(SymbolTable(self.name, self, 65000 * (len(symbol_tables))))
         quadruples.append(['START_CLASS', self.name, '', ''])
         for member in self.members:
             address = member.eval()
             quadruples.append(['ASG_MEMBER', '', '', address])
+
         if self.body is not None:
             self.body.eval()
+
+        if self.class_parent is not None:
+            # If we're extending a class...
+
+            # Find the parent's symbol table.
+            parent_sym_table = None
+            for table in final_sym_tables:
+                if table.cid == self.class_parent.name:
+                    parent_sym_table = table
+
+            if parent_sym_table is None:
+                raise Exception("Invalid class name {0}".format(self.class_parent.name))
+
+            # Verify that the length of the parent constructor call is equal to its signature.
+            if len(parent_sym_table.class_model.members) != len(self.class_parent.params):
+                raise Exception("{0} constructor expected {1} arguments".format(self.class_parent.name, len(
+                    parent_sym_table.class_model.members)))
+
+            # Verify that the call to the parent constructor has types that match.
+            # E.g. for a class declaration "class Student(int id, string name): Person(id, name)"
+            # we verify that the first argument of Person(int id, string name) is and int and the second
+            # a string.
+            for i in range(0, len(parent_sym_table.class_model.members)):
+                expected_type = parent_sym_table.class_model.members[i].type
+                sent_param_id = self.class_parent.params[i]
+                actual_type = None
+                for member in self.members:
+                    if member.name == sent_param_id:
+                        actual_type = member.type
+
+                if actual_type is None:
+                    raise Exception("Invalid argument {0} at pos({1})".format(sent_param_id, i))
+
+                if expected_type != actual_type:
+                    raise Exception("{0} constructor expected {1} at pos({2}) but was {3}"
+                                    .format(self.class_parent.name, expected_type, i, actual_type))
+
+            fun_dir = parent_sym_table.get_fun_dir()
+            for fun_name in fun_dir.keys():
+                if fun_name not in last_symbol_table().get_fun_dir():
+                    # Eval every fun in the superclass to generate quadruples for that fun inside this class.
+                    fun_dir[fun_name].eval()
+                else:
+                    # If it was already in the symbol table then it means we overrode it.
+                    # Verify its arguments have the same signature.
+                    parent_fun_params = fun_dir[fun_name].body.params
+                    child_fun_params = last_symbol_table().get_fun(fun_name).body.params
+
+                    if len(parent_fun_params) != len(child_fun_params):
+                        raise Exception("Fun {0} is already defined".format(fun_name))
+
+                    for i in range(0, len(parent_fun_params)):
+                        parent_param = parent_fun_params[i]
+                        child_param = child_fun_params[i]
+                        if parent_param.type != child_param.type:
+                            raise Exception("Overriden fun {0} expected {1} argument at pos({2}) but was {3}"
+                                            .format(fun_name, parent_param.type, i, child_param.type))
+
         quadruples.append(['END_CLASS', self.name, '', ''])
         table: SymbolTable = symbol_tables.pop()
         final_sym_tables.append(table)
-        print(table)
 
 
 class Assignment(BaseExpression):
@@ -268,16 +338,36 @@ class Assignment(BaseExpression):
         elif isinstance(self.value, NewObject):
             assignee_address, assignee_type = last_symbol_table().get_sym_address_and_type(self.id)
 
+            if assignee_type != self.value.type:
+                raise Exception("Invalid assignment of object of type {0} to variable of type {1}"
+                                .format(self.value.type, assignee_type))
+
             # Flag that indicates if this symbol is of global scope or local (function) scope,
             is_global = last_symbol_table().is_global(self.id)
 
             quadruples.append(['NEW_OBJ', self.value.type, assignee_address, is_global])
 
+            # Get the class model for this object type.
+            class_model = None
+            for table in final_sym_tables:
+                if table.cid == assignee_type:
+                    class_model: Class = table.class_model
+
+            if class_model is None:
+                raise Exception("Illegal state: class_model should not be None")
+
+            if len(class_model.members) != len(self.value.members):
+                raise Exception("Constructor of class {0} expected {1} arguments but found {2}"
+                                .format(assignee_type, len(class_model.members), len(self.value.members)))
+
             for param_index in range(0, len(self.value.members)):
                 param = self.value.members[param_index]
                 address, type = param.eval()
 
-                # TODO: verificar que los tipos sean compatibles
+                if class_model.members[param_index].type != type:
+                    if type != "NULL":
+                        raise Exception("{0} class constructor expected argument of type {1} at pos({2}) but found {3}"
+                                    .format(assignee_type, class_model.members[param_index].type, param_index, type))
 
                 quadruples.append(['OBJ_MEMBER', address, '', 'objMember' + str(param_index)])
                 param_index += 1

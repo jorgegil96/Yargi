@@ -3,8 +3,9 @@ SCOPE_LOCAL = "LOCAL"
 
 
 class SymbolTable:
-    def __init__(self, cid,  n):
+    def __init__(self, cid, class_model, n):
         self.cid = cid
+        self.class_model = class_model
 
         # Stores the functions of the program
         self.__fun_dir = {}
@@ -39,6 +40,9 @@ class SymbolTable:
 
     def get_global_table(self):
         return self.__global_sym_table
+
+    def get_fun_dir(self):
+        return self.__fun_dir
 
     def get_current_scope(self):
         '''
