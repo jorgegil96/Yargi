@@ -27,6 +27,7 @@ keywords = {
     'global': 'GLOBAL',
     'data': 'DATA',
     'class': 'CLASS',
+    'interface': 'INTERFACE',
     'list': 'LIST',
     'range': 'RANGE',
     'main': 'MAIN',
@@ -161,9 +162,45 @@ def t_EOL(token):
 
 def p_file(p):
     '''
-    file : class classr
+    file : interface_r class classr
     '''
-    p[0] = [p[1]] + p[2]
+    p[0] = p[1], [p[2]] + p[3]
+
+
+def p_interface_r(p):
+    '''
+    interface_r : INTERFACE CID interface_body interface_r
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [Interface(p[2], p[3])] + p[4]
+
+
+def p_interface_body(p):
+    '''
+    interface_body : LLAVEIZQ interface_fun interface_fun_r LLAVEDER
+    '''
+    p[0] = [p[2]] + p[3]
+
+
+def p_interface_fun(p):
+    '''
+    interface_fun : FUN ID PARIZQ fun2 PARDER COLON
+    '''
+    p[0] = InterfaceFun(p[2], p[4])
+
+
+def p_interface_fun_r(p):
+    '''
+    interface_fun_r : interface_fun interface_fun_r
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [p[1]] + p[2]
 
 
 def p_classr(p):
@@ -183,20 +220,86 @@ def p_class(p):
         | DATA CLASS CID classparams
     '''
     if len(p) == 6:
-        p[0] = Class(name=p[2], members=p[3], body=p[5], class_parent=p[4])
+        interfaces, parent = p[4]
+        p[0] = Class(name=p[2], members=p[3], body=p[5], class_parent=parent, interfaces=interfaces)
     else:
-        p[0] = Class(name=p[3], members=p[4], body=None, class_parent=None)
+        p[0] = Class(name=p[3], members=p[4], body=None, class_parent=None, interfaces=[])
 
 
 def p_class2(p):
     '''
-    class2 : DOSPUNTOS CID PARIZQ vars2 PARDER
+    class2 : DOSPUNTOS class_extras
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = [], None
+    elif len(p) == 3:
+        p[0] = p[2]
+
+
+def p_class_extras(p):
+    '''
+    class_extras : CID class_extras_2
+    '''
+    arg1, arg2, arg3, type = p[2]
+    if type == "SUPERCLASS":
+        p[0] = [], ClassParent(p[1], arg2)
+    elif type == "BOTH":
+        p[0] = [p[1]] + arg2, arg3
+    else:
+        raise Exception("Illegal state")
+
+
+def p_class_extras_2(p):
+    '''
+    class_extras_2 : COMA CID class_extras_2
+        | PARIZQ vars2 PARDER
+    '''
+    type = p.slice[1].type
+    if type == "PARIZQ":
+        p[0] = p[1], p[2], p[3], "SUPERCLASS"
+    else:
+        arg1, arg2, arg3, type = p[3]
+        if type == "SUPERCLASS":
+            p[0] = None, [], ClassParent(p[2], arg2), "BOTH"
+        elif type == "BOTH":
+            p[0] = None, [p[2]] + arg2, arg3, "BOTH"
+        else:
+            raise Exception("Illegal state")
+
+
+def p_class_extras_3(p):
+    '''
+    class_extras_3 : COMA CID class_parent
+        | PARIZQ vars2 PARDER
         | empty
     '''
     if len(p) == 2:
         p[0] = None
     else:
-        p[0] = ClassParent(p[2], p[4])
+        p[0] = p[2]
+
+
+def p_class_interfaces_r(p):
+    '''
+    class_interfaces_r : COMA CID class_interfaces_r
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = []
+    else:
+        p[0] = [p[2]] + p[3],
+
+
+def p_class_parent(p):
+    '''
+    class_parent : CID PARIZQ vars2 PARDER
+        | empty
+    '''
+    if len(p) == 2:
+        p[0] = None
+    else:
+        p[0] = ClassParent(p[1], p[3])
 
 
 def p_classparams(p):
@@ -866,10 +969,14 @@ parser = yacc.yacc(start='file')
 
 with open("test/sortlist.yi", 'r') as f:
     input = f.read()
-    file: List[Class] = parser.parse(input)
+
+    interfaces, classes = parser.parse(input)
+
     model.quadruples.append(['GOTO', '', '', ''])
 
-    for cls in file:
+    for interface in interfaces:
+        interface.eval()
+    for cls in classes:
         cls.eval()
 
     pp = pprint.PrettyPrinter()

@@ -5,6 +5,8 @@ from src.semantics.SemanticCube import cube
 from src.semantics.SymbolTable import SymbolTable
 from src.util import utils
 
+all_interfaces = {}
+
 # Each element in the list stores the SymbolTable for a class.
 symbol_tables = []
 
@@ -223,11 +225,13 @@ class ClassBody(BaseExpression):
 
 
 class Class(BaseExpression):
-    def __init__(self, name, members: List[VarDeclaration], body: ClassBody, class_parent: ClassParent):
+    def __init__(self, name, members: List[VarDeclaration], body: ClassBody, class_parent: ClassParent,
+                 interfaces: List):
         self.name = name
         self.members = members
         self.body = body
         self.class_parent = class_parent
+        self.interfaces = interfaces
 
     def __repr__(self):
         return '<Class name={0} members={1} body={2}>'.format(self.name, self.members, self.body)
@@ -298,6 +302,34 @@ class Class(BaseExpression):
                         if parent_param.type != child_param.type:
                             raise Exception("Overriden fun {0} expected {1} argument at pos({2}) but was {3}"
                                             .format(fun_name, parent_param.type, i, child_param.type))
+
+        for interface in self.interfaces:
+            if interface not in all_interfaces:
+                raise Exception("Undefined interface {0}".format(interface))
+
+            # Verify that the class implements all necessary interfaces.
+            for fun in all_interfaces[interface].funs:
+                if fun.id not in last_symbol_table().get_fun_dir():
+                    raise Exception("{0} must implement fun {1}".format(self.name, fun.id))
+
+                # Verify that the implement function has the same number of arguments as the interface fun.
+                if len(fun.params) != len(last_symbol_table().get_fun_dir()[fun.id].body.params):
+                    raise Exception("{0} interface fun expected {1} arguments but found {2}"
+                                    .format(fun.id, len(fun.params),
+                                            len(last_symbol_table().get_fun_dir()[fun.id].body.params)))
+
+                # Verify that the argument's types match.
+                for i in range(0, len(fun.params)):
+                    interface_fun_param: VarDeclaration = fun.params[i]
+                    impl_fun_param: VarDeclaration = last_symbol_table().get_fun_dir()[fun.id].body.params[i]
+
+                    if interface_fun_param.type != impl_fun_param.type:
+                        raise Exception("{0} interface fun expected an {1} argument at pos({2}) but found {3}"
+                                        .format(fun.id, interface_fun_param.type, i, impl_fun_param.type))
+
+
+
+
 
         quadruples.append(['END_CLASS', self.name, '', ''])
         table: SymbolTable = symbol_tables.pop()
@@ -915,3 +947,30 @@ class NewObject(BaseExpression):
     def eval(self):
         for member in self.members:
             member.eval()
+
+
+class InterfaceFun:
+    def __init__(self, id, params: List[VarDeclaration]):
+        self.id = id
+        self.params = params
+
+    def __repr__(self):
+        return '<InterfaceFun id={0} params={1}>'.format(self.id, self.params)
+
+    def eval(self):
+        print()
+
+
+class Interface(BaseExpression):
+    def __init__(self, cid, funs: List[InterfaceFun]):
+        self.cid = cid
+        self.funs = funs
+
+    def __repr__(self):
+        return '<Interface cid={0} funs={1}>'.format(self.cid, self.funs)
+
+    def eval(self):
+        if self.cid in all_interfaces:
+            raise Exception("{0} already defined".format(self.cid))
+        all_interfaces[self.cid] = self
+

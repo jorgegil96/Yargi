@@ -1,0 +1,56 @@
+interface StudentActions {
+    fun study();
+
+    fun play(int minutes);
+}
+
+class Student(int id, string name) {
+
+    fun getId(): int {
+        return id;
+    }
+
+    fun getName(): string {
+        return name;
+    }
+}
+
+class StudentAthlete(int id, string name) : StudentActions, Student(id, name) {
+    fun study() {
+        write(name, ": I can't study, I must go to practice");
+    }
+
+    fun play(int minutes) {
+        write(name, ": I'm already playing...");
+    }
+}
+
+class HonorStudent(int id, string name) : StudentActions, Student(id, name) {
+    fun study() {
+        write(name, ": I'm already studying...");
+    }
+
+    fun play(int minutes) {
+        write(name, ": I can't play for ", minutes, " minutes! It's too much!!");
+    }
+}
+
+class Main {
+    main() {
+        StudentAthlete studentAthlete;
+        HonorStudent honorStudent;
+
+        studentAthlete = StudentAthlete(1, "Sarah");
+        honorStudent = HonorStudent(2, "Mike");
+
+        write("Time to study");
+        studentAthlete.study();
+        honorStudent.study();
+
+        write("");
+        write("Time to play");
+        studentAthlete.play(50);
+        honorStudent.play(30);
+
+    }
+}

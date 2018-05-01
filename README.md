@@ -11,6 +11,7 @@ A statically typed object-oriented programming language written in Python
 * Classes
 * Data Classes
 * Inheritance
+* Interfaces
 
 ### Primitives & Variables
 Variables can be declared in single variable form `int x;` or multiple variable form `int x, y;`
@@ -200,7 +201,7 @@ class Person(int id, string name) {
   }
 }
 
-class Student(int id, string name, string major, int year): Person(id, name) {
+class Student(int id, string name, string major, int year) : Person(id, name) {
   fun talk() {
     write("Hi! My name is ", name, " and I'm a ", major, " student");
   }
@@ -228,7 +229,7 @@ class Main {
 Yargi supports a special tyoe of class whose main purpose is to hold data. Its fields are public and immutable.  
 Its syntax is as follows:  
 ```  
-data class([<ARGS>,])
+data class CLASS_NAME([<ARGS>,])
 ```
 #### Examples
 ```  
@@ -243,4 +244,68 @@ data class Dog(
   string color,
   int owner
 )
+```
+
+### Interfaces
+Interfaces are defined with the following syntax:
+```
+interface INTERFACE_NAME {
+    < interface funs >
+}
+```
+#### Examples
+```
+interface Bike {
+    fun accelerate();
+
+    fun brake();
+
+    fun changeGear(int newGear);
+}
+```
+Then to implement it:
+```
+class RoadBike : Bike {
+    fun accelerate() {
+        // TODO: implement
+    }
+
+    fun brake() {
+        // TODO: implement
+    }
+
+    fun changeGear(int newGear) {
+        // TODO: implement
+    }
+}
+```
+To implement multiple interfaces separate them with comas:
+```
+interface AccidentListener {
+    onCrash();
+}
+
+class RoadBike : Bike, AccidentListener {
+    fun accelerate() {
+        // TODO: implement
+    }
+
+    fun brake() {
+        // TODO: implement
+    }
+
+    fun changeGear(int newGear) {
+        // TODO: implement
+    }
+
+    fun onCrash() {
+
+    }
+}
+```
+To extend a class and have it implement interfaces at the same time put the superclass constructor call at the very end:
+```
+class RoadBike : Bike, AccidentListener, BaseBike() {
+    ...
+}
 ```
