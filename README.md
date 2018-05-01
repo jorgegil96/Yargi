@@ -149,7 +149,7 @@ class CLASS_NAME( [CONSTRUCTOR_ARGS,] ) [: PARENT_CLASS_NAME( [ARGS,] )] {
   
   [ functions ]
   
-  [ main() { < statements >}
+  [ main() { < statements >} ]
 }
 ```
 #### Examples
@@ -226,7 +226,7 @@ class Main {
 ```
 
 ### Data Classes
-Yargi supports a special tyoe of class whose main purpose is to hold data. Its fields are public and immutable.  
+Yargi supports a special type of class whose main purpose is to hold data. Its fields are public and immutable.  
 Its syntax is as follows:  
 ```  
 data class CLASS_NAME([<ARGS>,])
