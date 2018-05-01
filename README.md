@@ -10,6 +10,7 @@ A statically typed object-oriented programming language written in Python
 * Loops (while, for..in)
 * Classes
 * Data Classes
+* Inheritance
 
 ### Primitives & Variables
 Variables can be declared in single variable form `int x;` or multiple variable form `int x, y;`
@@ -133,7 +134,7 @@ while ( <expression> ) {
 ```
 ##### Example  
 ```  
-while (x < 10 ) {
+while (x < 10) {
   write(x);
   x = x + 1;
 }
@@ -142,7 +143,7 @@ while (x < 10 ) {
 ### Classes
 Classes are defined with the following syntax:  
 ```
-class CLASS_NAME( [CONSTRUCTOR_ARGS,] ) {
+class CLASS_NAME( [CONSTRUCTOR_ARGS,] ) [: PARENT_CLASS_NAME( [ARGS,] )] {
   [ global vars ]
   
   [ functions ]
@@ -179,15 +180,50 @@ class Main {
     main() {
         calculator = Calculator(50);
 
-        write(calculator.total()); // prints 50.
+        write(calculator.total()); // prints 50
         calculator.add(30);
-        write(calculator.total()); // prints 80.
+        write(calculator.total()); // prints 80
         
-        write(calculator.sum(2, 2)); // prints 4.
-        write(calculator.sub(2, 2)); // prints 0.
+        write(calculator.sum(2, 2)); // prints 4
+        write(calculator.sub(2, 2)); // prints 0
     }
 }
 ```
+```  
+class Person(int id, string name) {
+  fun talk() {
+    write("Hi! My name is ", name);
+  }
+  
+  fun walk() {
+    write(name, " is walking...");
+  }
+}
+
+class Student(int id, string name, string major, int year): Person(id, name) {
+  fun talk() {
+    write("Hi! My name is ", name, " and I'm a ", major, " student");
+  }
+}
+
+class Main {
+  
+  Person jim;
+  Student tuna;
+  
+  fun main() {
+     jim = Person(1, "Jimothy");
+     tuna = Student(2, "Andy", "CS", 3);
+     
+     jim.talk(); // prints "Hi! My name is Jimothy"
+     tuna.talk(); // prints "Hi! My name is Andy and I'm a CS student"
+     jim.walk(); // prints "Jimothy is walking..."
+     tuna.walk(); // prints "Andy is walking..."
+  }
+}
+
+```
+
 ### Data Classes
 Yargi supports a special tyoe of class whose main purpose is to hold data. Its fields are public and immutable.  
 Its syntax is as follows:  
