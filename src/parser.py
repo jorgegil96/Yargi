@@ -1,11 +1,7 @@
-import pprint
-
 import ply.lex as lex
 import ply.yacc as yacc
 
-from src.semantics import model
 from src.semantics.model import *
-from src.virtualmachine.VirtualMachine import VirtualMachine
 
 keywords = {
     'if': 'IF',
@@ -966,24 +962,3 @@ def p_empty(p):
 
 lex.lex()
 parser = yacc.yacc(start='file')
-
-with open("test/sortlist.yi", 'r') as f:
-    input = f.read()
-
-    interfaces, classes = parser.parse(input)
-
-    model.quadruples.append(['GOTO', '', '', ''])
-
-    for interface in interfaces:
-        interface.eval()
-    for cls in classes:
-        cls.eval()
-
-    pp = pprint.PrettyPrinter()
-    #pp.pprint(file)
-    #pp.pprint(model.symbol_tables)
-    for i in range(0, len(quadruples)):
-        print(str(i) + ": " + str(quadruples[i]))
-
-    vm = VirtualMachine(model.quadruples, model.final_sym_tables)
-    vm.execute()
