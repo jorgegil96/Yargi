@@ -1,3 +1,15 @@
+'''
+Defines the models used by the compiler to identify structures of the language such as Classes, Functions and Variable
+declaration.
+Most models are subclass of a BaseExpresion class, which means they must implement an eval() function that generates
+quadruples using the information contained in the model.
+
+Once the compiler parses the source files, a single File object that contains a list of interfaces and a list of classes
+is generated. These classes and interfaces each contain models such as functions who also contain other models such as
+variable declarations or statements.
+Calling class.eval() and interface.eval() will trigger all eval() calls of all the inner objects parsed by the compiler.
+This is how quadruples are generated.
+'''
 import operator
 from typing import List
 
@@ -53,6 +65,11 @@ class VarDeclaration(BaseExpression):
         return last_symbol_table().add_sym(self.name, self.type)
 
 
+'''
+Stores data about the main() function of a class. Upon evaluation, it generates quadruples for all its variable 
+declarations and then for all its statements.
+A START_PROC quadruple marks its beginning and an ENDPROC quadruple its end.
+'''
 class Main(BaseExpression):
     def __init__(self, vars: List[VarDeclaration], stmts: List[BaseExpression]):
         self.name = 'main'
@@ -102,7 +119,14 @@ class FunBody(BaseExpression):
             ret_address, ret_type = self.return_exp.eval()
             quadruples.append(['RETURN', ret_address, ret_type, ''])
 
+'''
+Stores data about a function declaration.
 
+Upon evaluation it generates quadruples for its arguments and its statements. Its beginning is marked by a STARTPROC
+quadruples and its end by an ENDPROC quadruple.
+
+It also performs semantic verification of its return value.
+'''
 class Fun(BaseExpression):
     def __init__(self, name, type, visibility, body: FunBody):
         self.name = name
@@ -223,7 +247,14 @@ class ClassBody(BaseExpression):
             quadruples[0][3] = len(quadruples)
             self.main.eval()
 
+'''
+A class object that contains information about a class declaration. 
 
+Upon evaluation it generates quadruples for all its member declarations, global declarations, functions and main 
+function. A START_CLASS quadruple marks its beginning and an END_CLASS quadruple its end.
+During evaluation multiple semantic verification are made such as verifying that the specified interfaces are correctly
+implemented and that the superclass constructor is called with valid parameters.
+'''
 class Class(BaseExpression):
     def __init__(self, name, members: List[VarDeclaration], body: ClassBody, class_parent: ClassParent,
                  interfaces: List):
@@ -326,10 +357,6 @@ class Class(BaseExpression):
                     if interface_fun_param.type != impl_fun_param.type:
                         raise Exception("{0} interface fun expected an {1} argument at pos({2}) but found {3}"
                                         .format(fun.id, interface_fun_param.type, i, impl_fun_param.type))
-
-
-
-
 
         quadruples.append(['END_CLASS', self.name, '', ''])
         table: SymbolTable = symbol_tables.pop()

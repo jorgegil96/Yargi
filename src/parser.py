@@ -156,6 +156,10 @@ def t_EOL(token):
     token.lexer.lineno += token.value.count("\n")
 
 
+'''
+Parses a series of interfaces (0 or more), followed by a series of classes (1 or more).
+Returns a Pair containing a list of interfaces and a list of classes.
+'''
 def p_file(p):
     '''
     file : interface_r class classr
@@ -163,6 +167,15 @@ def p_file(p):
     p[0] = p[1], [p[2]] + p[3]
 
 
+'''
+Parses a series of interfaces.
+An interface is defined with the following syntax:
+    interface MyInterface {
+        fun foo();
+        fun bar(int x=;
+    }
+Returns a list containing the available interfaces or an empty list if none were declared.
+'''
 def p_interface_r(p):
     '''
     interface_r : INTERFACE CID interface_body interface_r
@@ -210,6 +223,18 @@ def p_classr(p):
         p[0] = [p[1]] + p[2]
 
 
+'''
+Parses a class or a data class.
+A class follows the syntax:
+    class MyClass() : MyInterface, MySuperClass() {
+        < functions >
+        < main >
+    }
+A data classes follows the syntax:
+    data class MyDataClass(int x, bool y)
+    
+Returns a Class object containing the information of the declared class.
+'''
 def p_class(p):
     '''
     class : CLASS CID classparams class2 body

@@ -1,7 +1,16 @@
 SCOPE_GLOBAL = "GLOBAL"
 SCOPE_LOCAL = "LOCAL"
 
+'''
+Object used to store data about a class and its functions.
 
+It is generated during compilation and used to create a map of memory addresses for a specific class.
+It allocates blocks of memory to different variables of different scopes.
+
+A SymbolTable is used in such a way that when variables are declared they're assigned a unique memory address. These
+assignments could be from explicit variable declarations or temporary addresses generated as a result of an operation 
+such as a sum or substraction.
+'''
 class SymbolTable:
     def __init__(self, cid, class_model, n):
         self.cid = cid

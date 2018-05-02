@@ -4,12 +4,20 @@ from typing import List
 from src.semantics.SymbolTable import SymbolTable
 from src.util.utils import operator_from_symbol
 
+'''
+Uses the memory mappings and the quadruples created at compile time to execute the generated program.
 
+The execute() function runs through the quadruples by jumping from one to another and executing the instructions 
+specified by the operation codes using the object memory stack and the fun stack.
+'''
 class VirtualMachine:
+    # Memory map of classes generated at compile-time.
     classes_memory = {}
+    # Function stack to mark the current active context.
     fun_stack = []
+    # New Obj constructor stack.
     obj_const_stack = []
-    # Stack to keep the current context (i.e. the class instance currently active)
+    # Stack to keep the current context (i.e. the class instance currently active).
     current_class_stack = []
 
     def __init__(self, quadruples: List, symbol_tables: List[SymbolTable]):
