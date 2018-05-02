@@ -39,27 +39,27 @@ class Main {
     Person pepe;
     Professor elda;
     Student jorge;
-    CSStudent yareli;
+    CSStudent yarely;
 
     main() {
         pepe = Person(1, "Pepe");
         elda = Professor(2, "Elda", 231);
         jorge = Student(3, "Jorge", 513173);
-        yareli = CSStudent(4, "Yareli", "Python", 1280664);
+        yarely = CSStudent(4, "Yarely", "Python", 1280664);
 
         pepe.talk();
         elda.talk();
         jorge.talk();
-        yareli.talk();
+        yarely.talk();
 
         pepe.walk();
         elda.walk();
         jorge.walk();
-        yareli.walk();
+        yarely.walk();
 
         write(pepe.getId());
         write(elda.getId());
         write(jorge.getId());
-        write(yareli.getId());
+        write(yarely.getId());
     }
 }

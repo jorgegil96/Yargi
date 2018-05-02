@@ -1,5 +1,16 @@
 class Factorial {
 
+    fun nonRecursiveFactorial(int n): int {
+        int x, i;
+        x = 1;
+        i = n;
+        while (i >= 1) {
+            x = x * i;
+            i = i - 1;
+        }
+        return x;
+    }
+
     fun factorial(int n): int {
         int x;
         if (n <= 1) {
@@ -13,6 +24,7 @@ class Factorial {
 	main() {
 	    int n;
 	    n = read();
-	    write("Factorial de ", n, " es => ", factorial(5));
+	    write("Factorial de ", n, " es => ", factorial(n));
+	    write("Factorial de ", n, " es => ", nonRecursiveFactorial(n));
 	}
 }
