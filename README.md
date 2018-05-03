@@ -93,7 +93,7 @@ when {
   }
   1 + 1 == 2 -> { write("1 plus 1 is two); }
   else -> {
-    write("Non of the above");
+    write("None of the above");
   }
 }
 ```
@@ -209,17 +209,17 @@ class Student(int id, string name, string major, int year) : Person(id, name) {
 
 class Main {
   
-  Person jim;
-  Student tuna;
+  Person bigTuna;
+  Student nardDog;
   
   fun main() {
-     jim = Person(1, "Jimothy");
-     tuna = Student(2, "Andy", "CS", 3);
+     bigTuna = Person(1, "Jim");
+     nardDog = Student(2, "Andy", "CS", 3);
      
-     jim.talk(); // prints "Hi! My name is Jimothy"
-     tuna.talk(); // prints "Hi! My name is Andy and I'm a CS student"
-     jim.walk(); // prints "Jimothy is walking..."
-     tuna.walk(); // prints "Andy is walking..."
+     bigTuna.talk(); // prints "Hi! My name is Jim"
+     nardDog.talk(); // prints "Hi! My name is Andy and I'm a CS student"
+     bigTuna.walk(); // prints "Jimothy is walking..."
+     nardDog.walk(); // prints "Andy is walking..."
   }
 }
 
